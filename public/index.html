@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" id="html-layout">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    <title>建造工智能云屏</title>
+  </head>
+  <body>
+  <script>
+    (function (win) {
+        /**
+         * 参照3840px
+         * 1rem = 38.4px
+         * 实际rem = uipx / 38.4px
+         * */ 
+        var clientW = win.document.documentElement.clientWidth;
+        win.document.getElementById('html-layout').style.fontSize = clientW / 100 + 'px';
+    })(window)
+  </script>
+  <div id="root"></div>
+  </body>
+    <!--<script src="http://192.168.0.44:8081/target/target-script-min.js#anonymous"></script>-->
+</html>

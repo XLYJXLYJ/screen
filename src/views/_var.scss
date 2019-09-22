@@ -1,0 +1,26 @@
+$base_gold: #fcb813;
+$base_red: #cc2929;
+$base-yellow: #fff100;
+$base-gray: #cccccc;
+$base-bg: #222233;
+$base-bg-new: #222326;
+
+%font-light {
+    font-weight: 300;   
+}
+%font-normal {
+    font-weight: 400;
+}
+%font-bold {
+    font-weight: 600;
+}
+%text-overflow {
+    width: auto;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+$base-bg-dark-gradient: linear-gradient(left top, rgba(255, 255, 255, .06) 10%, rgba(255, 255, 255, 0) 25%);
+$base-bg-gold-gradient: linear-gradient(left top, rgba(255, 0, 0, .06) 10%, $base_gold 25%);
+$base-bg-red-gradient: linear-gradient(left top, rgba(255, 0, 0, .06) 10%, $base_red 25%);
