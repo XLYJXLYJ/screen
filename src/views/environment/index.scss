@@ -446,15 +446,107 @@ body,
       }
     }
 
-
     .app-content-bottom{
-      background: red;
-      height: px-rem(300);
+      // background: red;
+      height: px-rem(400);
       width: px-rem(1800);
       position: absolute;
       bottom: px-rem(50);
-    }
+      //enter是入场前的刹那（点击按钮），appear指页面第一次加载前的一刹那（自动）
+      .title{
+        font-family: MI-LANTING_GB-OUTSIDE-YS;
+        font-size: px-rem(40);
+        color: #cccccc;
+        position: absolute;
+        top: px-rem(32);
+        left: px-rem(130);
+      }
+      .app-content-bottom-content{
+        height: px-rem(288);
+        width: px-rem(1800);
+        // background: blue;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: absolute;
+        bottom: 0px;
+        .content{
+          height: px-rem(218);
+          width: px-rem(218);
+          // background: yellow;
+          position: relative;
+          text-align: center;
+          .number{
+            position: absolute;
+            background: #FCB813;
+            border-radius: px-rem(8);
+            position: absolute;
+            top: px-rem(84);
+            left:px-rem(-60);
+            font-size: px-rem(28);
+            padding:px-rem(6);
+            span{
+              font-family: AvenirNextCondensed-Bold;
+              color: #222233;
+              width: auto;
+              height: px-rem(30);
+            }
+          }
+          p{
+            font-family: MI-LANTING_GB-OUTSIDE-YS;
+            font-size: px-rem(28);
+            color: #cccccc;
+            margin-top: px-rem(16);
+          }
+          .taji{
+            width:px-rem(180);
+            height:px-rem(180);
 
+          }
+          .line{
+            width:px-rem(8);
+            height:px-rem(20);
+            position: absolute;
+            left:px-rem(76);
+            top: px-rem(34);
+            transition: all 3s;
+          }
+          .breathe-line {
+            position:relative;
+            width:px-rem(220);
+            height:px-rem(4);
+            background: -webkit-linear-gradient(left, rgb(33, 34, 2) -4%,rgb(215, 218, 40) 50%,rgb(33, 34, 2) 100%);
+            box-shadow:0 -10px px-rem(40) rgb(215, 218, 40);
+            overflow:hidden;
+            background-image:gradient(linear,left top,left bottom,from(rgb(215, 218, 40)),to(rgb(215, 218, 40)));
+            animation-timing-function:ease-in-out;
+            animation-name:breathe1;
+            animation-duration:2700ms;
+            animation-iteration-count:infinite;
+            animation-direction:alternate;
+          }
+          @keyframes breathe1 {
+            0% {
+              opacity:.2;
+              box-shadow:0 -10px px-rem(40) yellow;
+            }
+            100% {
+              opacity:1;
+              box-shadow:0 -10px px-rem(40) yellow;
+            }
+          }
+          .thing{
+            width:px-rem(24);
+            height:px-rem(18);
+            position: absolute;
+            left:px-rem(68);
+            top: px-rem(128);
+            transition: all 3s;
+
+          }
+        }
+      }
+    }
 
     .app-content-right {
       display: flex;

@@ -1,5 +1,6 @@
 import React, { Component } from "react"
-import ReactDom from "react-dom"
+// import ReactDom from "react-dom"
+import { CSSTransition } from 'react-transition-group'
 import { DataSet, DataView } from "@antv/data-set"
 import G2 from "@antv/g2"
 
@@ -1790,12 +1791,58 @@ class App extends Component {
           </div>
           <div className="app-content-center">
             {/* 地图 start */}
-            <div className="content-right-map">
+            {/* <div className="content-right-map">
               <div id="mapcontainer" />
-            </div>
+            </div> */}
             {/* 地图 end */}
             <div className="app-content-bottom">
-              <p>这是地图底部</p>
+              <p className='title'>各塔机吊钩载重 / 高度</p>
+              <div className="app-content-bottom-content">
+                <div className='content'>
+                  <div className='number'>
+                    <span>1.38t</span><br/>
+                    <span>50.07m</span>
+                  </div>
+                  <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
+                  <img className='line' src={require("../../assets/images/line.png")} alt=""/>
+                  <img className='thing' src={require("../../assets/images/thing.png")} alt=""/>
+                  <div className='breathe-line'></div>
+                  <p>1号塔机监测系统</p>
+                </div>
+                <div className='content'>
+                  <div className='number'>
+                    <span>1.38t</span><br/>
+                    <span>50.07m</span>
+                  </div>
+                  <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
+                  <img className='line' src={require("../../assets/images/line.png")} alt=""/>
+                  <img className='thing' src={require("../../assets/images/thing.png")} alt=""/>
+                  <div className='breathe-line'></div>
+                  <p>1号塔机监测系统</p>
+                </div>
+                <div className='content'>
+                  <div className='number'>
+                    <span>1.38t</span><br/>
+                    <span>50.07m</span>
+                  </div>
+                  <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
+                  <img className='line' src={require("../../assets/images/line.png")} alt=""/>
+                  <img className='thing' src={require("../../assets/images/thing.png")} alt=""/>
+                  <div className='breathe-line'></div>
+                  <p>1号塔机监测系统</p>
+                </div>
+                <div className='content'>
+                  <div className='number'>
+                    <span>1.38t</span><br/>
+                    <span>50.07m</span>
+                  </div>
+                  <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
+                  <img className='line' src={require("../../assets/images/line.png")} alt=""/>
+                  <img className='thing' src={require("../../assets/images/thing.png")} alt=""/>
+                  <div className='breathe-line'></div>
+                  <p>1号塔机监测系统</p>
+                </div>
+              </div>
             </div>
           </div>
           <div className="app-content-right">
