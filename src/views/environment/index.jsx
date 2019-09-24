@@ -249,7 +249,7 @@ class App extends Component {
       warnStatistic: {},
     }
     // 18414220100155144  18414220100155130 huanjingjiance
-    let deviceCode = tools.getUrlParam("deviceCode") || "huanjingjiance"
+    let deviceCode = tools.getUrlParam("deviceCode") || "taji"
     this.deviceCode = deviceCode // 设备码
     this.version = tools.getUrlParam("version") || "1.0" // 版本
 
@@ -342,25 +342,25 @@ class App extends Component {
       padding: [0, 0, 0, 0],
       theme: "themeOne"
     })
-    let maxValue = Math.max(this.state.brokenLineList.pm10.maxValue,
-      this.state.brokenLineList.pm25.maxValue,
-      this.state.brokenLineList.tsp.maxValue)
+    let maxValue = Math.max(this.state.brokenLineList.heavy.maxValue,
+      this.state.brokenLineList.torque.maxValue,
+      this.state.brokenLineList.amplitude.maxValue)
     let min = maxValue == 0 ? 0 : -50
     let max = maxValue == 0 ? 1 : maxValue + 50
     let tickCount = maxValue == 0 ? 6 : 4
 
     this.brokenLineChart.source(this.state.brokenLineList.indicatorDateList)
-    this.brokenLineChart.scale("tsp", {
+    this.brokenLineChart.scale("幅度", {
       min,
       max,
       tickCount
     })
-    this.brokenLineChart.scale("pm10", {
+    this.brokenLineChart.scale("载重", {
       min,
       max,
       tickCount
     })
-    this.brokenLineChart.scale("pm25", {
+    this.brokenLineChart.scale("力矩", {
       min,
       max,
       tickCount
@@ -969,7 +969,7 @@ class App extends Component {
 
     this.markerList = []
     this.state.equipmentList.map((item, index) => {
-      // let content = `<canvas id="clock" width="500" height="500"></canvas>`
+      console.log(item)   // let content = `<canvas id="clock" width="500" height="500"></canvas>`
       var oBody=document.getElementsByTagName("body")[0];
       var canvas = document.createElement('canvas');
       // var canvas = React.createElement('canvas' , { id:'canvas',width:50,height:50} ,  '这是一个canvas' )
@@ -978,11 +978,8 @@ class App extends Component {
       canvas.height = 400;
       oBody.appendChild(canvas);
       // 
-      console.log(canvas)
       var canvas1 = document.getElementById('clock');
-      console.log(canvas1)
       var cxt = canvas1.getContext('2d');
-      console.log(cxt)
       
       function drawClock() {
         //获取时间
@@ -991,17 +988,20 @@ class App extends Component {
         var sec = now.getSeconds();
         //表盘
         cxt.lineWidth = 1;
-        cxt.strokeStyle = "yellow";
+        //大圈边框颜色
+        cxt.strokeStyle = "rgba(252,184,19,0.5)";
         cxt.beginPath();
         cxt.arc(150, 150, 80, 0, 360, false);
-        cxt.fillStyle = "yellow";
+        //大圈颜色
+        cxt.fillStyle = "rgba(252,184,19,0.5)";
         cxt.fill();
         cxt.closePath();
         cxt.stroke();
         //秒针
         cxt.save();
         cxt.beginPath();
-        cxt.strokeStyle="green";
+        //边框颜色
+        cxt.strokeStyle="rgb(252,184,19)";
         // cxt.rect(230,245,220,10);
         cxt.translate(150, 150);
         cxt.rotate(sec * 6 * Math.PI / 180);
@@ -1012,13 +1012,19 @@ class App extends Component {
       //   cxt.lineTo(0, 20);
       //   cxt.closePath();
       //   cxt.stroke();
-        cxt.fillStyle = "red";
+        //方块的颜色
+        cxt.fillStyle = "rgb(252,184,19)";
         cxt.fillRect(-10, -10, 20, 20);
+        cxt.shadowOffsetX = -3; // 阴影Y轴偏移
+        cxt.shadowOffsetY = 0; // 阴影X轴偏移
+        cxt.shadowBlur = 4; // 模糊尺寸
+        cxt.shadowColor = '#000'; // 颜色
 
         cxt.beginPath();
-        cxt.arc(80, 0, 5, 0, 360, false);
+        cxt.arc(70, 0, 3, 0, 360, false);
         cxt.closePath();
-        cxt.fillStyle = "red";
+        //小球的颜色
+        cxt.fillStyle = "rgb(252,184,19)";
         cxt.fill();
         cxt.stroke();
 
@@ -1038,6 +1044,7 @@ class App extends Component {
           zIndex: 99 - index,
         })
       )
+
     })
     this.map.add(this.markerList)
   }
@@ -1067,7 +1074,6 @@ class App extends Component {
     }
 
     let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
-    // console.log('item',item)
     
     let pageX = 0.008, pageY = 0.0078
     let bounds = new AMap.Bounds([+item.longitude - pageX, +item.latitude - pageY], [+item.longitude + pageX, +item.latitude + pageY])
@@ -1334,14 +1340,23 @@ class App extends Component {
     }
 
     this.$http
-      .post("/rest/environment/getTvBasicInfo", {
+      .post("/rest/tower/getTvBasicInfo", {
         deviceCode: this.deviceCode,
         version: this.version
       })
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          let data = res.response
+          // let data = res.response
+          let data = {
+            yunPingStatus: 1,
+            projectName: "深圳市龙华新区龙华二小改建工程",
+            slogan: null,
+            sloganStyle: null,
+            yunPingName: "1号智能云屏系统",
+            yunPingCode: "huanjingjiance",
+            logo: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/logo2.png"
+          }
           let footerInfoStatus = ''
           // 设备已解绑状态
 
@@ -1384,12 +1399,62 @@ class App extends Component {
   }
   // 获取地图设备分布信息
   getDevice() {
+    console.log(this.deviceCode)
     this.$http
-      .post("/rest/environment/getDevice", { deviceCode: this.deviceCode })
+      .post("/rest/tower/getDevice", { deviceCode: this.deviceCode})
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          let data = res.response
+          // let data = res.response
+          let data =  {
+            mapList: [{
+              longitude: "114.0463264685513",
+              latitude: "22.55985284345753"
+            }, {
+              longitude: "114.0470551676265",
+              latitude: "22.56079916169713"
+            }, {
+              longitude: "114.0506075791376",
+              latitude: "22.56187164625972"
+            }, {
+              longitude: "114.0535451487578",
+              latitude: "22.56176650142255"
+            }, {
+              longitude: "114.054729286392",
+              latitude: "22.55947431503903"
+            }, {
+              longitude: "114.0492412669802",
+              latitude: "22.55514218952409"
+            }],
+            deviceList: [{
+              deviceName: "1 号环境监测系统",
+              longitude: "114.0409536290864",
+              latitude: "22.567919658086872",
+              status: 1,
+              orderProductList: 10,
+              alarmTimes: 987,
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
+            }, {
+              deviceName: "2 号环境监测系统",
+              longitude: "114.0410153808594",
+              latitude: "22.56797929382324",
+              status: 1,
+              orderProductList: 11,
+              alarmTimes: 1002,
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
+            }, {
+              deviceName: "3 号环境监测系统",
+              longitude: "114.0410153808556",
+              latitude: "22.56797929382318",
+              status: 1,
+              orderProductList: 12,
+              alarmTimes: 623,
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            }]
+          }
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
             return [item.longitude, item.latitude]
@@ -1448,16 +1513,133 @@ class App extends Component {
   // 获取指标数据
   getIndicators() {
     this.$http
-      .post("rest/environment/getIndicators", {
+      .post("rest/tower/getIndicators", {
         orderProductList: this.state.equipmentList[
           this.state.actionEquipmentListIndex
         ].orderProductList,
-        deviceCode: this.deviceCode
+        // deviceCode: this.deviceCode
       })
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          let data = res.response
+          // let data = res.response
+          let data =  {
+            status: 1,
+            newInd: [{
+              indicatorName: "PM2.5",
+              indicatorValue: "56",
+              unit: "μg/m³",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "PM10",
+              indicatorValue: "72",
+              unit: "μg/m³",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "TSP",
+              indicatorValue: "89",
+              unit: "μg/m³",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "噪音",
+              indicatorValue: "38.9",
+              unit: "dB",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "温度",
+              indicatorValue: "25",
+              unit: "℃",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "湿度",
+              indicatorValue: "6.23",
+              unit: "%RH",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "风速",
+              indicatorValue: "1.2",
+              unit: "m/s",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "风向",
+              indicatorValue: "东南",
+              unit: "",
+              statusName: "",
+              status: 0,
+              dataType: 1
+            }],
+            oldInd: [{
+              indicatorName: "PM2.5",
+              indicatorValue: "56",
+              unit: "μg/m³",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "PM10",
+              indicatorValue: "72",
+              unit: "μg/m³",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "TSP",
+              indicatorValue: "189",
+              unit: "μg/m³",
+              statusName: "超标",
+              status: 1,
+              dataType: 1
+            }, {
+              indicatorName: "噪音",
+              indicatorValue: "38.9",
+              unit: "dB",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "温度",
+              indicatorValue: "25",
+              unit: "℃",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "湿度",
+              indicatorValue: "6.23",
+              unit: "%RH",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "风速",
+              indicatorValue: "1.2",
+              unit: "m/s",
+              statusName: "正常",
+              status: 0,
+              dataType: 1
+            }, {
+              indicatorName: "风向",
+              indicatorValue: "东南",
+              unit: "",
+              statusName: "",
+              status: 0,
+              dataType: 1
+            }]
+          }
           let backData = JSON.parse(JSON.stringify(data))
           this.setState({
             indicators: data,
@@ -1483,51 +1665,234 @@ class App extends Component {
   }
   //获取12小时内统计数据
   get12Hours() {
-    this.$http
-      .post("/rest/environment/getStatisticDataIn12Hours", {
-        orderProductList: this.state.equipmentList[
-          this.state.actionEquipmentListIndex
-        ].orderProductList,
-        deviceCode: this.deviceCode
-      })
-      .then(re => {
-        let res = re.data
-        if (res.status == 200) {
-          let data = res.response
-          // data.indicatorDateList = [{ "pm25": 10, "pm10": 20, "tsp": 10, "dateHour": "08:00" }, { "pm25": 30, "pm10": 0, "tsp": 50, "dateHour": "09:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "10:00" }, { "pm25": 10, "pm10": 0, "tsp": 80, "dateHour": "11:00" }, { "pm25": 0, "pm10": 0, "tsp": 90, "dateHour": "12:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "13:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "14:00" }, { "pm25": 0, "pm10": 0, "tsp": 110, "dateHour": "15:00" }, { "pm25": 20, "pm10": 0, "tsp": 0, "dateHour": "16:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "17:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "18:00" }, { "pm25": 80, "pm10": 0, "tsp": 0, "dateHour": "19:00" }]
-          // data.pm10.maxValue = 20
-          // data.pm25.maxValue = 80
-          // data.tsp.maxValue = 110
-          this.setState(
-            {
-              brokenLineList: data
-            },
-            () => {
-              if (data.indicatorDateList &&
-                data.indicatorDateList.length > 0) {
-                this.initBrokenLine()
-              } else {
-                this.brokenLineChart = null;
-              }
-            }
-          )
+
+    let data =  {
+      torque: {
+        indicatorKey: " torque ",
+        indicatorName: "力矩",
+        minValue: 10.0,
+        maxValue: 42.0
+      },
+      heavy: {
+        indicatorKey: " heavy ",
+        indicatorName: "载重",
+        minValue: 16.0,
+        maxValue: 53.0
+      },
+      amplitude: {
+        indicatorKey: " amplitude ",
+        indicatorName: "幅度",
+        minValue: 85.0,
+        maxValue: 150.0
+      },
+      indicatorDateList: [{
+        torque: 20.0,
+        heavy: 30.0,
+        amplitude: 100.0,
+        dateHour: "09:00"
+      }, {
+        torque: 20.0,
+        heavy: 30.0,
+        amplitude: 102.0,
+        dateHour: "10:00"
+      }, {
+        torque: 20.0,
+        heavy: 32.0,
+        amplitude: 103.0,
+        dateHour: "11:00"
+      }, {
+        torque: 16.0,
+        heavy: 28.0,
+        amplitude: 90.0,
+        dateHour: "12:00"
+      }, {
+        torque: 15.0,
+        heavy: 23.0,
+        amplitude: 85.0,
+        dateHour: "13:00"
+      }, {
+        torque: 12.0,
+        heavy: 20.0,
+        amplitude: 93.0,
+        dateHour: "14:00"
+      }, {
+        torque: 10.0,
+        heavy: 16.0,
+        amplitude: 100.0,
+        dateHour: "15:00"
+      }, {
+        torque: 13.0,
+        heavy: 18.0,
+        amplitude: 110.0,
+        dateHour: "16:00"
+      }, {
+        torque: 26.0,
+        heavy: 32.0,
+        amplitude: 119.0,
+        dateHour: "17:00"
+      }, {
+        torque: 36.0,
+        heavy: 38.0,
+        amplitude: 129.0,
+        dateHour: "18:00"
+      }, {
+        torque: 38.0,
+        heavy: 46.0,
+        amplitude: 135.0,
+        dateHour: "19:00"
+      }, {
+        torque: 42.0,
+        heavy: 53.0,
+        amplitude: 150.0,
+        dateHour: "20:00"
+      }]
+    }
+    // data.indicatorDateList = [{ "pm25": 10, "pm10": 20, "tsp": 10, "dateHour": "08:00" }, { "pm25": 30, "pm10": 0, "tsp": 50, "dateHour": "09:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "10:00" }, { "pm25": 10, "pm10": 0, "tsp": 80, "dateHour": "11:00" }, { "pm25": 0, "pm10": 0, "tsp": 90, "dateHour": "12:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "13:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "14:00" }, { "pm25": 0, "pm10": 0, "tsp": 110, "dateHour": "15:00" }, { "pm25": 20, "pm10": 0, "tsp": 0, "dateHour": "16:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "17:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "18:00" }, { "pm25": 80, "pm10": 0, "tsp": 0, "dateHour": "19:00" }]
+    // data.pm10.maxValue = 20
+    // data.pm25.maxValue = 80
+    // data.tsp.maxValue = 110
+    this.setState(
+      {
+        brokenLineList: data
+      },
+      () => {
+        console.log(data.indicatorDateList)
+        if (data.indicatorDateList &&
+          data.indicatorDateList.length > 0) {
+          this.initBrokenLine()
+        } else {
+          this.brokenLineChart = null;
         }
-      }).catch(error => {
-        if (this.state.footerInfoStatus !== 'noNetwork') {
-            this.setState({
-                footerInfoStatus: 'networkAbnormal',
-            })
-        }
-    })
+      }
+    )
+
+
+  //   this.$http
+  //     .post("/rest/test/getStatisticDataIn12Hours", {
+  //       orderProductList: this.state.equipmentList[
+  //         this.state.actionEquipmentListIndex
+  //       ].orderProductList,
+  //       // deviceCode: this.deviceCode
+  //     })
+  //     .then(re => {
+  //       let res = re.data
+  //       if (res.status == 200) {
+  //         // let data = res.response
+  //         let data =  {
+  //           torque: {
+  //             indicatorKey: " torque ",
+  //             indicatorName: "力矩",
+  //             minValue: 10.0,
+  //             maxValue: 42.0
+  //           },
+  //           heavy: {
+  //             indicatorKey: " heavy ",
+  //             indicatorName: "载重",
+  //             minValue: 16.0,
+  //             maxValue: 53.0
+  //           },
+  //           amplitude: {
+  //             indicatorKey: " amplitude ",
+  //             indicatorName: "幅度",
+  //             minValue: 85.0,
+  //             maxValue: 150.0
+  //           },
+  //           indicatorDateList: [{
+  //             torque: 20.0,
+  //             heavy: 30.0,
+  //             amplitude: 100.0,
+  //             dateHour: "09:00"
+  //           }, {
+  //             torque: 20.0,
+  //             heavy: 30.0,
+  //             amplitude: 102.0,
+  //             dateHour: "10:00"
+  //           }, {
+  //             torque: 20.0,
+  //             heavy: 32.0,
+  //             amplitude: 103.0,
+  //             dateHour: "11:00"
+  //           }, {
+  //             torque: 16.0,
+  //             heavy: 28.0,
+  //             amplitude: 90.0,
+  //             dateHour: "12:00"
+  //           }, {
+  //             torque: 15.0,
+  //             heavy: 23.0,
+  //             amplitude: 85.0,
+  //             dateHour: "13:00"
+  //           }, {
+  //             torque: 12.0,
+  //             heavy: 20.0,
+  //             amplitude: 93.0,
+  //             dateHour: "14:00"
+  //           }, {
+  //             torque: 10.0,
+  //             heavy: 16.0,
+  //             amplitude: 100.0,
+  //             dateHour: "15:00"
+  //           }, {
+  //             torque: 13.0,
+  //             heavy: 18.0,
+  //             amplitude: 110.0,
+  //             dateHour: "16:00"
+  //           }, {
+  //             torque: 26.0,
+  //             heavy: 32.0,
+  //             amplitude: 119.0,
+  //             dateHour: "17:00"
+  //           }, {
+  //             torque: 36.0,
+  //             heavy: 38.0,
+  //             amplitude: 129.0,
+  //             dateHour: "18:00"
+  //           }, {
+  //             torque: 38.0,
+  //             heavy: 46.0,
+  //             amplitude: 135.0,
+  //             dateHour: "19:00"
+  //           }, {
+  //             torque: 42.0,
+  //             heavy: 53.0,
+  //             amplitude: 150.0,
+  //             dateHour: "20:00"
+  //           }]
+  //         }
+  //         // data.indicatorDateList = [{ "pm25": 10, "pm10": 20, "tsp": 10, "dateHour": "08:00" }, { "pm25": 30, "pm10": 0, "tsp": 50, "dateHour": "09:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "10:00" }, { "pm25": 10, "pm10": 0, "tsp": 80, "dateHour": "11:00" }, { "pm25": 0, "pm10": 0, "tsp": 90, "dateHour": "12:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "13:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "14:00" }, { "pm25": 0, "pm10": 0, "tsp": 110, "dateHour": "15:00" }, { "pm25": 20, "pm10": 0, "tsp": 0, "dateHour": "16:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "17:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "18:00" }, { "pm25": 80, "pm10": 0, "tsp": 0, "dateHour": "19:00" }]
+  //         // data.pm10.maxValue = 20
+  //         // data.pm25.maxValue = 80
+  //         // data.tsp.maxValue = 110
+  //         this.setState(
+  //           {
+  //             brokenLineList: data
+  //           },
+  //           () => {
+  //             if (data.indicatorDateList &&
+  //               data.indicatorDateList.length > 0) {
+  //               this.initBrokenLine()
+  //             } else {
+  //               this.brokenLineChart = null;
+  //             }
+  //           }
+  //         )
+  //       }
+  //     }).catch(error => {
+  //       if (this.state.footerInfoStatus !== 'noNetwork') {
+  //           this.setState({
+  //               footerInfoStatus: 'networkAbnormal',
+  //           })
+  //       }
+  //   })
   }
-  // 获取7天平均数据
+  // // 获取7天平均数据
   getSevenDays() {
     this.$http
-      .post("/rest/environment/getAverageDataIn7Days", {
+      .post("/rest/tower/getAverageDataIn7Days", {
         orderProductList: this.state.equipmentList[
           this.state.actionEquipmentListIndex
         ].orderProductList,
-        deviceCode: this.deviceCode
+        // deviceCode: this.deviceCode
       })
       .then(re => {
         let res = re.data
@@ -1561,7 +1926,7 @@ class App extends Component {
   //报警统计
   getWarnStatistic() {
     this.$http
-      .post("/rest/environment/getWarnStatistic", {
+      .post("/rest/tower/getWarnStatistic", {
         orderProductList: this.state.equipmentList[
           this.state.actionEquipmentListIndex
         ].orderProductList,
@@ -1721,20 +2086,20 @@ class App extends Component {
                   <div className="brokenlin-mark">
                     <div className="brokenlin-mark-li">
                       <i className="brokenlin-mark-icon icon2"></i>
-                      {"PM2.5（" + this.state.brokenLineList.pm25.minValue}~{
-                        this.state.brokenLineList.pm25.maxValue
+                      {"PM2.5（" + this.state.brokenLineList.torque.minValue}~{
+                        this.state.brokenLineList.torque.maxValue
                       }）
                     </div>
                     <div className="brokenlin-mark-li">
                       <i className="brokenlin-mark-icon icon1"></i>
-                      {"PM10（" + this.state.brokenLineList.pm10.minValue}~{
-                        this.state.brokenLineList.pm10.maxValue
+                      {"PM10（" + this.state.brokenLineList.heavy.minValue}~{
+                        this.state.brokenLineList.heavy.maxValue
                       }）
                     </div>
                     <div className="brokenlin-mark-li">
                       <i className="brokenlin-mark-icon icon3"></i>
-                      {"TSP（" + this.state.brokenLineList.tsp.minValue}~{
-                        this.state.brokenLineList.tsp.maxValue
+                      {"TSP（" + this.state.brokenLineList.amplitude.minValue}~{
+                        this.state.brokenLineList.amplitude.maxValue
                       }）
                     </div>
                   </div>
@@ -1759,7 +2124,7 @@ class App extends Component {
                         {/* {`PM2.5(${this.state.sevenDays.pm25.minValue}~${
                           this.state.sevenDays.pm25.maxValue
                           })`} */}
-                        <MarqueeWrap title={"PM2.5（" + this.state.sevenDays.pm25.minValue + "~" +
+                        <MarqueeWrap title={"力矩（" + this.state.sevenDays.pm25.minValue + "~" +
                           this.state.sevenDays.pm25.maxValue + "）"} />
                       </div>
                     </div>
@@ -1769,7 +2134,7 @@ class App extends Component {
                         {/* {`PM10(${this.state.sevenDays.pm10.minValue}~${
                           this.state.sevenDays.pm10.maxValue
                           })`} */}
-                        <MarqueeWrap title={"PM10（" + this.state.sevenDays.pm10.minValue + "~" +
+                        <MarqueeWrap title={"载重（" + this.state.sevenDays.pm10.minValue + "~" +
                           this.state.sevenDays.pm10.maxValue + "）"} />
                       </div>
                     </div>
@@ -1779,7 +2144,7 @@ class App extends Component {
                         {/* {`TSP(${this.state.sevenDays.tsp.minValue}~${
                           this.state.sevenDays.tsp.maxValue
                           })`} */}
-                        <MarqueeWrap title={"TSP（" + this.state.sevenDays.tsp.minValue + "~" +
+                        <MarqueeWrap title={"幅度（" + this.state.sevenDays.tsp.minValue + "~" +
                           this.state.sevenDays.tsp.maxValue + "）"} />
                       </div>
                     </div>
@@ -1791,9 +2156,9 @@ class App extends Component {
           </div>
           <div className="app-content-center">
             {/* 地图 start */}
-            {/* <div className="content-right-map">
+            <div className="content-right-map">
               <div id="mapcontainer" />
-            </div> */}
+            </div>
             {/* 地图 end */}
             <div className="app-content-bottom">
               <p className='title'>各塔机吊钩载重 / 高度</p>
