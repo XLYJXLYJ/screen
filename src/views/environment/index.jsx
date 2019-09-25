@@ -956,29 +956,154 @@ class App extends Component {
   // 重置地图标注
   resetMapMarker() {
     // 没有数据情况下
-    if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
-      return null
-    }
-    if (this.markerList) {
-      //重置标记index 层级
-      this.markerList.forEach((e, i) => {
-        e.setzIndex(this.state.actionEquipmentListIndex == i ? 100 : 10)
+    // if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
+    //   return null
+    // }
+    // if (this.markerList) {
+    //   //重置标记index 层级
+    //   this.markerList.forEach((e, i) => {
+    //     e.setzIndex(this.state.actionEquipmentListIndex == i ? 100 : 10)
+    //   })
+    //   return null
+    // }
+
+    this.markerList = []
+    console.log(this.state.equipmentList)
+    this.state.equipmentList.map((item, index) => {
+      // console.log(item)   // let content = `<canvas id="clock" width="500" height="500"></canvas>`
+
+
+      //光圈开始
+      let canvasC = document.createElement('canvas')
+      canvasC.width = canvasC.height = 200
+  
+      let context = canvasC.getContext('2d')
+      context.fillStyle = 'rgba(252, 184, 19,.8)'
+      context.strokeStyle = 'rgba(252, 184, 19,.4)'
+      context.globalAlpha = 1
+  
+      let radius = 0
+      let draw = () => {
+          context.clearRect(0, 0, 200, 200)
+          context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+          radius = (radius + 1) % 100;
+          
+          context.beginPath()
+          context.arc(100, 100, radius, 0, 2 * Math.PI)
+          context.fill()
+          context.stroke()
+  
+          AMap.Util.requestAnimFrame(draw)
+
+           //获取时间
+
+        var now = new Date();
+        var sec = now.getSeconds();
+        //表盘
+        context.lineWidth = 1;
+        //大圈边框颜色
+        //秒针
+        context.save();
+        context.beginPath();
+        //边框颜色
+        context.strokeStyle="rgb(252,184,19)";
+        // cxt.rect(230,245,220,10);
+        context.translate(150, 150);
+        context.rotate(sec * 6 * Math.PI / 180);
+        context.closePath();
+        context.strokeRect(-20,-5,100,10);
+      //   cxt.beginPath();
+      //   cxt.moveTo(0, -170);
+      //   cxt.lineTo(0, 20);
+      //   cxt.closePath();
+      //   cxt.stroke();
+        //方块的颜色
+        context.fillStyle = "rgb(252,184,19)";
+        context.fillRect(-10, -10, 20, 20);
+        context.shadowOffsetX = -3; // 阴影Y轴偏移
+        context.shadowOffsetY = 0; // 阴影X轴偏移
+        context.shadowBlur = 4; // 模糊尺寸
+        context.shadowColor = '#000'; // 颜色
+
+        context.beginPath();
+        context.arc(70, 0, 3, 0, 360, false);
+        context.closePath();
+        //小球的颜色
+        context.fillStyle = "rgb(252,184,19)";
+        context.fill();
+        context.stroke();
+
+        context.restore();
+      }
+  
+      let itemC = this.state.equipmentList[this.state.actionEquipmentListIndex]
+      
+      let pageX = 0.008, pageY = 0.0078
+      let bounds = new AMap.Bounds([+itemC.longitude - pageX, +itemC.latitude - pageY], [+itemC.longitude + pageX, +itemC.latitude + pageY])
+      // console.log(bounds)
+      this.mapMarkerDraw = new AMap.CanvasLayer({
+        canvas: canvasC,
+        bounds: bounds,
+        zooms: [3, 18],
       })
-      return null
-    }
+  
+      this.mapMarkerDraw.setMap(this.map)
+      draw()
+
+    })
+
+  }
+  //地图标注选中动画效果
+  selMapMarker() {
+    // if (!this.state.equipmentList || !this.state.equipmentList.length || !this.state.equipmentList[this.state.actionEquipmentListIndex].deviceCode) return null
+    // let canvas = document.createElement('canvas')
+    // canvas.width = canvas.height = 200
+
+    // let context = canvas.getContext('2d')
+    // context.fillStyle = 'rgba(252, 184, 19,.8)'
+    // context.strokeStyle = 'rgba(252, 184, 19,.4)'
+    // context.globalAlpha = 1
+
+    // let radius = 0
+    // let draw = () => {
+    //     context.clearRect(0, 0, 200, 200)
+    //     context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+    //     radius = (radius + 1) % 100;
+        
+    //     context.beginPath()
+    //     context.arc(100, 100, radius, 0, 2 * Math.PI)
+    //     context.fill()
+    //     context.stroke()
+
+    //     AMap.Util.requestAnimFrame(draw)
+    // }
+
+    // let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
+    
+    // let pageX = 0.008, pageY = 0.0078
+    // let bounds = new AMap.Bounds([+item.longitude - pageX, +item.latitude - pageY], [+item.longitude + pageX, +item.latitude + pageY])
+    // // console.log(bounds)
+    // this.mapMarkerDraw = new AMap.CanvasLayer({
+    //   canvas: canvas,
+    //   bounds: bounds,
+    //   zooms: [3, 18],
+    // })
+
+    // this.mapMarkerDraw.setMap(this.map)
+    // draw()
 
     this.markerList = []
     this.state.equipmentList.map((item, index) => {
-      console.log(item)   // let content = `<canvas id="clock" width="500" height="500"></canvas>`
-      var oBody=document.getElementsByTagName("body")[0];
-      var canvas = document.createElement('canvas');
+      // let content = `<canvas id="clock" width="500" height="500"></canvas>`
+      // var oBody=document.getElementsByTagName("body")[0];
+      var canvas1 = document.createElement('canvas');
       // var canvas = React.createElement('canvas' , { id:'canvas',width:50,height:50} ,  '这是一个canvas' )
-      canvas.id = "clock";
-      canvas.width = 400;
-      canvas.height = 400;
-      oBody.appendChild(canvas);
+      canvas1.id = "clock";
+      canvas1.width = 400;
+      canvas1.height = 400;
+      // oBody.appendChild(canvas);
       // 
-      var canvas1 = document.getElementById('clock');
+      // var canvas1 = document.getElementById('clock');
       var cxt = canvas1.getContext('2d');
       
       function drawClock() {
@@ -1033,7 +1158,7 @@ class App extends Component {
       drawClock();
       setInterval(drawClock, 1000);
 
-      var content = canvas
+      var content = canvas1
 
       this.markerList.push(
         new AMap.Marker({
@@ -1044,49 +1169,8 @@ class App extends Component {
           zIndex: 99 - index,
         })
       )
-
     })
     this.map.add(this.markerList)
-  }
-  //地图标注选中动画效果
-  selMapMarker() {
-    if (!this.state.equipmentList || !this.state.equipmentList.length || !this.state.equipmentList[this.state.actionEquipmentListIndex].deviceCode) return null
-    let canvas = document.createElement('canvas')
-    canvas.width = canvas.height = 200
-
-    let context = canvas.getContext('2d')
-    context.fillStyle = 'rgba(252, 184, 19,.8)'
-    context.strokeStyle = 'rgba(252, 184, 19,.4)'
-    context.globalAlpha = 1
-
-    let radius = 0
-    let draw = () => {
-        context.clearRect(0, 0, 200, 200)
-        context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-        radius = (radius + 1) % 100;
-        
-        context.beginPath()
-        context.arc(100, 100, radius, 0, 2 * Math.PI)
-        context.fill()
-        context.stroke()
-
-        AMap.Util.requestAnimFrame(draw)
-    }
-
-    let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
-    
-    let pageX = 0.008, pageY = 0.0078
-    let bounds = new AMap.Bounds([+item.longitude - pageX, +item.latitude - pageY], [+item.longitude + pageX, +item.latitude + pageY])
-    // console.log(bounds)
-    this.mapMarkerDraw = new AMap.CanvasLayer({
-      canvas: canvas,
-      bounds: bounds,
-      zooms: [3, 18],
-    })
-
-    this.mapMarkerDraw.setMap(this.map)
-    draw()
-
   }
   //画定位2d图形
   map2D() {
@@ -1347,16 +1431,16 @@ class App extends Component {
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          // let data = res.response
-          let data = {
-            yunPingStatus: 1,
-            projectName: "深圳市龙华新区龙华二小改建工程",
-            slogan: null,
-            sloganStyle: null,
-            yunPingName: "1号智能云屏系统",
-            yunPingCode: "huanjingjiance",
-            logo: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/logo2.png"
-          }
+          let data = res.response
+          // let data = {
+          //   yunPingStatus: 1,
+          //   projectName: "深圳市龙华新区龙华二小改建工程",
+          //   slogan: null,
+          //   sloganStyle: null,
+          //   yunPingName: "1号智能云屏系统",
+          //   yunPingCode: "huanjingjiance",
+          //   logo: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/logo2.png"
+          // }
           let footerInfoStatus = ''
           // 设备已解绑状态
 
@@ -1405,56 +1489,56 @@ class App extends Component {
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          // let data = res.response
-          let data =  {
-            mapList: [{
-              longitude: "114.0463264685513",
-              latitude: "22.55985284345753"
-            }, {
-              longitude: "114.0470551676265",
-              latitude: "22.56079916169713"
-            }, {
-              longitude: "114.0506075791376",
-              latitude: "22.56187164625972"
-            }, {
-              longitude: "114.0535451487578",
-              latitude: "22.56176650142255"
-            }, {
-              longitude: "114.054729286392",
-              latitude: "22.55947431503903"
-            }, {
-              longitude: "114.0492412669802",
-              latitude: "22.55514218952409"
-            }],
-            deviceList: [{
-              deviceName: "1 号环境监测系统",
-              longitude: "114.0409536290864",
-              latitude: "22.567919658086872",
-              status: 1,
-              orderProductList: 10,
-              alarmTimes: 987,
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
-            }, {
-              deviceName: "2 号环境监测系统",
-              longitude: "114.0410153808594",
-              latitude: "22.56797929382324",
-              status: 1,
-              orderProductList: 11,
-              alarmTimes: 1002,
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
-            }, {
-              deviceName: "3 号环境监测系统",
-              longitude: "114.0410153808556",
-              latitude: "22.56797929382318",
-              status: 1,
-              orderProductList: 12,
-              alarmTimes: 623,
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            }]
-          }
+          let data = res.response
+          // let data =  {
+          //   mapList: [{
+          //     longitude: "114.0463264685513",
+          //     latitude: "22.55985284345753"
+          //   }, {
+          //     longitude: "114.0470551676265",
+          //     latitude: "22.56079916169713"
+          //   }, {
+          //     longitude: "114.0506075791376",
+          //     latitude: "22.56187164625972"
+          //   }, {
+          //     longitude: "114.0535451487578",
+          //     latitude: "22.56176650142255"
+          //   }, {
+          //     longitude: "114.054729286392",
+          //     latitude: "22.55947431503903"
+          //   }, {
+          //     longitude: "114.0492412669802",
+          //     latitude: "22.55514218952409"
+          //   }],
+          //   deviceList: [{
+          //     deviceName: "1 号环境监测系统",
+          //     longitude: "114.0409536290864",
+          //     latitude: "22.567919658086872",
+          //     status: 1,
+          //     orderProductList: 10,
+          //     alarmTimes: 987,
+          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          //     deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
+          //   }, {
+          //     deviceName: "2 号环境监测系统",
+          //     longitude: "114.0410153808594",
+          //     latitude: "22.56797929382324",
+          //     status: 1,
+          //     orderProductList: 11,
+          //     alarmTimes: 1002,
+          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          //     deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
+          //   }, {
+          //     deviceName: "3 号环境监测系统",
+          //     longitude: "114.0410153808556",
+          //     latitude: "22.56797929382318",
+          //     status: 1,
+          //     orderProductList: 12,
+          //     alarmTimes: 623,
+          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+          //   }]
+          // }
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
             return [item.longitude, item.latitude]
@@ -1513,7 +1597,7 @@ class App extends Component {
   // 获取指标数据
   getIndicators() {
     this.$http
-      .post("rest/tower/getIndicators", {
+      .post("/rest/tower/getIndicators", {
         orderProductList: this.state.equipmentList[
           this.state.actionEquipmentListIndex
         ].orderProductList,
@@ -1522,124 +1606,124 @@ class App extends Component {
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          // let data = res.response
-          let data =  {
-            status: 1,
-            newInd: [{
-              indicatorName: "PM2.5",
-              indicatorValue: "56",
-              unit: "μg/m³",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "PM10",
-              indicatorValue: "72",
-              unit: "μg/m³",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "TSP",
-              indicatorValue: "89",
-              unit: "μg/m³",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "噪音",
-              indicatorValue: "38.9",
-              unit: "dB",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "温度",
-              indicatorValue: "25",
-              unit: "℃",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "湿度",
-              indicatorValue: "6.23",
-              unit: "%RH",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "风速",
-              indicatorValue: "1.2",
-              unit: "m/s",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "风向",
-              indicatorValue: "东南",
-              unit: "",
-              statusName: "",
-              status: 0,
-              dataType: 1
-            }],
-            oldInd: [{
-              indicatorName: "PM2.5",
-              indicatorValue: "56",
-              unit: "μg/m³",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "PM10",
-              indicatorValue: "72",
-              unit: "μg/m³",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "TSP",
-              indicatorValue: "189",
-              unit: "μg/m³",
-              statusName: "超标",
-              status: 1,
-              dataType: 1
-            }, {
-              indicatorName: "噪音",
-              indicatorValue: "38.9",
-              unit: "dB",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "温度",
-              indicatorValue: "25",
-              unit: "℃",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "湿度",
-              indicatorValue: "6.23",
-              unit: "%RH",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "风速",
-              indicatorValue: "1.2",
-              unit: "m/s",
-              statusName: "正常",
-              status: 0,
-              dataType: 1
-            }, {
-              indicatorName: "风向",
-              indicatorValue: "东南",
-              unit: "",
-              statusName: "",
-              status: 0,
-              dataType: 1
-            }]
-          }
+          let data = res.response
+          // let data =  {
+          //   status: 1,
+          //   newInd: [{
+          //     indicatorName: "PM2.5",
+          //     indicatorValue: "56",
+          //     unit: "μg/m³",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "PM10",
+          //     indicatorValue: "72",
+          //     unit: "μg/m³",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "TSP",
+          //     indicatorValue: "89",
+          //     unit: "μg/m³",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "噪音",
+          //     indicatorValue: "38.9",
+          //     unit: "dB",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "温度",
+          //     indicatorValue: "25",
+          //     unit: "℃",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "湿度",
+          //     indicatorValue: "6.23",
+          //     unit: "%RH",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "风速",
+          //     indicatorValue: "1.2",
+          //     unit: "m/s",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "风向",
+          //     indicatorValue: "东南",
+          //     unit: "",
+          //     statusName: "",
+          //     status: 0,
+          //     dataType: 1
+          //   }],
+          //   oldInd: [{
+          //     indicatorName: "PM2.5",
+          //     indicatorValue: "56",
+          //     unit: "μg/m³",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "PM10",
+          //     indicatorValue: "72",
+          //     unit: "μg/m³",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "TSP",
+          //     indicatorValue: "189",
+          //     unit: "μg/m³",
+          //     statusName: "超标",
+          //     status: 1,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "噪音",
+          //     indicatorValue: "38.9",
+          //     unit: "dB",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "温度",
+          //     indicatorValue: "25",
+          //     unit: "℃",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "湿度",
+          //     indicatorValue: "6.23",
+          //     unit: "%RH",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "风速",
+          //     indicatorValue: "1.2",
+          //     unit: "m/s",
+          //     statusName: "正常",
+          //     status: 0,
+          //     dataType: 1
+          //   }, {
+          //     indicatorName: "风向",
+          //     indicatorValue: "东南",
+          //     unit: "",
+          //     statusName: "",
+          //     status: 0,
+          //     dataType: 1
+          //   }]
+          // }
           let backData = JSON.parse(JSON.stringify(data))
           this.setState({
             indicators: data,
@@ -1666,224 +1750,124 @@ class App extends Component {
   //获取12小时内统计数据
   get12Hours() {
 
-    let data =  {
-      torque: {
-        indicatorKey: " torque ",
-        indicatorName: "力矩",
-        minValue: 10.0,
-        maxValue: 42.0
-      },
-      heavy: {
-        indicatorKey: " heavy ",
-        indicatorName: "载重",
-        minValue: 16.0,
-        maxValue: 53.0
-      },
-      amplitude: {
-        indicatorKey: " amplitude ",
-        indicatorName: "幅度",
-        minValue: 85.0,
-        maxValue: 150.0
-      },
-      indicatorDateList: [{
-        torque: 20.0,
-        heavy: 30.0,
-        amplitude: 100.0,
-        dateHour: "09:00"
-      }, {
-        torque: 20.0,
-        heavy: 30.0,
-        amplitude: 102.0,
-        dateHour: "10:00"
-      }, {
-        torque: 20.0,
-        heavy: 32.0,
-        amplitude: 103.0,
-        dateHour: "11:00"
-      }, {
-        torque: 16.0,
-        heavy: 28.0,
-        amplitude: 90.0,
-        dateHour: "12:00"
-      }, {
-        torque: 15.0,
-        heavy: 23.0,
-        amplitude: 85.0,
-        dateHour: "13:00"
-      }, {
-        torque: 12.0,
-        heavy: 20.0,
-        amplitude: 93.0,
-        dateHour: "14:00"
-      }, {
-        torque: 10.0,
-        heavy: 16.0,
-        amplitude: 100.0,
-        dateHour: "15:00"
-      }, {
-        torque: 13.0,
-        heavy: 18.0,
-        amplitude: 110.0,
-        dateHour: "16:00"
-      }, {
-        torque: 26.0,
-        heavy: 32.0,
-        amplitude: 119.0,
-        dateHour: "17:00"
-      }, {
-        torque: 36.0,
-        heavy: 38.0,
-        amplitude: 129.0,
-        dateHour: "18:00"
-      }, {
-        torque: 38.0,
-        heavy: 46.0,
-        amplitude: 135.0,
-        dateHour: "19:00"
-      }, {
-        torque: 42.0,
-        heavy: 53.0,
-        amplitude: 150.0,
-        dateHour: "20:00"
-      }]
-    }
-    // data.indicatorDateList = [{ "pm25": 10, "pm10": 20, "tsp": 10, "dateHour": "08:00" }, { "pm25": 30, "pm10": 0, "tsp": 50, "dateHour": "09:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "10:00" }, { "pm25": 10, "pm10": 0, "tsp": 80, "dateHour": "11:00" }, { "pm25": 0, "pm10": 0, "tsp": 90, "dateHour": "12:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "13:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "14:00" }, { "pm25": 0, "pm10": 0, "tsp": 110, "dateHour": "15:00" }, { "pm25": 20, "pm10": 0, "tsp": 0, "dateHour": "16:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "17:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "18:00" }, { "pm25": 80, "pm10": 0, "tsp": 0, "dateHour": "19:00" }]
-    // data.pm10.maxValue = 20
-    // data.pm25.maxValue = 80
-    // data.tsp.maxValue = 110
-    this.setState(
-      {
-        brokenLineList: data
-      },
-      () => {
-        console.log(data.indicatorDateList)
-        if (data.indicatorDateList &&
-          data.indicatorDateList.length > 0) {
-          this.initBrokenLine()
-        } else {
-          this.brokenLineChart = null;
+
+    this.$http
+      .post("/rest/tower/getStatisticDataIn12Hours", {
+        orderProductList: this.state.equipmentList[
+          this.state.actionEquipmentListIndex
+        ].orderProductList,
+        // deviceCode: this.deviceCode
+      })
+      .then(re => {
+        let res = re.data
+        if (res.status == 200) {
+          let data = res.response
+          // let data =  {
+          //   torque: {
+          //     indicatorKey: " torque ",
+          //     indicatorName: "力矩",
+          //     minValue: 10.0,
+          //     maxValue: 42.0
+          //   },
+          //   heavy: {
+          //     indicatorKey: " heavy ",
+          //     indicatorName: "载重",
+          //     minValue: 16.0,
+          //     maxValue: 53.0
+          //   },
+          //   amplitude: {
+          //     indicatorKey: " amplitude ",
+          //     indicatorName: "幅度",
+          //     minValue: 85.0,
+          //     maxValue: 150.0
+          //   },
+          //   indicatorDateList: [{
+          //     torque: 20.0,
+          //     heavy: 30.0,
+          //     amplitude: 100.0,
+          //     dateHour: "09:00"
+          //   }, {
+          //     torque: 20.0,
+          //     heavy: 30.0,
+          //     amplitude: 102.0,
+          //     dateHour: "10:00"
+          //   }, {
+          //     torque: 20.0,
+          //     heavy: 32.0,
+          //     amplitude: 103.0,
+          //     dateHour: "11:00"
+          //   }, {
+          //     torque: 16.0,
+          //     heavy: 28.0,
+          //     amplitude: 90.0,
+          //     dateHour: "12:00"
+          //   }, {
+          //     torque: 15.0,
+          //     heavy: 23.0,
+          //     amplitude: 85.0,
+          //     dateHour: "13:00"
+          //   }, {
+          //     torque: 12.0,
+          //     heavy: 20.0,
+          //     amplitude: 93.0,
+          //     dateHour: "14:00"
+          //   }, {
+          //     torque: 10.0,
+          //     heavy: 16.0,
+          //     amplitude: 100.0,
+          //     dateHour: "15:00"
+          //   }, {
+          //     torque: 13.0,
+          //     heavy: 18.0,
+          //     amplitude: 110.0,
+          //     dateHour: "16:00"
+          //   }, {
+          //     torque: 26.0,
+          //     heavy: 32.0,
+          //     amplitude: 119.0,
+          //     dateHour: "17:00"
+          //   }, {
+          //     torque: 36.0,
+          //     heavy: 38.0,
+          //     amplitude: 129.0,
+          //     dateHour: "18:00"
+          //   }, {
+          //     torque: 38.0,
+          //     heavy: 46.0,
+          //     amplitude: 135.0,
+          //     dateHour: "19:00"
+          //   }, {
+          //     torque: 42.0,
+          //     heavy: 53.0,
+          //     amplitude: 150.0,
+          //     dateHour: "20:00"
+          //   }]
+          // }
+          // data.indicatorDateList = [{ "pm25": 10, "pm10": 20, "tsp": 10, "dateHour": "08:00" }, { "pm25": 30, "pm10": 0, "tsp": 50, "dateHour": "09:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "10:00" }, { "pm25": 10, "pm10": 0, "tsp": 80, "dateHour": "11:00" }, { "pm25": 0, "pm10": 0, "tsp": 90, "dateHour": "12:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "13:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "14:00" }, { "pm25": 0, "pm10": 0, "tsp": 110, "dateHour": "15:00" }, { "pm25": 20, "pm10": 0, "tsp": 0, "dateHour": "16:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "17:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "18:00" }, { "pm25": 80, "pm10": 0, "tsp": 0, "dateHour": "19:00" }]
+          // data.pm10.maxValue = 20
+          // data.pm25.maxValue = 80
+          // data.tsp.maxValue = 110
+          this.setState(
+            {
+              brokenLineList: data
+            },
+            () => {
+              if (data.indicatorDateList &&
+                data.indicatorDateList.length > 0) {
+                this.initBrokenLine()
+              } else {
+                this.brokenLineChart = null;
+              }
+            }
+          )
         }
-      }
-    )
-
-
-  //   this.$http
-  //     .post("/rest/test/getStatisticDataIn12Hours", {
-  //       orderProductList: this.state.equipmentList[
-  //         this.state.actionEquipmentListIndex
-  //       ].orderProductList,
-  //       // deviceCode: this.deviceCode
-  //     })
-  //     .then(re => {
-  //       let res = re.data
-  //       if (res.status == 200) {
-  //         // let data = res.response
-  //         let data =  {
-  //           torque: {
-  //             indicatorKey: " torque ",
-  //             indicatorName: "力矩",
-  //             minValue: 10.0,
-  //             maxValue: 42.0
-  //           },
-  //           heavy: {
-  //             indicatorKey: " heavy ",
-  //             indicatorName: "载重",
-  //             minValue: 16.0,
-  //             maxValue: 53.0
-  //           },
-  //           amplitude: {
-  //             indicatorKey: " amplitude ",
-  //             indicatorName: "幅度",
-  //             minValue: 85.0,
-  //             maxValue: 150.0
-  //           },
-  //           indicatorDateList: [{
-  //             torque: 20.0,
-  //             heavy: 30.0,
-  //             amplitude: 100.0,
-  //             dateHour: "09:00"
-  //           }, {
-  //             torque: 20.0,
-  //             heavy: 30.0,
-  //             amplitude: 102.0,
-  //             dateHour: "10:00"
-  //           }, {
-  //             torque: 20.0,
-  //             heavy: 32.0,
-  //             amplitude: 103.0,
-  //             dateHour: "11:00"
-  //           }, {
-  //             torque: 16.0,
-  //             heavy: 28.0,
-  //             amplitude: 90.0,
-  //             dateHour: "12:00"
-  //           }, {
-  //             torque: 15.0,
-  //             heavy: 23.0,
-  //             amplitude: 85.0,
-  //             dateHour: "13:00"
-  //           }, {
-  //             torque: 12.0,
-  //             heavy: 20.0,
-  //             amplitude: 93.0,
-  //             dateHour: "14:00"
-  //           }, {
-  //             torque: 10.0,
-  //             heavy: 16.0,
-  //             amplitude: 100.0,
-  //             dateHour: "15:00"
-  //           }, {
-  //             torque: 13.0,
-  //             heavy: 18.0,
-  //             amplitude: 110.0,
-  //             dateHour: "16:00"
-  //           }, {
-  //             torque: 26.0,
-  //             heavy: 32.0,
-  //             amplitude: 119.0,
-  //             dateHour: "17:00"
-  //           }, {
-  //             torque: 36.0,
-  //             heavy: 38.0,
-  //             amplitude: 129.0,
-  //             dateHour: "18:00"
-  //           }, {
-  //             torque: 38.0,
-  //             heavy: 46.0,
-  //             amplitude: 135.0,
-  //             dateHour: "19:00"
-  //           }, {
-  //             torque: 42.0,
-  //             heavy: 53.0,
-  //             amplitude: 150.0,
-  //             dateHour: "20:00"
-  //           }]
-  //         }
-  //         // data.indicatorDateList = [{ "pm25": 10, "pm10": 20, "tsp": 10, "dateHour": "08:00" }, { "pm25": 30, "pm10": 0, "tsp": 50, "dateHour": "09:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "10:00" }, { "pm25": 10, "pm10": 0, "tsp": 80, "dateHour": "11:00" }, { "pm25": 0, "pm10": 0, "tsp": 90, "dateHour": "12:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "13:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "14:00" }, { "pm25": 0, "pm10": 0, "tsp": 110, "dateHour": "15:00" }, { "pm25": 20, "pm10": 0, "tsp": 0, "dateHour": "16:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "17:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "18:00" }, { "pm25": 80, "pm10": 0, "tsp": 0, "dateHour": "19:00" }]
-  //         // data.pm10.maxValue = 20
-  //         // data.pm25.maxValue = 80
-  //         // data.tsp.maxValue = 110
-  //         this.setState(
-  //           {
-  //             brokenLineList: data
-  //           },
-  //           () => {
-  //             if (data.indicatorDateList &&
-  //               data.indicatorDateList.length > 0) {
-  //               this.initBrokenLine()
-  //             } else {
-  //               this.brokenLineChart = null;
-  //             }
-  //           }
-  //         )
-  //       }
-  //     }).catch(error => {
-  //       if (this.state.footerInfoStatus !== 'noNetwork') {
-  //           this.setState({
-  //               footerInfoStatus: 'networkAbnormal',
-  //           })
-  //       }
-  //   })
+      }).catch(error => {
+        if (this.state.footerInfoStatus !== 'noNetwork') {
+            this.setState({
+                footerInfoStatus: 'networkAbnormal',
+            })
+        }
+    })
   }
   // // 获取7天平均数据
   getSevenDays() {
@@ -2086,19 +2070,19 @@ class App extends Component {
                   <div className="brokenlin-mark">
                     <div className="brokenlin-mark-li">
                       <i className="brokenlin-mark-icon icon2"></i>
-                      {"PM2.5（" + this.state.brokenLineList.torque.minValue}~{
+                      {"力矩（" + this.state.brokenLineList.torque.minValue}~{
                         this.state.brokenLineList.torque.maxValue
                       }）
                     </div>
                     <div className="brokenlin-mark-li">
                       <i className="brokenlin-mark-icon icon1"></i>
-                      {"PM10（" + this.state.brokenLineList.heavy.minValue}~{
+                      {"载重（" + this.state.brokenLineList.heavy.minValue}~{
                         this.state.brokenLineList.heavy.maxValue
                       }）
                     </div>
                     <div className="brokenlin-mark-li">
                       <i className="brokenlin-mark-icon icon3"></i>
-                      {"TSP（" + this.state.brokenLineList.amplitude.minValue}~{
+                      {"幅度（" + this.state.brokenLineList.amplitude.minValue}~{
                         this.state.brokenLineList.amplitude.maxValue
                       }）
                     </div>
