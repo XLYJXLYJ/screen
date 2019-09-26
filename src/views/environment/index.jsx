@@ -930,6 +930,7 @@ class App extends Component {
     if (this.map) {
         // console.log(this.map)
       this.mapMarkerDraw && this.map.remove(this.mapMarkerDraw)
+     
       this.selMapMarker()
       this.resetMapMarker()
     } else {
@@ -956,102 +957,109 @@ class App extends Component {
   // 重置地图标注
   resetMapMarker() {
     // 没有数据情况下
-    // if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
-    //   return null
-    // }
-    // if (this.markerList) {
-    //   //重置标记index 层级
-    //   this.markerList.forEach((e, i) => {
-    //     e.setzIndex(this.state.actionEquipmentListIndex == i ? 100 : 10)
-    //   })
-    //   return null
-    // }
+    console.log('重置地图标注')
+    if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
+      console.log('')
+      return null
+    }
+    if (this.markerList) {
+      //重置标记index 层级
+      console.log('捡来222')
+      console.log(this.markerList)
+      this.markerList.forEach((e, i) => {
+        console.log(e)
+        console.log(i)
+        console.log( this.state.actionEquipmentListIndex)
+        e.setzIndex(this.state.actionEquipmentListIndex == i ? -100 : 100)
+      })
+      return null
+    }
 
     this.markerList = []
-    console.log(this.state.equipmentList)
+   
     this.state.equipmentList.map((item, index) => {
       // console.log(item)   // let content = `<canvas id="clock" width="500" height="500"></canvas>`
+      console.log(index)
+      console.log('this.state.actionEquipmentListIndex' + this.state.actionEquipmentListIndex)
 
+        //光圈开始
+        let canvasC = document.createElement('canvas')
+        canvasC.width = canvasC.height = 200
+    
+        let context = canvasC.getContext('2d')
+        context.fillStyle = 'rgba(252, 184, 19,.8)'
+        context.strokeStyle = 'rgba(252, 184, 19,.4)'
+        context.globalAlpha = 1
+    
+        let radius = 0
+        let draw = () => {
+            context.clearRect(0, 0, 200, 200)
+            context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+            radius = (radius + 1) % 100;
+            
+            context.beginPath()
+            context.arc(100, 100, radius, 0, 2 * Math.PI)
+            context.fill()
+            context.stroke()
+    
+            AMap.Util.requestAnimFrame(draw)
 
-      //光圈开始
-      let canvasC = document.createElement('canvas')
-      canvasC.width = canvasC.height = 200
-  
-      let context = canvasC.getContext('2d')
-      context.fillStyle = 'rgba(252, 184, 19,.8)'
-      context.strokeStyle = 'rgba(252, 184, 19,.4)'
-      context.globalAlpha = 1
-  
-      let radius = 0
-      let draw = () => {
-          context.clearRect(0, 0, 200, 200)
-          context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-          radius = (radius + 1) % 100;
-          
-          context.beginPath()
-          context.arc(100, 100, radius, 0, 2 * Math.PI)
-          context.fill()
-          context.stroke()
-  
-          AMap.Util.requestAnimFrame(draw)
+            //获取时间
 
-           //获取时间
+          var now = new Date();
+          var sec = now.getSeconds();
+          //表盘
+          context.lineWidth = 1;
+          //大圈边框颜色
+          //秒针
+          context.save();
+          context.beginPath();
+          //边框颜色
+          context.strokeStyle="rgb(252,184,19)";
+          // cxt.rect(230,245,220,10);
+          context.translate(100, 100);
+          context.rotate(sec * 6 * Math.PI / 180);
+          context.closePath();
+          context.strokeRect(-20,-5,120,10);
+        //   cxt.beginPath();
+        //   cxt.moveTo(0, -170);
+        //   cxt.lineTo(0, 20);
+        //   cxt.closePath();
+        //   cxt.stroke();
+          //方块的颜色
+          context.fillStyle = "rgb(252,184,19)";
+          context.fillRect(-15, -10, 20, 20);
+          context.shadowOffsetX = -3; // 阴影Y轴偏移
+          context.shadowOffsetY = 0; // 阴影X轴偏移
+          context.shadowBlur = 4; // 模糊尺寸
+          context.shadowColor = '#000'; // 颜色
 
-        var now = new Date();
-        var sec = now.getSeconds();
-        //表盘
-        context.lineWidth = 1;
-        //大圈边框颜色
-        //秒针
-        context.save();
-        context.beginPath();
-        //边框颜色
-        context.strokeStyle="rgb(252,184,19)";
-        // cxt.rect(230,245,220,10);
-        context.translate(150, 150);
-        context.rotate(sec * 6 * Math.PI / 180);
-        context.closePath();
-        context.strokeRect(-20,-5,100,10);
-      //   cxt.beginPath();
-      //   cxt.moveTo(0, -170);
-      //   cxt.lineTo(0, 20);
-      //   cxt.closePath();
-      //   cxt.stroke();
-        //方块的颜色
-        context.fillStyle = "rgb(252,184,19)";
-        context.fillRect(-10, -10, 20, 20);
-        context.shadowOffsetX = -3; // 阴影Y轴偏移
-        context.shadowOffsetY = 0; // 阴影X轴偏移
-        context.shadowBlur = 4; // 模糊尺寸
-        context.shadowColor = '#000'; // 颜色
+          context.beginPath();
+          context.arc(70, 0, 3, 0, 360, false);
+          context.closePath();
+          //小球的颜色
+          context.fillStyle = "rgb(252,184,19)";
+          context.fill();
+          context.stroke();
 
-        context.beginPath();
-        context.arc(70, 0, 3, 0, 360, false);
-        context.closePath();
-        //小球的颜色
-        context.fillStyle = "rgb(252,184,19)";
-        context.fill();
-        context.stroke();
+          context.restore();
+        }
+    
+        this.markerList.push(
+          new AMap.Marker({
+            content: canvasC,
+            position: new AMap.LngLat(item.longitude, item.latitude),
+            offset: new AMap.Pixel(-15, -17),
+            size: new AMap.Size(40, 50),
+            zIndex: 99 - index,
+          })
+        )
+        
+        draw()
 
-        context.restore();
-      }
-  
-      let itemC = this.state.equipmentList[this.state.actionEquipmentListIndex]
-      
-      let pageX = 0.008, pageY = 0.0078
-      let bounds = new AMap.Bounds([+itemC.longitude - pageX, +itemC.latitude - pageY], [+itemC.longitude + pageX, +itemC.latitude + pageY])
-      // console.log(bounds)
-      this.mapMarkerDraw = new AMap.CanvasLayer({
-        canvas: canvasC,
-        bounds: bounds,
-        zooms: [3, 18],
-      })
-  
-      this.mapMarkerDraw.setMap(this.map)
-      draw()
 
     })
-
+    this.map.add(this.markerList)
   }
   //地图标注选中动画效果
   selMapMarker() {
@@ -1092,85 +1100,93 @@ class App extends Component {
     // this.mapMarkerDraw.setMap(this.map)
     // draw()
 
-    this.markerList = []
-    this.state.equipmentList.map((item, index) => {
+    
+      this.state.equipmentList.map((item, index) => {
       // let content = `<canvas id="clock" width="500" height="500"></canvas>`
       // var oBody=document.getElementsByTagName("body")[0];
-      var canvas1 = document.createElement('canvas');
-      // var canvas = React.createElement('canvas' , { id:'canvas',width:50,height:50} ,  '这是一个canvas' )
-      canvas1.id = "clock";
-      canvas1.width = 400;
-      canvas1.height = 400;
-      // oBody.appendChild(canvas);
-      // 
-      // var canvas1 = document.getElementById('clock');
-      var cxt = canvas1.getContext('2d');
-      
-      function drawClock() {
-        //获取时间
-        cxt.clearRect(0, 0, 500, 500);
-        var now = new Date();
-        var sec = now.getSeconds();
-        //表盘
-        cxt.lineWidth = 1;
-        //大圈边框颜色
-        cxt.strokeStyle = "rgba(252,184,19,0.5)";
-        cxt.beginPath();
-        cxt.arc(150, 150, 80, 0, 360, false);
-        //大圈颜色
-        cxt.fillStyle = "rgba(252,184,19,0.5)";
-        cxt.fill();
-        cxt.closePath();
-        cxt.stroke();
-        //秒针
-        cxt.save();
-        cxt.beginPath();
-        //边框颜色
-        cxt.strokeStyle="rgb(252,184,19)";
-        // cxt.rect(230,245,220,10);
-        cxt.translate(150, 150);
-        cxt.rotate(sec * 6 * Math.PI / 180);
-        cxt.closePath();
-        cxt.strokeRect(-20,-5,100,10);
-      //   cxt.beginPath();
-      //   cxt.moveTo(0, -170);
-      //   cxt.lineTo(0, 20);
-      //   cxt.closePath();
-      //   cxt.stroke();
-        //方块的颜色
-        cxt.fillStyle = "rgb(252,184,19)";
-        cxt.fillRect(-10, -10, 20, 20);
-        cxt.shadowOffsetX = -3; // 阴影Y轴偏移
-        cxt.shadowOffsetY = 0; // 阴影X轴偏移
-        cxt.shadowBlur = 4; // 模糊尺寸
-        cxt.shadowColor = '#000'; // 颜色
 
-        cxt.beginPath();
-        cxt.arc(70, 0, 3, 0, 360, false);
-        cxt.closePath();
-        //小球的颜色
-        cxt.fillStyle = "rgb(252,184,19)";
-        cxt.fill();
-        cxt.stroke();
+      if(index == this.state.actionEquipmentListIndex){
 
+        var canvas1 = document.createElement('canvas');
+        // var canvas = React.createElement('canvas', { id:'canvas',width:50,height:50},'这是一个canvas')
+        canvas1.id = "clock";
+        canvas1.width = 400;
+        canvas1.height = 400;
+        // oBody.appendChild(canvas);
+        // 
+        // var canvas1 = document.getElementById('clock');
+        var cxt = canvas1.getContext('2d');
         cxt.restore();
-      }
-      drawClock();
-      setInterval(drawClock, 1000);
+        function drawClock() {
+          //获取时间
+          cxt.clearRect(0, 0, 500, 500);
+          var now = new Date();
+          var sec = now.getSeconds();
+          //表盘
+          cxt.lineWidth = 1;
+          //大圈边框颜色
+          cxt.strokeStyle = "rgba(252,184,19,0.5)";
+          cxt.beginPath();
+          cxt.arc(150, 150, 80, 0, 360, false);
+          //大圈颜色
+          cxt.fillStyle = "rgba(252,184,19,0.5)";
+          cxt.fill();
+          cxt.closePath();
+          cxt.stroke();
+          //秒针
+          cxt.save();
+          cxt.beginPath();
+          //边框颜色
+          cxt.strokeStyle="rgb(252,184,19)";
+          // cxt.rect(230,245,220,10);
+          cxt.translate(150, 150);
+          cxt.rotate(sec * 6 * Math.PI / 180);
+          cxt.closePath();
+          cxt.strokeRect(-20,-5,100,10);
+        //   cxt.beginPath();
+        //   cxt.moveTo(0, -170);
+        //   cxt.lineTo(0, 20);
+        //   cxt.closePath();
+        //   cxt.stroke();
+          //方块的颜色
+          cxt.fillStyle = "rgb(252,184,19)";
+          cxt.fillRect(-10, -10, 20, 20);
+          cxt.shadowOffsetX = -3; // 阴影Y轴偏移
+          cxt.shadowOffsetY = 0; // 阴影X轴偏移
+          cxt.shadowBlur = 4; // 模糊尺寸
+          cxt.shadowColor = '#000'; // 颜色
+  
+          cxt.beginPath();
+          cxt.arc(70, 0, 3, 0, 360, false);
+          cxt.closePath();
+          //小球的颜色
+          cxt.fillStyle = "rgb(252,184,19)";
+          cxt.fill();
+          cxt.stroke();
+  
+          cxt.restore();
+        }
 
-      var content = canvas1
+        drawClock();
+        setInterval(drawClock, 1000);
 
-      this.markerList.push(
-        new AMap.Marker({
-          content: content,
-          position: new AMap.LngLat(item.longitude, item.latitude),
-          offset: new AMap.Pixel(-15, -17),
-          size: new AMap.Size(40, 50),
-          zIndex: 99 - index,
+        var content = canvas1
+        let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
+        // console.log('item',item)
+        
+        let pageX = 0.008, pageY = 0.0078
+        let bounds = new AMap.Bounds([+item.longitude - pageX, +item.latitude - pageY], [+item.longitude + pageX, +item.latitude + pageY])
+        // console.log(bounds)
+        this.mapMarkerDraw = new AMap.CanvasLayer({
+          canvas: content,
+          bounds: bounds,
+          zooms: [3, 18],
         })
-      )
+      }
     })
-    this.map.add(this.markerList)
+  
+    this.mapMarkerDraw.setMap(this.map)
+
   }
   //画定位2d图形
   map2D() {
@@ -1217,7 +1233,7 @@ class App extends Component {
       }
       borderData.push(arr)
     })
-    // console.log("转换后的xy坐标", borderData)
+ 
     //canvas  建立阴影
     new AMap.plugin("AMap.CustomLayer", () => {
       let canvas = document.createElement("canvas")
@@ -1483,62 +1499,62 @@ class App extends Component {
   }
   // 获取地图设备分布信息
   getDevice() {
-    console.log(this.deviceCode)
+    
     this.$http
       .post("/rest/tower/getDevice", { deviceCode: this.deviceCode})
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          let data = res.response
-          // let data =  {
-          //   mapList: [{
-          //     longitude: "114.0463264685513",
-          //     latitude: "22.55985284345753"
-          //   }, {
-          //     longitude: "114.0470551676265",
-          //     latitude: "22.56079916169713"
-          //   }, {
-          //     longitude: "114.0506075791376",
-          //     latitude: "22.56187164625972"
-          //   }, {
-          //     longitude: "114.0535451487578",
-          //     latitude: "22.56176650142255"
-          //   }, {
-          //     longitude: "114.054729286392",
-          //     latitude: "22.55947431503903"
-          //   }, {
-          //     longitude: "114.0492412669802",
-          //     latitude: "22.55514218952409"
-          //   }],
-          //   deviceList: [{
-          //     deviceName: "1 号环境监测系统",
-          //     longitude: "114.0409536290864",
-          //     latitude: "22.567919658086872",
-          //     status: 1,
-          //     orderProductList: 10,
-          //     alarmTimes: 987,
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
-          //   }, {
-          //     deviceName: "2 号环境监测系统",
-          //     longitude: "114.0410153808594",
-          //     latitude: "22.56797929382324",
-          //     status: 1,
-          //     orderProductList: 11,
-          //     alarmTimes: 1002,
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
-          //   }, {
-          //     deviceName: "3 号环境监测系统",
-          //     longitude: "114.0410153808556",
-          //     latitude: "22.56797929382318",
-          //     status: 1,
-          //     orderProductList: 12,
-          //     alarmTimes: 623,
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          //   }]
-          // }
+          // let data = res.response
+          let data =  {
+            mapList: [{
+              longitude: "114.0163264685513",
+              latitude: "22.55985284345753"
+            }, {
+              longitude: "114.0470551676265",
+              latitude: "22.56079916169713"
+            }, {
+              longitude: "114.0506075791376",
+              latitude: "22.56187164625972"
+            }, {
+              longitude: "114.0635451487578",
+              latitude: "22.56176650142255"
+            }, {
+              longitude: "114.074729286392",
+              latitude: "22.55947431503903"
+            }, {
+              longitude: "114.0892412669802",
+              latitude: "22.55514218952409"
+            }],
+            deviceList: [{
+              deviceName: "1 号环境监测系统",
+              longitude: "114.1009536290864",
+              latitude: "22.557919658086872",
+              status: 1,
+              orderProductList: 10,
+              alarmTimes: 987,
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
+            }, {
+              deviceName: "2 号环境监测系统",
+              longitude: "114.0440153808594",
+              latitude: "22.56797929382324",
+              status: 1,
+              orderProductList: 11,
+              alarmTimes: 1002,
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
+            }, {
+              deviceName: "3 号环境监测系统",
+              longitude: "114.05853808556",
+              latitude: "22.57797929382318",
+              status: 1,
+              orderProductList: 12,
+              alarmTimes: 623,
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            }]
+          }
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
             return [item.longitude, item.latitude]
