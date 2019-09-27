@@ -962,23 +962,34 @@ class App extends Component {
       console.log('')
       return null
     }
-    if (this.markerList) {
-      //重置标记index 层级
-      console.log('捡来222')
-      console.log(this.markerList)
-      this.markerList.forEach((e, i) => {
-        console.log(e)
-        console.log(i)
-        console.log( this.state.actionEquipmentListIndex)
-        e.setzIndex(this.state.actionEquipmentListIndex == i ? -100 : 100)
-      })
-      return null
-    }
+    // if (this.markerList) {
+    //   //重置标记index 层级
+    //   let arrEquipment = [localStorage.getItem('equipmentList')];
+    //   console.log(arrEquipment)
+    //   arrEquipment.map((e, i) => {
+    //       this.markerList.splice(this.state.actionEquipmentListIndex,1)
+    //       console.log(this.markerList)
+    //   })
+    //   return null
+    // }
 
+    // if (this.markerList) {
+    //   //重置标记index 层级
+    //   console.log(this.markerList)
+    //   let arrEquipment = JSON.parse(localStorage.getItem('markerList'))
+    //   console.log(arrEquipment)
+    //   arrEquipment.forEach((e, i) => {
+    //     if(this.state.actionEquipmentListIndex == i){
+    //       this.markerList = arrEquipment.splice(i,1)
+    //     }
+    //   })
+    //   return null
+    // }
+    this.map.remove(this.markerList)
     this.markerList = []
-   
+    // this.map.add(null)
     this.state.equipmentList.map((item, index) => {
-      // console.log(item)   // let content = `<canvas id="clock" width="500" height="500"></canvas>`
+       console.log(item)   // let content = `<canvas id="clock" width="500" height="500"></canvas>`
       console.log(index)
       console.log('this.state.actionEquipmentListIndex' + this.state.actionEquipmentListIndex)
 
@@ -993,21 +1004,21 @@ class App extends Component {
     
         let radius = 0
         let draw = () => {
-            context.clearRect(0, 0, 200, 200)
-            context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-            radius = (radius + 1) % 100;
-            
-            context.beginPath()
-            context.arc(100, 100, radius, 0, 2 * Math.PI)
-            context.fill()
-            context.stroke()
-    
-            AMap.Util.requestAnimFrame(draw)
+        context.clearRect(0, 0, 200, 200)
+        context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+        radius = (radius + 1) % 100;
+        
+        context.beginPath()
+        context.arc(100, 100, radius, 0, 2 * Math.PI)
+        context.fill()
+        context.stroke()
+
+        AMap.Util.requestAnimFrame(draw)
 
             //获取时间
 
-          var now = new Date();
-          var sec = now.getSeconds();
+          // var now = new Date();
+          // var sec = now.getSeconds();
           //表盘
           context.lineWidth = 1;
           //大圈边框颜色
@@ -1018,14 +1029,16 @@ class App extends Component {
           context.strokeStyle="rgb(252,184,19)";
           // cxt.rect(230,245,220,10);
           context.translate(100, 100);
-          context.rotate(sec * 6 * Math.PI / 180);
+          console.log(item)
+          console.log(item.rotary)
+          context.rotate((item.rotary - 180) * Math.PI / 180);
           context.closePath();
           context.strokeRect(-20,-5,120,10);
-        //   cxt.beginPath();
-        //   cxt.moveTo(0, -170);
-        //   cxt.lineTo(0, 20);
-        //   cxt.closePath();
-        //   cxt.stroke();
+          //   cxt.beginPath();
+          //   cxt.moveTo(0, -170);
+          //   cxt.lineTo(0, 20);
+          //   cxt.closePath();
+          //   cxt.stroke();
           //方块的颜色
           context.fillStyle = "rgb(252,184,19)";
           context.fillRect(-15, -10, 20, 20);
@@ -1035,7 +1048,7 @@ class App extends Component {
           context.shadowColor = '#000'; // 颜色
 
           context.beginPath();
-          context.arc(70, 0, 3, 0, 360, false);
+          context.arc(item.amplitude, 0, 3, 0, 360, false);
           context.closePath();
           //小球的颜色
           context.fillStyle = "rgb(252,184,19)";
@@ -1044,7 +1057,7 @@ class App extends Component {
 
           context.restore();
         }
-    
+
         this.markerList.push(
           new AMap.Marker({
             content: canvasC,
@@ -1059,9 +1072,17 @@ class App extends Component {
 
 
     })
+
+    
+    localStorage.setItem('markerList',JSON.stringify(this.markerList))
+    this.markerList.forEach((e, i) => {
+      if(this.state.actionEquipmentListIndex == i){
+        this.markerList.splice(i,1)
+      }
+    })
     this.map.add(this.markerList)
   }
-  //地图标注选中动画效果
+  //地图标注选中效果
   selMapMarker() {
     // if (!this.state.equipmentList || !this.state.equipmentList.length || !this.state.equipmentList[this.state.actionEquipmentListIndex].deviceCode) return null
     // let canvas = document.createElement('canvas')
@@ -1100,13 +1121,19 @@ class App extends Component {
     // this.mapMarkerDraw.setMap(this.map)
     // draw()
 
-    
+      console.log('跳转')
+      let arrRotary = [];
+      let arrAmplitude = [];
+      let arrEquipment= JSON.parse(localStorage.getItem('markerList')) 
+      console.log(this.state.equipmentList)
       this.state.equipmentList.map((item, index) => {
       // let content = `<canvas id="clock" width="500" height="500"></canvas>`
       // var oBody=document.getElementsByTagName("body")[0];
-
+      console.log()
+      
+      arrRotary.push(item.rotary)
+      arrAmplitude.push(item.amplitude)
       if(index == this.state.actionEquipmentListIndex){
-
         var canvas1 = document.createElement('canvas');
         // var canvas = React.createElement('canvas', { id:'canvas',width:50,height:50},'这是一个canvas')
         canvas1.id = "clock";
@@ -1123,11 +1150,11 @@ class App extends Component {
           var now = new Date();
           var sec = now.getSeconds();
           //表盘
-          cxt.lineWidth = 1;
+          // cxt.lineWidth = 1;
           //大圈边框颜色
           cxt.strokeStyle = "rgba(252,184,19,0.5)";
           cxt.beginPath();
-          cxt.arc(150, 150, 80, 0, 360, false);
+          cxt.arc(225, 225, 60, 0, 360, false);
           //大圈颜色
           cxt.fillStyle = "rgba(252,184,19,0.5)";
           cxt.fill();
@@ -1139,10 +1166,11 @@ class App extends Component {
           //边框颜色
           cxt.strokeStyle="rgb(252,184,19)";
           // cxt.rect(230,245,220,10);
-          cxt.translate(150, 150);
-          cxt.rotate(sec * 6 * Math.PI / 180);
+          cxt.translate(225, 225);
+          console.log(arrRotary[index])
+          cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
           cxt.closePath();
-          cxt.strokeRect(-20,-5,100,10);
+          cxt.strokeRect(-10,-2.5,70,4);
         //   cxt.beginPath();
         //   cxt.moveTo(0, -170);
         //   cxt.lineTo(0, 20);
@@ -1150,14 +1178,15 @@ class App extends Component {
         //   cxt.stroke();
           //方块的颜色
           cxt.fillStyle = "rgb(252,184,19)";
-          cxt.fillRect(-10, -10, 20, 20);
+          cxt.fillRect(-5, -5, 10, 10);
           cxt.shadowOffsetX = -3; // 阴影Y轴偏移
           cxt.shadowOffsetY = 0; // 阴影X轴偏移
           cxt.shadowBlur = 4; // 模糊尺寸
           cxt.shadowColor = '#000'; // 颜色
   
           cxt.beginPath();
-          cxt.arc(70, 0, 3, 0, 360, false);
+          // amplitude
+          cxt.arc(arrAmplitude[index], 0, 1, 0, 360, false);
           cxt.closePath();
           //小球的颜色
           cxt.fillStyle = "rgb(252,184,19)";
@@ -1167,14 +1196,13 @@ class App extends Component {
           cxt.restore();
         }
 
-        drawClock();
-        setInterval(drawClock, 1000);
+
 
         var content = canvas1
         let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
         // console.log('item',item)
         
-        let pageX = 0.008, pageY = 0.0078
+        let pageX = 0.05, pageY = 0.05
         let bounds = new AMap.Bounds([+item.longitude - pageX, +item.latitude - pageY], [+item.longitude + pageX, +item.latitude + pageY])
         // console.log(bounds)
         this.mapMarkerDraw = new AMap.CanvasLayer({
@@ -1182,10 +1210,15 @@ class App extends Component {
           bounds: bounds,
           zooms: [3, 18],
         })
+        console.log(this.map)
+        console.log(this.mapMarkerDraw)
+        this.mapMarkerDraw.setMap(this.map)
+        drawClock();
+        // setInterval(drawClock, 1000);
       }
+
     })
-  
-    this.mapMarkerDraw.setMap(this.map)
+
 
   }
   //画定位2d图形
@@ -1507,32 +1540,25 @@ class App extends Component {
         if (res.status == 200) {
           // let data = res.response
           let data =  {
-            mapList: [{
-              longitude: "114.0163264685513",
-              latitude: "22.55985284345753"
-            }, {
-              longitude: "114.0470551676265",
-              latitude: "22.56079916169713"
-            }, {
-              longitude: "114.0506075791376",
-              latitude: "22.56187164625972"
-            }, {
-              longitude: "114.0635451487578",
-              latitude: "22.56176650142255"
-            }, {
-              longitude: "114.074729286392",
-              latitude: "22.55947431503903"
-            }, {
-              longitude: "114.0892412669802",
-              latitude: "22.55514218952409"
-            }],
+            mapList: [{longitude: "114.03322516505993", latitude: "22.567655873539117"},
+            {longitude: "114.05741734885589", latitude: "22.570405120994014"},
+            {longitude: "114.05873565456415", latitude: "22.563237148348076"},
+            {longitude: "114.078177646276", latitude: "22.527747225143692"},
+            {longitude: "114.07508774154371", latitude: "22.525589270430714"},
+            {longitude: "114.07957105383541", latitude: "22.51918457950339"},
+            {longitude: "114.05102564488274", latitude: "22.513942918144956"},
+            {longitude: "114.02808873488428", latitude: "22.54069176808944"}],
             deviceList: [{
               deviceName: "1 号环境监测系统",
-              longitude: "114.1009536290864",
-              latitude: "22.557919658086872",
+              longitude: "114.0399936290864",
+              latitude: "22.527919658186872",
               status: 1,
               orderProductList: 10,
               alarmTimes: 987,
+              rotary: "97",
+              amplitude:'15',
+              height:'0',
+              heavy:'10',
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
             }, {
@@ -1542,15 +1568,23 @@ class App extends Component {
               status: 1,
               orderProductList: 11,
               alarmTimes: 1002,
+              rotary: "197",
+              amplitude:'30',
+              height:'60',
+              heavy:'20',
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
             }, {
               deviceName: "3 号环境监测系统",
               longitude: "114.05853808556",
-              latitude: "22.57797929382318",
+              latitude: "22.54797929382318",
               status: 1,
               orderProductList: 12,
               alarmTimes: 623,
+              rotary: "297",
+              amplitude:'55',
+              height:'20',
+              heavy:'30',
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
             }]
@@ -1571,6 +1605,7 @@ class App extends Component {
               }
             }
           }
+          localStorage.setItem('equipmentList',deviceList)
           this.setState(
             {
               equipmentList: deviceList,
@@ -2163,50 +2198,27 @@ class App extends Component {
             <div className="app-content-bottom">
               <p className='title'>各塔机吊钩载重 / 高度</p>
               <div className="app-content-bottom-content">
-                <div className='content'>
-                  <div className='number'>
-                    <span>1.38t</span><br/>
-                    <span>50.07m</span>
-                  </div>
-                  <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                  <img className='line' src={require("../../assets/images/line.png")} alt=""/>
-                  <img className='thing' src={require("../../assets/images/thing.png")} alt=""/>
-                  <div className='breathe-line'></div>
-                  <p>1号塔机监测系统</p>
-                </div>
-                <div className='content'>
-                  <div className='number'>
-                    <span>1.38t</span><br/>
-                    <span>50.07m</span>
-                  </div>
-                  <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                  <img className='line' src={require("../../assets/images/line.png")} alt=""/>
-                  <img className='thing' src={require("../../assets/images/thing.png")} alt=""/>
-                  <div className='breathe-line'></div>
-                  <p>1号塔机监测系统</p>
-                </div>
-                <div className='content'>
-                  <div className='number'>
-                    <span>1.38t</span><br/>
-                    <span>50.07m</span>
-                  </div>
-                  <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                  <img className='line' src={require("../../assets/images/line.png")} alt=""/>
-                  <img className='thing' src={require("../../assets/images/thing.png")} alt=""/>
-                  <div className='breathe-line'></div>
-                  <p>1号塔机监测系统</p>
-                </div>
-                <div className='content'>
-                  <div className='number'>
-                    <span>1.38t</span><br/>
-                    <span>50.07m</span>
-                  </div>
-                  <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                  <img className='line' src={require("../../assets/images/line.png")} alt=""/>
-                  <img className='thing' src={require("../../assets/images/thing.png")} alt=""/>
-                  <div className='breathe-line'></div>
-                  <p>1号塔机监测系统</p>
-                </div>
+
+              {
+                this.state.equipmentList.map(
+                  (item,index)=>{
+                    return(
+                      <div className='content'>
+                        <div className='number'>
+                          <span>{item.heavy}t</span><br/>
+                          <span>{item.height}m</span>
+                        </div>
+                        <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
+                        <img className='line'  style={{height:+item.height,left:+item.amplitude}} src={require("../../assets/images/line.png")} alt=""/>
+                        <img className='thing' style={{top:+item.height,left:+item.amplitude}} src={require("../../assets/images/thing.png")} alt=""/>
+                        <div className='breathe-line'></div>
+                        <p>1号塔机监测系统</p>
+                      </div>
+                    )
+                  }
+                ) 
+              }
+
               </div>
             </div>
           </div>
