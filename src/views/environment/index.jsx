@@ -202,8 +202,10 @@ class App extends Component {
     this.columnarPM10Dom = React.createRef() //PM2.5 7天柱状图对象
     this.columnarTSPDom = React.createRef() //PMTSP 7天柱状图对象
     this.proportionDom = React.createRef() //24小时报警次数饼图对象
-
+    console.log('2222')
     this.map = null // 地图对象
+    console.log(this.map)
+    console.log('3333')
     this.mapMarkerDraw = null//选中地图光标对象
 
     this.equipmentListTime = null // 设备列表定时器对象
@@ -220,6 +222,7 @@ class App extends Component {
     this.brokenLineLableIndex = [] // 标注的索引
     this.oldMapPolygonPath = "" // 上一次黄色区域经纬度
     this.bannerTime = null // banner轮播
+    this.ulTop = ''
     this.state = {
       equipmentListAnimation: true, // 设备动画
       projectName: "", // 项目名称
@@ -927,6 +930,8 @@ class App extends Component {
   }
   // 初始化地图
   initMap() {
+    console.log('初始化地图')
+    console.log(this.map)
     if (this.map) {
         // console.log(this.map)
       this.mapMarkerDraw && this.map.remove(this.mapMarkerDraw)
@@ -957,7 +962,22 @@ class App extends Component {
   // 重置地图标注
   resetMapMarker() {
     // 没有数据情况下
-    console.log('重置地图标注')
+
+    console.log(-260 * parseInt(this.state.actionEquipmentListIndex/4))
+    if(this.state.actionEquipmentListIndex>3){
+      let arr = Object.keys(this.refs)
+      console.log(arr)
+      if(arr.length!=0){
+        console.log('元素对象')
+        console.log(this.refs.content.style.top)
+        this.refs.content.style.top = -7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
+        console.log(this.refs.content.style.top)
+      }else{
+        console.log(this.refs)
+      }
+    }else{
+      this.refs.content.style.top = 0
+    }
     if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
       console.log('')
       return null
@@ -989,9 +1009,6 @@ class App extends Component {
     this.markerList = []
     // this.map.add(null)
     this.state.equipmentList.map((item, index) => {
-       console.log(item)   // let content = `<canvas id="clock" width="500" height="500"></canvas>`
-      console.log(index)
-      console.log('this.state.actionEquipmentListIndex' + this.state.actionEquipmentListIndex)
 
         //光圈开始
         let canvasC = document.createElement('canvas')
@@ -1029,8 +1046,6 @@ class App extends Component {
           context.strokeStyle="rgb(252,184,19)";
           // cxt.rect(230,245,220,10);
           context.translate(100, 100);
-          console.log(item)
-          console.log(item.rotary)
           context.rotate((item.rotary - 180) * Math.PI / 180);
           context.closePath();
           context.strokeRect(-20,-5,120,10);
@@ -1121,15 +1136,13 @@ class App extends Component {
     // this.mapMarkerDraw.setMap(this.map)
     // draw()
 
-      console.log('跳转')
+
       let arrRotary = [];
       let arrAmplitude = [];
       let arrEquipment= JSON.parse(localStorage.getItem('markerList')) 
-      console.log(this.state.equipmentList)
       this.state.equipmentList.map((item, index) => {
       // let content = `<canvas id="clock" width="500" height="500"></canvas>`
       // var oBody=document.getElementsByTagName("body")[0];
-      console.log()
       
       arrRotary.push(item.rotary)
       arrAmplitude.push(item.amplitude)
@@ -1150,7 +1163,7 @@ class App extends Component {
           var now = new Date();
           var sec = now.getSeconds();
           //表盘
-          // cxt.lineWidth = 1;
+          cxt.lineWidth = 0.3;
           //大圈边框颜色
           cxt.strokeStyle = "rgba(252,184,19,0.5)";
           cxt.beginPath();
@@ -1404,6 +1417,7 @@ class App extends Component {
   // 初始化设备列表
   initEquipmentList() {
     // 没有数据情况下
+    console.log('初始化数据列表')
     if (!this.state.equipmentList.length) {
       this.setState({
         actionEquipmentListIndex: 0,
@@ -1455,6 +1469,7 @@ class App extends Component {
   }
   //更新接口数据
   updateDate(type) {
+    console.log('更新接口数据')
     !type && this.getBaseInfo()
     !type && this.getDevice()
     this.map && this.initMap()
@@ -1555,10 +1570,10 @@ class App extends Component {
               status: 1,
               orderProductList: 10,
               alarmTimes: 987,
-              rotary: "97",
-              amplitude:'15',
-              height:'0',
-              heavy:'10',
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:Math.ceil(60+Math.random()*60),
+              height:Math.ceil(Math.random()*70),
+              heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
             }, {
@@ -1568,10 +1583,10 @@ class App extends Component {
               status: 1,
               orderProductList: 11,
               alarmTimes: 1002,
-              rotary: "197",
-              amplitude:'30',
-              height:'60',
-              heavy:'20',
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:Math.ceil(60+Math.random()*60),
+              height:Math.ceil(Math.random()*70),
+              heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
             }, {
@@ -1581,13 +1596,136 @@ class App extends Component {
               status: 1,
               orderProductList: 12,
               alarmTimes: 623,
-              rotary: "297",
-              amplitude:'55',
-              height:'20',
-              heavy:'30',
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:Math.ceil(60+Math.random()*60),
+              height:Math.ceil(Math.random()*70),
+              heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            }]
+            },
+            {
+              deviceName: "4 号环境监测系统",
+              longitude: "114.06853808556",
+              latitude: "22.54797929382318",
+              status: 1,
+              orderProductList: 12,
+              alarmTimes: 623,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:Math.ceil(60+Math.random()*60),
+              height:Math.ceil(Math.random()*70),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            },
+            {
+              deviceName: "5 号环境监测系统",
+              longitude: "114.07853808556",
+              latitude: "22.54797929382318",
+              status: 1,
+              orderProductList: 12,
+              alarmTimes: 623,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:Math.ceil(60+Math.random()*60),
+              height:Math.ceil(Math.random()*70),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            }
+          ,{
+            deviceName: "6 号环境监测系统",
+            longitude: "114.08853808556",
+            latitude: "22.54797929382318",
+            status: 1,
+            orderProductList: 12,
+            alarmTimes: 623,
+            rotary: Math.ceil(Math.random()*360),
+            amplitude:Math.ceil(60+Math.random()*60),
+            height:Math.ceil(Math.random()*70),
+            heavy:Math.ceil(Math.random()*100),
+            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+          },{
+            deviceName: "7 号环境监测系统",
+            longitude: "114.1599936290864",
+            latitude: "22.527919658186872",
+            status: 1,
+            orderProductList: 10,
+            alarmTimes: 987,
+            rotary: Math.ceil(Math.random()*360),
+            amplitude:Math.ceil(60+Math.random()*60),
+            height:Math.ceil(Math.random()*70),
+            heavy:Math.ceil(Math.random()*100),
+            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
+          }, {
+            deviceName: "8 号环境监测系统",
+            longitude: "114.1440153808594",
+            latitude: "22.56797929382324",
+            status: 1,
+            orderProductList: 11,
+            alarmTimes: 1002,
+            rotary: Math.ceil(Math.random()*360),
+            amplitude:Math.ceil(60+Math.random()*60),
+            height:Math.ceil(Math.random()*70),
+            heavy:Math.ceil(Math.random()*100),
+            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
+          }, {
+            deviceName: "9 号环境监测系统",
+            longitude: "114.13853808556",
+            latitude: "22.54797929382318",
+            status: 1,
+            orderProductList: 12,
+            alarmTimes: 623,
+            rotary: Math.ceil(Math.random()*360),
+            amplitude:Math.ceil(60+Math.random()*60),
+            height:Math.ceil(Math.random()*70),
+            heavy:Math.ceil(Math.random()*100),
+            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+          },
+          {
+            deviceName: "10 号环境监测系统",
+            longitude: "114.12853808556",
+            latitude: "22.54797929382318",
+            status: 1,
+            orderProductList: 12,
+            alarmTimes: 623,
+            rotary: Math.ceil(Math.random()*360),
+            amplitude:Math.ceil(60+Math.random()*60),
+            height:Math.ceil(Math.random()*70),
+            heavy:Math.ceil(Math.random()*100),
+            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+          },
+          {
+            deviceName: "11 号环境监测系统",
+            longitude: "114.11853808556",
+            latitude: "22.54797929382318",
+            status: 1,
+            orderProductList: 12,
+            alarmTimes: 623,
+            rotary: Math.ceil(Math.random()*360),
+            amplitude:Math.ceil(60+Math.random()*60),
+            height:Math.ceil(Math.random()*70),
+            heavy:Math.ceil(Math.random()*100),
+            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+          }
+        ,{
+          deviceName: "12 号环境监测系统",
+          longitude: "114.10853808556",
+          latitude: "22.54797929382318",
+          status: 1,
+          orderProductList: 12,
+          alarmTimes: 623,
+          rotary: Math.ceil(Math.random()*360),
+          amplitude:Math.ceil(60+Math.random()*60),
+          height:Math.ceil(Math.random()*70),
+          heavy:Math.ceil(Math.random()*100),
+          img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+        }]
           }
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
@@ -1626,6 +1764,8 @@ class App extends Component {
                     }
                 }
                 if (data.mapList) {
+                  console.log('进来了呀')
+                  console.log(this.map)
                     !this.map && this.initEquipmentList();
                     this.map && this.initMap();
 
@@ -2006,6 +2146,9 @@ class App extends Component {
     }, 1000)
   }
   render() {
+    const ulStyle = {
+      top: -260
+    };
     return (
       <div className="app-wrap">
         <div className="app-header">
@@ -2197,29 +2340,33 @@ class App extends Component {
             {/* 地图 end */}
             <div className="app-content-bottom">
               <p className='title'>各塔机吊钩载重 / 高度</p>
+
               <div className="app-content-bottom-content">
-
-              {
-                this.state.equipmentList.map(
-                  (item,index)=>{
-                    return(
-                      <div className='content'>
-                        <div className='number'>
-                          <span>{item.heavy}t</span><br/>
-                          <span>{item.height}m</span>
-                        </div>
-                        <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                        <img className='line'  style={{height:+item.height,left:+item.amplitude}} src={require("../../assets/images/line.png")} alt=""/>
-                        <img className='thing' style={{top:+item.height,left:+item.amplitude}} src={require("../../assets/images/thing.png")} alt=""/>
-                        <div className='breathe-line'></div>
-                        <p>1号塔机监测系统</p>
-                      </div>
-                    )
-                  }
-                ) 
-              }
-
+                <ul className="app-content-bottom-content-1" ref='content'>
+                {
+                  this.state.equipmentList.map(
+                    (item,index)=>{
+                      return(
+                        <li className='content' key={index}>
+                          <div className='number'>
+                            <span>{item.heavy}t</span><br/>
+                            <span>{item.height}m</span>
+                          </div>
+                          <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
+                          <img className='line'  style={{height:+item.height,left:+item.amplitude}} src={require("../../assets/images/line.png")} alt=""/>
+                          <img className='thing' style={{top:+item.height+18,left:+item.amplitude-4}} src={require("../../assets/images/thing.png")} alt=""/>
+                          <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
+                          <p>{item.deviceName}</p>
+                          {/* <p>{this.state.equipmentList[this.state.actionEquipmentListIndex]}</p>
+                          <p>{index}</p> */}
+                        </li>
+                      )
+                    }
+                  ) 
+                }
+                </ul>
               </div>
+
             </div>
           </div>
           <div className="app-content-right">
