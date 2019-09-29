@@ -1012,7 +1012,7 @@ class App extends Component {
 
         //光圈开始
         let canvasC = document.createElement('canvas')
-        canvasC.width = canvasC.height = 200
+        canvasC.width = canvasC.height = 220
     
         let context = canvasC.getContext('2d')
         context.fillStyle = 'rgba(252, 184, 19,.8)'
@@ -1048,7 +1048,7 @@ class App extends Component {
           context.translate(100, 100);
           context.rotate((item.rotary - 180) * Math.PI / 180);
           context.closePath();
-          context.strokeRect(-20,-5,120,10);
+          context.strokeRect(-30,-1,160,12);
           //   cxt.beginPath();
           //   cxt.moveTo(0, -170);
           //   cxt.lineTo(0, 20);
@@ -1056,14 +1056,14 @@ class App extends Component {
           //   cxt.stroke();
           //方块的颜色
           context.fillStyle = "rgb(252,184,19)";
-          context.fillRect(-15, -10, 20, 20);
+          context.fillRect(-15, -10, 30, 30);
           context.shadowOffsetX = -3; // 阴影Y轴偏移
           context.shadowOffsetY = 0; // 阴影X轴偏移
           context.shadowBlur = 4; // 模糊尺寸
           context.shadowColor = '#000'; // 颜色
 
           context.beginPath();
-          context.arc(item.amplitude, 0, 3, 0, 360, false);
+          context.arc(item.amplitude, 5, 3, 0, 360, false);
           context.closePath();
           //小球的颜色
           context.fillStyle = "rgb(252,184,19)";
@@ -1150,8 +1150,8 @@ class App extends Component {
         var canvas1 = document.createElement('canvas');
         // var canvas = React.createElement('canvas', { id:'canvas',width:50,height:50},'这是一个canvas')
         canvas1.id = "clock";
-        canvas1.width = 400;
-        canvas1.height = 400;
+        canvas1.width = 420;
+        canvas1.height = 420;
         // oBody.appendChild(canvas);
         // 
         // var canvas1 = document.getElementById('clock');
@@ -1183,7 +1183,7 @@ class App extends Component {
           console.log(arrRotary[index])
           cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
           cxt.closePath();
-          cxt.strokeRect(-10,-2.5,70,4);
+          cxt.strokeRect(-10,-2,70,4);
         //   cxt.beginPath();
         //   cxt.moveTo(0, -170);
         //   cxt.lineTo(0, 20);
@@ -1199,7 +1199,8 @@ class App extends Component {
   
           cxt.beginPath();
           // amplitude
-          cxt.arc(arrAmplitude[index], 0, 1, 0, 360, false);
+          cxt.arc(arrAmplitude[index]-40, 0, 1, 0, 360, false);
+          
           cxt.closePath();
           //小球的颜色
           cxt.fillStyle = "rgb(252,184,19)";
@@ -1602,130 +1603,7 @@ class App extends Component {
               heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            },
-            {
-              deviceName: "4 号环境监测系统",
-              longitude: "114.06853808556",
-              latitude: "22.54797929382318",
-              status: 1,
-              orderProductList: 12,
-              alarmTimes: 623,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:Math.ceil(60+Math.random()*60),
-              height:Math.ceil(Math.random()*70),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            },
-            {
-              deviceName: "5 号环境监测系统",
-              longitude: "114.07853808556",
-              latitude: "22.54797929382318",
-              status: 1,
-              orderProductList: 12,
-              alarmTimes: 623,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:Math.ceil(60+Math.random()*60),
-              height:Math.ceil(Math.random()*70),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            }
-          ,{
-            deviceName: "6 号环境监测系统",
-            longitude: "114.08853808556",
-            latitude: "22.54797929382318",
-            status: 1,
-            orderProductList: 12,
-            alarmTimes: 623,
-            rotary: Math.ceil(Math.random()*360),
-            amplitude:Math.ceil(60+Math.random()*60),
-            height:Math.ceil(Math.random()*70),
-            heavy:Math.ceil(Math.random()*100),
-            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          },{
-            deviceName: "7 号环境监测系统",
-            longitude: "114.1599936290864",
-            latitude: "22.527919658186872",
-            status: 1,
-            orderProductList: 10,
-            alarmTimes: 987,
-            rotary: Math.ceil(Math.random()*360),
-            amplitude:Math.ceil(60+Math.random()*60),
-            height:Math.ceil(Math.random()*70),
-            heavy:Math.ceil(Math.random()*100),
-            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
-          }, {
-            deviceName: "8 号环境监测系统",
-            longitude: "114.1440153808594",
-            latitude: "22.56797929382324",
-            status: 1,
-            orderProductList: 11,
-            alarmTimes: 1002,
-            rotary: Math.ceil(Math.random()*360),
-            amplitude:Math.ceil(60+Math.random()*60),
-            height:Math.ceil(Math.random()*70),
-            heavy:Math.ceil(Math.random()*100),
-            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
-          }, {
-            deviceName: "9 号环境监测系统",
-            longitude: "114.13853808556",
-            latitude: "22.54797929382318",
-            status: 1,
-            orderProductList: 12,
-            alarmTimes: 623,
-            rotary: Math.ceil(Math.random()*360),
-            amplitude:Math.ceil(60+Math.random()*60),
-            height:Math.ceil(Math.random()*70),
-            heavy:Math.ceil(Math.random()*100),
-            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          },
-          {
-            deviceName: "10 号环境监测系统",
-            longitude: "114.12853808556",
-            latitude: "22.54797929382318",
-            status: 1,
-            orderProductList: 12,
-            alarmTimes: 623,
-            rotary: Math.ceil(Math.random()*360),
-            amplitude:Math.ceil(60+Math.random()*60),
-            height:Math.ceil(Math.random()*70),
-            heavy:Math.ceil(Math.random()*100),
-            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          },
-          {
-            deviceName: "11 号环境监测系统",
-            longitude: "114.11853808556",
-            latitude: "22.54797929382318",
-            status: 1,
-            orderProductList: 12,
-            alarmTimes: 623,
-            rotary: Math.ceil(Math.random()*360),
-            amplitude:Math.ceil(60+Math.random()*60),
-            height:Math.ceil(Math.random()*70),
-            heavy:Math.ceil(Math.random()*100),
-            img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          }
-        ,{
-          deviceName: "12 号环境监测系统",
-          longitude: "114.10853808556",
-          latitude: "22.54797929382318",
-          status: 1,
-          orderProductList: 12,
-          alarmTimes: 623,
-          rotary: Math.ceil(Math.random()*360),
-          amplitude:Math.ceil(60+Math.random()*60),
-          height:Math.ceil(Math.random()*70),
-          heavy:Math.ceil(Math.random()*100),
-          img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-        }]
+            }]
           }
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
@@ -2349,8 +2227,9 @@ class App extends Component {
                       return(
                         <li className='content' key={index}>
                           <div className='number'>
-                            <span>{item.heavy}t</span><br/>
-                            <span>{item.height}m</span>
+                            <span>重{item.heavy}t</span><br/>
+                            <span>高度{item.height}m</span><br/>
+                            <span>幅{item.amplitude}m</span>
                           </div>
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
                           <img className='line'  style={{height:+item.height,left:+item.amplitude}} src={require("../../assets/images/line.png")} alt=""/>
