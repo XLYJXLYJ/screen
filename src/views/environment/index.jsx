@@ -202,10 +202,7 @@ class App extends Component {
     this.columnarPM10Dom = React.createRef() //PM2.5 7天柱状图对象
     this.columnarTSPDom = React.createRef() //PMTSP 7天柱状图对象
     this.proportionDom = React.createRef() //24小时报警次数饼图对象
-    console.log('2222')
     this.map = null // 地图对象
-    console.log(this.map)
-    console.log('3333')
     this.mapMarkerDraw = null//选中地图光标对象
 
     this.equipmentListTime = null // 设备列表定时器对象
@@ -930,12 +927,8 @@ class App extends Component {
   }
   // 初始化地图
   initMap() {
-    console.log('初始化地图')
-    console.log(this.map)
     if (this.map) {
-        // console.log(this.map)
       this.mapMarkerDraw && this.map.remove(this.mapMarkerDraw)
-     
       this.selMapMarker()
       this.resetMapMarker()
     } else {
@@ -962,16 +955,10 @@ class App extends Component {
   // 重置地图标注
   resetMapMarker() {
     // 没有数据情况下
-
-    console.log(-260 * parseInt(this.state.actionEquipmentListIndex/4))
     if(this.state.actionEquipmentListIndex>3){
       let arr = Object.keys(this.refs)
-      console.log(arr)
       if(arr.length!=0){
-        console.log('元素对象')
-        console.log(this.refs.content.style.top)
         this.refs.content.style.top = -7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
-        console.log(this.refs.content.style.top)
       }else{
         console.log(this.refs)
       }
@@ -979,116 +966,78 @@ class App extends Component {
       this.refs.content.style.top = 0
     }
     if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
-      console.log('')
       return null
     }
-    // if (this.markerList) {
-    //   //重置标记index 层级
-    //   let arrEquipment = [localStorage.getItem('equipmentList')];
-    //   console.log(arrEquipment)
-    //   arrEquipment.map((e, i) => {
-    //       this.markerList.splice(this.state.actionEquipmentListIndex,1)
-    //       console.log(this.markerList)
-    //   })
-    //   return null
-    // }
 
-    // if (this.markerList) {
-    //   //重置标记index 层级
-    //   console.log(this.markerList)
-    //   let arrEquipment = JSON.parse(localStorage.getItem('markerList'))
-    //   console.log(arrEquipment)
-    //   arrEquipment.forEach((e, i) => {
-    //     if(this.state.actionEquipmentListIndex == i){
-    //       this.markerList = arrEquipment.splice(i,1)
-    //     }
-    //   })
-    //   return null
-    // }
     this.map.remove(this.markerList)
     this.markerList = []
-    // this.map.add(null)
     this.state.equipmentList.map((item, index) => {
-
         //光圈开始
         let canvasC = document.createElement('canvas')
-        canvasC.width = canvasC.height = 220
+        canvasC.width = canvasC.height = 320
     
         let context = canvasC.getContext('2d')
         context.fillStyle = 'rgba(252, 184, 19,.8)'
         context.strokeStyle = 'rgba(252, 184, 19,.4)'
-        context.globalAlpha = 1
     
         let radius = 0
+        console.log('不发光')
         let draw = () => {
-        context.clearRect(0, 0, 200, 200)
+        console.log('发光')
+        context.clearRect(0, 0, 500, 500)
+
+        context.beginPath()
         context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
         radius = (radius + 1) % 100;
-        
-        context.beginPath()
         context.arc(100, 100, radius, 0, 2 * Math.PI)
         context.fill()
         context.stroke()
+        context.closePath();
 
         AMap.Util.requestAnimFrame(draw)
-
-            //获取时间
-
-          // var now = new Date();
-          // var sec = now.getSeconds();
-          //表盘
           context.lineWidth = 1;
-          //大圈边框颜色
-          //秒针
           context.save();
-          context.beginPath();
+
           //边框颜色
+          context.beginPath();
           context.strokeStyle="rgb(252,184,19)";
-          // cxt.rect(230,245,220,10);
           context.translate(100, 100);
           context.rotate((item.rotary - 180) * Math.PI / 180);
-          context.closePath();
           context.strokeRect(-30,-1,160,12);
-          //   cxt.beginPath();
-          //   cxt.moveTo(0, -170);
-          //   cxt.lineTo(0, 20);
-          //   cxt.closePath();
-          //   cxt.stroke();
+          context.closePath();
+          
           //方块的颜色
+          context.beginPath();
           context.fillStyle = "rgb(252,184,19)";
           context.fillRect(-15, -10, 30, 30);
           context.shadowOffsetX = -3; // 阴影Y轴偏移
           context.shadowOffsetY = 0; // 阴影X轴偏移
           context.shadowBlur = 4; // 模糊尺寸
           context.shadowColor = '#000'; // 颜色
+          context.closePath();
 
+          //小球
           context.beginPath();
           context.arc(item.amplitude, 5, 3, 0, 360, false);
-          context.closePath();
-          //小球的颜色
           context.fillStyle = "rgb(252,184,19)";
           context.fill();
           context.stroke();
+          context.closePath();
 
           context.restore();
         }
-
+        draw()
         this.markerList.push(
           new AMap.Marker({
             content: canvasC,
             position: new AMap.LngLat(item.longitude, item.latitude),
             offset: new AMap.Pixel(-15, -17),
-            size: new AMap.Size(40, 50),
+            size: new AMap.Size(50, 60),
             zIndex: 99 - index,
           })
         )
-        
-        draw()
-
-
     })
 
-    
     localStorage.setItem('markerList',JSON.stringify(this.markerList))
     this.markerList.forEach((e, i) => {
       if(this.state.actionEquipmentListIndex == i){
@@ -1099,141 +1048,78 @@ class App extends Component {
   }
   //地图标注选中效果
   selMapMarker() {
-    // if (!this.state.equipmentList || !this.state.equipmentList.length || !this.state.equipmentList[this.state.actionEquipmentListIndex].deviceCode) return null
-    // let canvas = document.createElement('canvas')
-    // canvas.width = canvas.height = 200
-
-    // let context = canvas.getContext('2d')
-    // context.fillStyle = 'rgba(252, 184, 19,.8)'
-    // context.strokeStyle = 'rgba(252, 184, 19,.4)'
-    // context.globalAlpha = 1
-
-    // let radius = 0
-    // let draw = () => {
-    //     context.clearRect(0, 0, 200, 200)
-    //     context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-    //     radius = (radius + 1) % 100;
-        
-    //     context.beginPath()
-    //     context.arc(100, 100, radius, 0, 2 * Math.PI)
-    //     context.fill()
-    //     context.stroke()
-
-    //     AMap.Util.requestAnimFrame(draw)
-    // }
-
-    // let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
-    
-    // let pageX = 0.008, pageY = 0.0078
-    // let bounds = new AMap.Bounds([+item.longitude - pageX, +item.latitude - pageY], [+item.longitude + pageX, +item.latitude + pageY])
-    // // console.log(bounds)
-    // this.mapMarkerDraw = new AMap.CanvasLayer({
-    //   canvas: canvas,
-    //   bounds: bounds,
-    //   zooms: [3, 18],
-    // })
-
-    // this.mapMarkerDraw.setMap(this.map)
-    // draw()
-
 
       let arrRotary = [];
       let arrAmplitude = [];
       let arrEquipment= JSON.parse(localStorage.getItem('markerList')) 
       this.state.equipmentList.map((item, index) => {
-      // let content = `<canvas id="clock" width="500" height="500"></canvas>`
-      // var oBody=document.getElementsByTagName("body")[0];
-      
+    
       arrRotary.push(item.rotary)
       arrAmplitude.push(item.amplitude)
       if(index == this.state.actionEquipmentListIndex){
         var canvas1 = document.createElement('canvas');
-        // var canvas = React.createElement('canvas', { id:'canvas',width:50,height:50},'这是一个canvas')
         canvas1.id = "clock";
-        canvas1.width = 420;
-        canvas1.height = 420;
-        // oBody.appendChild(canvas);
-        // 
-        // var canvas1 = document.getElementById('clock');
+        canvas1.width = 400;
+        canvas1.height = 400;
+
         var cxt = canvas1.getContext('2d');
         cxt.restore();
         function drawClock() {
-          //获取时间
+
           cxt.clearRect(0, 0, 500, 500);
-          var now = new Date();
-          var sec = now.getSeconds();
-          //表盘
-          cxt.lineWidth = 0.3;
-          //大圈边框颜色
-          cxt.strokeStyle = "rgba(252,184,19,0.5)";
+          //大圈
           cxt.beginPath();
+          cxt.lineWidth = 0.3;
+          cxt.strokeStyle = "rgba(252,184,19,0.5)";
           cxt.arc(225, 225, 60, 0, 360, false);
-          //大圈颜色
           cxt.fillStyle = "rgba(252,184,19,0.5)";
           cxt.fill();
-          cxt.closePath();
           cxt.stroke();
-          //秒针
-          cxt.save();
-          cxt.beginPath();
-          //边框颜色
-          cxt.strokeStyle="rgb(252,184,19)";
-          // cxt.rect(230,245,220,10);
-          cxt.translate(225, 225);
-          console.log(arrRotary[index])
-          cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
           cxt.closePath();
+
+          cxt.save();
+          //边框
+          cxt.beginPath();
+          cxt.strokeStyle="rgb(252,184,19)";
+          cxt.translate(225, 225);
+          cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
           cxt.strokeRect(-10,-2,70,4);
-        //   cxt.beginPath();
-        //   cxt.moveTo(0, -170);
-        //   cxt.lineTo(0, 20);
-        //   cxt.closePath();
-        //   cxt.stroke();
+          cxt.closePath();
+
           //方块的颜色
+          cxt.beginPath();
           cxt.fillStyle = "rgb(252,184,19)";
           cxt.fillRect(-5, -5, 10, 10);
           cxt.shadowOffsetX = -3; // 阴影Y轴偏移
           cxt.shadowOffsetY = 0; // 阴影X轴偏移
           cxt.shadowBlur = 4; // 模糊尺寸
           cxt.shadowColor = '#000'; // 颜色
-  
-          cxt.beginPath();
-          // amplitude
-          cxt.arc(arrAmplitude[index]-40, 0, 1, 0, 360, false);
-          
           cxt.closePath();
-          //小球的颜色
+
+          //小球
+          cxt.beginPath();
+          cxt.arc(arrAmplitude[index]-40, 0, 1, 0, 360, false);
           cxt.fillStyle = "rgb(252,184,19)";
           cxt.fill();
           cxt.stroke();
+          cxt.closePath();
   
-          cxt.restore();
+          // cxt.restore();
         }
-
-
 
         var content = canvas1
         let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
-        // console.log('item',item)
-        
         let pageX = 0.05, pageY = 0.05
         let bounds = new AMap.Bounds([+item.longitude - pageX, +item.latitude - pageY], [+item.longitude + pageX, +item.latitude + pageY])
-        // console.log(bounds)
         this.mapMarkerDraw = new AMap.CanvasLayer({
           canvas: content,
           bounds: bounds,
           zooms: [3, 18],
         })
-        console.log(this.map)
-        console.log(this.mapMarkerDraw)
         this.mapMarkerDraw.setMap(this.map)
         drawClock();
-        // setInterval(drawClock, 1000);
       }
-
     })
-
-
   }
   //画定位2d图形
   map2D() {
@@ -1418,7 +1304,6 @@ class App extends Component {
   // 初始化设备列表
   initEquipmentList() {
     // 没有数据情况下
-    console.log('初始化数据列表')
     if (!this.state.equipmentList.length) {
       this.setState({
         actionEquipmentListIndex: 0,
@@ -1470,7 +1355,6 @@ class App extends Component {
   }
   //更新接口数据
   updateDate(type) {
-    console.log('更新接口数据')
     !type && this.getBaseInfo()
     !type && this.getDevice()
     this.map && this.initMap()
@@ -1642,8 +1526,6 @@ class App extends Component {
                     }
                 }
                 if (data.mapList) {
-                  console.log('进来了呀')
-                  console.log(this.map)
                     !this.map && this.initEquipmentList();
                     this.map && this.initMap();
 
