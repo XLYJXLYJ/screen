@@ -219,6 +219,7 @@ class App extends Component {
     this.brokenLineLableIndex = [] // 标注的索引
     this.oldMapPolygonPath = "" // 上一次黄色区域经纬度
     this.bannerTime = null // banner轮播
+    this.equipmentListTime01 = '' // 发光设备定时器
     this.ulTop = ''
     this.state = {
       equipmentListAnimation: true, // 设备动画
@@ -968,13 +969,23 @@ class App extends Component {
     if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
       return null
     }
-
+    window.clearInterval(this.equipmentListTime01)
     this.map.remove(this.markerList)
     this.markerList = []
     this.state.equipmentList.map((item, index) => {
         //光圈开始
+    
         let canvasC = document.createElement('canvas')
-        canvasC.width = canvasC.height = 320
+
+        let size = this.map.getSize() //resize
+        
+        let width = size.width
+        let height = size.height
+        canvasC.style.width = width + "px"
+        canvasC.style.height = height + "px"
+        canvasC.width = width*devicePixelRatio
+        canvasC.height = height*devicePixelRatio
+        // canvasC.width = canvasC.height = 320
     
         let context = canvasC.getContext('2d')
         context.fillStyle = 'rgba(252, 184, 19,.8)'
@@ -986,15 +997,16 @@ class App extends Component {
         console.log('发光')
         context.clearRect(0, 0, 500, 500)
 
+
         context.beginPath()
         context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-        radius = (radius + 1) % 100;
+        radius = (radius + 2) % 100;
         context.arc(100, 100, radius, 0, 2 * Math.PI)
         context.fill()
         context.stroke()
         context.closePath();
 
-        AMap.Util.requestAnimFrame(draw)
+
           context.lineWidth = 1;
           context.save();
 
@@ -1018,15 +1030,18 @@ class App extends Component {
 
           //小球
           context.beginPath();
-          context.arc(item.amplitude, 5, 3, 0, 360, false);
+          context.arc(10+item.amplitude*4, 5, 3, 0, 360, false);
           context.fillStyle = "rgb(252,184,19)";
           context.fill();
           context.stroke();
           context.closePath();
-
+          // AMap.Util.requestAnimFrame(draw)
           context.restore();
         }
-        draw()
+        this.equipmentListTime01 = setInterval(() => {
+          draw()
+        }, 2);
+
         this.markerList.push(
           new AMap.Marker({
             content: canvasC,
@@ -1059,19 +1074,29 @@ class App extends Component {
       if(index == this.state.actionEquipmentListIndex){
         var canvas1 = document.createElement('canvas');
         canvas1.id = "clock";
-        canvas1.width = 400;
-        canvas1.height = 400;
+
+        let size = this.map.getSize() //resize
+        
+        let width = size.width
+        let height = size.height
+        // canvas1.style.width = width + "px"
+        // canvas1.style.height = height + "px"
+        canvas1.width = width*devicePixelRatio*1.1
+        canvas1.height = height*devicePixelRatio*1.2
+
+        // canvas1.width = 400;
+        // canvas1.height = 400;
 
         var cxt = canvas1.getContext('2d');
         cxt.restore();
         function drawClock() {
 
-          cxt.clearRect(0, 0, 500, 500);
+          cxt.clearRect(0, 0, 800, 800);
           //大圈
           cxt.beginPath();
           cxt.lineWidth = 0.3;
           cxt.strokeStyle = "rgba(252,184,19,0.5)";
-          cxt.arc(225, 225, 60, 0, 360, false);
+          cxt.arc(125, 1085, 100, 0, 360, false);
           cxt.fillStyle = "rgba(252,184,19,0.5)";
           cxt.fill();
           cxt.stroke();
@@ -1081,15 +1106,15 @@ class App extends Component {
           //边框
           cxt.beginPath();
           cxt.strokeStyle="rgb(252,184,19)";
-          cxt.translate(225, 225);
+          cxt.translate(125, 1085);
           cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
-          cxt.strokeRect(-10,-2,70,4);
+          cxt.strokeRect(-14,1,112,8);
           cxt.closePath();
 
           //方块的颜色
           cxt.beginPath();
           cxt.fillStyle = "rgb(252,184,19)";
-          cxt.fillRect(-5, -5, 10, 10);
+          cxt.fillRect(-5, -5, 20, 20);
           cxt.shadowOffsetX = -3; // 阴影Y轴偏移
           cxt.shadowOffsetY = 0; // 阴影X轴偏移
           cxt.shadowBlur = 4; // 模糊尺寸
@@ -1098,7 +1123,7 @@ class App extends Component {
 
           //小球
           cxt.beginPath();
-          cxt.arc(arrAmplitude[index]-40, 0, 1, 0, 360, false);
+          cxt.arc(arrAmplitude[index]+25, 5, 1, 0, 360, false);
           cxt.fillStyle = "rgb(252,184,19)";
           cxt.fill();
           cxt.stroke();
@@ -1110,7 +1135,7 @@ class App extends Component {
         var content = canvas1
         let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
         let pageX = 0.05, pageY = 0.05
-        let bounds = new AMap.Bounds([+item.longitude - pageX, +item.latitude - pageY], [+item.longitude + pageX, +item.latitude + pageY])
+        let bounds = new AMap.Bounds([+item.longitude - 0.008, +item.latitude - 0.006], [+item.longitude + 0.1, +item.latitude + 0.1])
         this.mapMarkerDraw = new AMap.CanvasLayer({
           canvas: content,
           bounds: bounds,
@@ -1456,8 +1481,8 @@ class App extends Component {
               orderProductList: 10,
               alarmTimes: 987,
               rotary: Math.ceil(Math.random()*360),
-              amplitude:Math.ceil(60+Math.random()*60),
-              height:Math.ceil(Math.random()*70),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
               heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
@@ -1469,12 +1494,13 @@ class App extends Component {
               orderProductList: 11,
               alarmTimes: 1002,
               rotary: Math.ceil(Math.random()*360),
-              amplitude:Math.ceil(60+Math.random()*60),
-              height:Math.ceil(Math.random()*70),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
               heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
-            }, {
+            }, 
+            {
               deviceName: "3 号环境监测系统",
               longitude: "114.05853808556",
               latitude: "22.54797929382318",
@@ -1482,12 +1508,13 @@ class App extends Component {
               orderProductList: 12,
               alarmTimes: 623,
               rotary: Math.ceil(Math.random()*360),
-              amplitude:Math.ceil(60+Math.random()*60),
-              height:Math.ceil(Math.random()*70),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
               heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            }]
+            }
+          ]
           }
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
@@ -2095,12 +2122,11 @@ class App extends Component {
           <div className="app-content-center">
             {/* 地图 start */}
             <div className="content-right-map">
-              <div id="mapcontainer" />
-            </div>
-            {/* 地图 end */}
-            <div className="app-content-bottom">
-              <p className='title'>各塔机吊钩载重 / 高度</p>
+              <div id="mapcontainer">
+              </div>
 
+              <div className="app-content-bottom">
+              <p className='title'>各塔机吊钩载重 / 高度</p>
               <div className="app-content-bottom-content">
                 <ul className="app-content-bottom-content-1" ref='content'>
                 {
@@ -2109,13 +2135,13 @@ class App extends Component {
                       return(
                         <li className='content' key={index}>
                           <div className='number'>
-                            <span>重{item.heavy}t</span><br/>
-                            <span>高度{item.height}m</span><br/>
-                            <span>幅{item.amplitude}m</span>
+                            <span>{item.heavy}t</span><br/>
+                            <span>{item.height}m</span><br/>
+                            {/* <span>幅{item.amplitude}m</span> */}
                           </div>
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                          <img className='line'  style={{height:+item.height,left:+item.amplitude}} src={require("../../assets/images/line.png")} alt=""/>
-                          <img className='thing' style={{top:+item.height+18,left:+item.amplitude-4}} src={require("../../assets/images/thing.png")} alt=""/>
+                          <img className='line'  style={{height:+item.height+4,left:-item.amplitude+56}} src={require("../../assets/images/line.png")} alt=""/>
+                          <img className='thing' style={{top:+item.height+8,left:-item.amplitude+54}} src={require("../../assets/images/thing.png")} alt=""/>
                           <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <p>{item.deviceName}</p>
                           {/* <p>{this.state.equipmentList[this.state.actionEquipmentListIndex]}</p>
@@ -2127,8 +2153,11 @@ class App extends Component {
                 }
                 </ul>
               </div>
-
             </div>
+              
+            </div>
+            {/* 地图 end */}
+
           </div>
           <div className="app-content-right">
             <div className="warn-info-title">报警信息统计</div>

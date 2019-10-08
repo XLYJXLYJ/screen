@@ -451,7 +451,7 @@ body,
       height: px-rem(400);
       width: px-rem(1800);
       position: absolute;
-      bottom: px-rem(50);
+      bottom: px-rem(180);
       //enter是入场前的刹那（点击按钮），appear指页面第一次加载前的一刹那（自动）
       .title{
         font-family: MI-LANTING_GB-OUTSIDE-YS;
@@ -475,10 +475,9 @@ body,
           position: relative;
           transition: all 3s;
           .content{
-            height: px-rem(218);
+            height: px-rem(232);
             width: px-rem(400);
             list-style: none;
-            // background: yellow;
             position: relative;
             text-align: center;
             float:left;
@@ -519,6 +518,7 @@ body,
               position: absolute;
               left:px-rem(76);
               top: px-rem(34);
+              right: px-rem(76);
               transition: all 6s;
             }
             .breathe-line {
@@ -550,8 +550,9 @@ body,
               width:px-rem(24);
               height:px-rem(18);
               position: absolute;
-              left:px-rem(68);
+              left:px-rem(8);
               top: px-rem(128);
+              right: px-rem(76);
               transition: all 6s;
   
             }
