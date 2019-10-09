@@ -969,16 +969,19 @@ class App extends Component {
     if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
       return null
     }
-    window.clearInterval(this.equipmentListTime01)
+    // window.clearInterval(this.equipmentListTime01)
+    
+    for(let i=0;i<this.state.equipmentList.length*2-1;i++){
+      window.clearInterval(this.equipmentListTime01+i)
+    }
     this.map.remove(this.markerList)
     this.markerList = []
     this.state.equipmentList.map((item, index) => {
         //光圈开始
-    
         let canvasC = document.createElement('canvas')
 
         let size = this.map.getSize() //resize
-        
+
         let width = size.width
         let height = size.height
         canvasC.style.width = width + "px"
@@ -988,19 +991,22 @@ class App extends Component {
         // canvasC.width = canvasC.height = 320
     
         let context = canvasC.getContext('2d')
-        context.fillStyle = 'rgba(252, 184, 19,.8)'
-        context.strokeStyle = 'rgba(252, 184, 19,.4)'
+        context.fillStyle = 'rgba(252, 184, 19,1)'
+        context.strokeStyle = 'rgba(252, 184, 19,1)'
     
         let radius = 0
-        console.log('不发光')
         let draw = () => {
-        console.log('发光')
-        context.clearRect(0, 0, 500, 500)
+
+
+
+        context.clearRect(0, 0, canvasC.width, canvasC.height)
 
 
         context.beginPath()
+
         context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-        radius = (radius + 2) % 100;
+
+        radius = (radius + 5) % 100;
         context.arc(100, 100, radius, 0, 2 * Math.PI)
         context.fill()
         context.stroke()
@@ -1015,7 +1021,7 @@ class App extends Component {
           context.strokeStyle="rgb(252,184,19)";
           context.translate(100, 100);
           context.rotate((item.rotary - 180) * Math.PI / 180);
-          context.strokeRect(-30,-1,160,12);
+          context.strokeRect(-30,-1,125,12);
           context.closePath();
           
           //方块的颜色
@@ -1040,7 +1046,10 @@ class App extends Component {
         }
         this.equipmentListTime01 = setInterval(() => {
           draw()
-        }, 2);
+        }, 100);
+
+        // draw()
+ 
 
         this.markerList.push(
           new AMap.Marker({
@@ -1051,6 +1060,7 @@ class App extends Component {
             zIndex: 99 - index,
           })
         )
+
     })
 
     localStorage.setItem('markerList',JSON.stringify(this.markerList))
@@ -1066,28 +1076,31 @@ class App extends Component {
 
       let arrRotary = [];
       let arrAmplitude = [];
-      let arrEquipment= JSON.parse(localStorage.getItem('markerList')) 
       this.state.equipmentList.map((item, index) => {
     
       arrRotary.push(item.rotary)
       arrAmplitude.push(item.amplitude)
       if(index == this.state.actionEquipmentListIndex){
         var canvas1 = document.createElement('canvas');
-        canvas1.id = "clock";
+        // canvas1.id = "clock";
 
         let size = this.map.getSize() //resize
         
         let width = size.width
         let height = size.height
-        // canvas1.style.width = width + "px"
-        // canvas1.style.height = height + "px"
-        canvas1.width = width*devicePixelRatio*1.1
-        canvas1.height = height*devicePixelRatio*1.2
+        canvas1.style.width = width + "px"
+        canvas1.style.height = height + "px"
+        canvas1.width = width*devicePixelRatio
+        canvas1.height = height*2.3
 
         // canvas1.width = 400;
         // canvas1.height = 400;
 
+
         var cxt = canvas1.getContext('2d');
+        
+        cxt.clearRect(0, 0, canvas1.width, canvas1.width)
+
         cxt.restore();
         function drawClock() {
 
@@ -1096,7 +1109,7 @@ class App extends Component {
           cxt.beginPath();
           cxt.lineWidth = 0.3;
           cxt.strokeStyle = "rgba(252,184,19,0.5)";
-          cxt.arc(125, 1085, 100, 0, 360, false);
+          cxt.arc(105, 1011, 100, 0, 360, false);
           cxt.fillStyle = "rgba(252,184,19,0.5)";
           cxt.fill();
           cxt.stroke();
@@ -1106,7 +1119,7 @@ class App extends Component {
           //边框
           cxt.beginPath();
           cxt.strokeStyle="rgb(252,184,19)";
-          cxt.translate(125, 1085);
+          cxt.translate(104, 1011);
           cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
           cxt.strokeRect(-14,1,112,8);
           cxt.closePath();
@@ -1135,13 +1148,15 @@ class App extends Component {
         var content = canvas1
         let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
         let pageX = 0.05, pageY = 0.05
-        let bounds = new AMap.Bounds([+item.longitude - 0.008, +item.latitude - 0.006], [+item.longitude + 0.1, +item.latitude + 0.1])
+        let bounds = new AMap.Bounds([+item.longitude - 0.006, +item.latitude - 0.008], [+item.longitude + 0.1, +item.latitude + 0.1])
+        
         this.mapMarkerDraw = new AMap.CanvasLayer({
           canvas: content,
           bounds: bounds,
           zooms: [3, 18],
         })
         this.mapMarkerDraw.setMap(this.map)
+
         drawClock();
       }
     })
@@ -1204,7 +1219,7 @@ class App extends Component {
       })
       customLayer.render = () => {
         let size = this.map.getSize() //resize
-        
+        console.log(size)
         let width = size.width
         let height = size.height
         let ctx = canvas.getContext("2d")
@@ -1366,6 +1381,7 @@ class App extends Component {
       }
       this.updateIndicators(updateTime)
     }, 1000 * updateTime)
+
   }
   // 中途更新指标数据
   updateIndicators(time)  {
@@ -1474,7 +1490,7 @@ class App extends Component {
             {longitude: "114.05102564488274", latitude: "22.513942918144956"},
             {longitude: "114.02808873488428", latitude: "22.54069176808944"}],
             deviceList: [{
-              deviceName: "1 号环境监测系统",
+              deviceName: "1 号塔机监测系统",
               longitude: "114.0399936290864",
               latitude: "22.527919658186872",
               status: 1,
@@ -1487,7 +1503,7 @@ class App extends Component {
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
             }, {
-              deviceName: "2 号环境监测系统",
+              deviceName: "2 号塔机监测系统",
               longitude: "114.0440153808594",
               latitude: "22.56797929382324",
               status: 1,
@@ -1501,7 +1517,7 @@ class App extends Component {
               deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
             }, 
             {
-              deviceName: "3 号环境监测系统",
+              deviceName: "3 号塔机监测系统",
               longitude: "114.05853808556",
               latitude: "22.54797929382318",
               status: 1,
@@ -1513,7 +1529,49 @@ class App extends Component {
               heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            }
+            },
+            {
+              deviceName: "4 号塔机监测系统",
+              longitude: "114.06853808556",
+              latitude: "22.56797929382318",
+              status: 1,
+              orderProductList: 12,
+              alarmTimes: 623,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            },
+            // {
+            //   deviceName: "5 号塔机监测系统",
+            //   longitude: "114.07853808556",
+            //   latitude: "22.57797929382318",
+            //   status: 1,
+            //   orderProductList: 12,
+            //   alarmTimes: 623,
+            //   rotary: Math.ceil(Math.random()*360),
+            //   amplitude:30-Math.ceil(Math.random()*30),
+            //   height:Math.ceil(Math.random()*30),
+            //   heavy:Math.ceil(Math.random()*100),
+            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            // },
+            // {
+            //   deviceName: "6 号塔机监测系统",
+            //   longitude: "114.08853808556",
+            //   latitude: "22.58797929382318",
+            //   status: 1,
+            //   orderProductList: 12,
+            //   alarmTimes: 623,
+            //   rotary: Math.ceil(Math.random()*360),
+            //   amplitude:30-Math.ceil(Math.random()*30),
+            //   height:Math.ceil(Math.random()*30),
+            //   heavy:Math.ceil(Math.random()*100),
+            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            // }
           ]
           }
           //格式化地图范围坐标
@@ -1912,6 +1970,7 @@ class App extends Component {
   }
   // 更新本地显示时间
   updateLocalTime() {
+   
     setInterval(() => {
       let dataObj = new Date()
       let nongLi = solarLunar.solar2lunar(
