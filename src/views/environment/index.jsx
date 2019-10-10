@@ -219,7 +219,7 @@ class App extends Component {
     this.brokenLineLableIndex = [] // 标注的索引
     this.oldMapPolygonPath = "" // 上一次黄色区域经纬度
     this.bannerTime = null // banner轮播
-    this.equipmentListTime01 = '' // 发光设备定时器
+    this.equipmentListTime01 = [] // 发光设备定时器
     this.ulTop = ''
     this.state = {
       equipmentListAnimation: true, // 设备动画
@@ -971,12 +971,15 @@ class App extends Component {
     }
     // window.clearInterval(this.equipmentListTime01)
     
-    for(let i=0;i<this.state.equipmentList.length*2-1;i++){
-      window.clearInterval(this.equipmentListTime01+i)
+    for(let i=0;i<this.equipmentListTime01.length;i++){
+      window.clearInterval(this.equipmentListTime01[i])
+      console.log(this.equipmentListTime01[i])
     }
     this.map.remove(this.markerList)
     this.markerList = []
-    this.state.equipmentList.map((item, index) => {
+    this.equipmentListTime01 = []
+
+    this.state.equipmentList.forEach((item, index) => {
         //光圈开始
         let canvasC = document.createElement('canvas')
 
@@ -1006,8 +1009,8 @@ class App extends Component {
 
         context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
 
-        radius = (radius + 5) % 100;
-        context.arc(100, 100, radius, 0, 2 * Math.PI)
+        radius = (radius + 1) % 100;
+        context.arc(102, 100, radius, 0, 2 * Math.PI)
         context.fill()
         context.stroke()
         context.closePath();
@@ -1036,7 +1039,7 @@ class App extends Component {
 
           //小球
           context.beginPath();
-          context.arc(10+item.amplitude*4, 5, 3, 0, 360, false);
+          context.arc(10+item.amplitude*3, 5, 3, 0, 360, false);
           context.fillStyle = "rgb(252,184,19)";
           context.fill();
           context.stroke();
@@ -1044,9 +1047,13 @@ class App extends Component {
           // AMap.Util.requestAnimFrame(draw)
           context.restore();
         }
-        this.equipmentListTime01 = setInterval(() => {
+        let timer = setInterval(() => {
           draw()
         }, 100);
+        // console.log(timer)
+        this.equipmentListTime01.push(timer)
+        console.log(this.equipmentListTime01)
+        // console.log(this.equipmentListTime01)
 
         // draw()
  
@@ -1063,7 +1070,7 @@ class App extends Component {
 
     })
 
-    localStorage.setItem('markerList',JSON.stringify(this.markerList))
+    // // localStorage.setItem('markerList',JSON.stringify(this.markerList))
     this.markerList.forEach((e, i) => {
       if(this.state.actionEquipmentListIndex == i){
         this.markerList.splice(i,1)
@@ -1074,92 +1081,82 @@ class App extends Component {
   //地图标注选中效果
   selMapMarker() {
 
-      let arrRotary = [];
-      let arrAmplitude = [];
-      this.state.equipmentList.map((item, index) => {
-    
-      arrRotary.push(item.rotary)
-      arrAmplitude.push(item.amplitude)
-      if(index == this.state.actionEquipmentListIndex){
-        var canvas1 = document.createElement('canvas');
-        // canvas1.id = "clock";
+    let arrRotary = [];
+    let arrAmplitude = [];
+    this.state.equipmentList.map((item, index) => {
+    arrRotary.push(item.rotary)
+    arrAmplitude.push(item.amplitude)
+    if(index == this.state.actionEquipmentListIndex){
+      var canvas1 = document.createElement('canvas');
+      canvas1.width = 600;
+      canvas1.height = 600;
 
-        let size = this.map.getSize() //resize
-        
-        let width = size.width
-        let height = size.height
-        canvas1.style.width = width + "px"
-        canvas1.style.height = height + "px"
-        canvas1.width = width*devicePixelRatio
-        canvas1.height = height*2.3
+      var cxt = canvas1.getContext('2d');
+      cxt.restore();
+      function drawClock() {
+        cxt.clearRect(0, 0, 500, 500);
+        //大圈
+        cxt.beginPath();
+        cxt.lineWidth = 0.3;
+        //大圈边框颜色
+        cxt.strokeStyle = "rgba(252,184,19,0.5)";
+        cxt.arc(365, 325, 60, 0, 360, false);
+        //大圈颜色
+        cxt.fillStyle = "rgba(252,184,19,0.5)";
+        cxt.fill();
+        cxt.stroke();
+        cxt.closePath();
 
-        // canvas1.width = 400;
-        // canvas1.height = 400;
+        cxt.save();
+        //边框
+        cxt.beginPath();
+        //边框颜色
+        cxt.strokeStyle="rgb(252,184,19)";
+        // cxt.rect(230,245,220,10);
+        cxt.translate(365, 325);
+        console.log(arrRotary[index])
+        cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
+        cxt.strokeRect(-10,-2,70,4);
+        cxt.closePath();
 
+        //方块的颜色
+        cxt.beginPath();
+        cxt.fillStyle = "rgb(252,184,19)";
+        cxt.fillRect(-5, -5, 10, 10);
+        cxt.shadowOffsetX = -3; // 阴影Y轴偏移
+        cxt.shadowOffsetY = 0; // 阴影X轴偏移
+        cxt.shadowBlur = 4; // 模糊尺寸
+        cxt.shadowColor = '#000'; // 颜色
+        cxt.closePath();
 
-        var cxt = canvas1.getContext('2d');
-        
-        cxt.clearRect(0, 0, canvas1.width, canvas1.width)
+        //小球
+        cxt.beginPath();
+        cxt.arc(arrAmplitude[index]+15, 0, 1, 0, 360, false);
+        cxt.fillStyle = "rgb(252,184,19)";
+        cxt.fill();
+        cxt.stroke();
+        cxt.closePath();
 
         cxt.restore();
-        function drawClock() {
-
-          cxt.clearRect(0, 0, 800, 800);
-          //大圈
-          cxt.beginPath();
-          cxt.lineWidth = 0.3;
-          cxt.strokeStyle = "rgba(252,184,19,0.5)";
-          cxt.arc(105, 1011, 100, 0, 360, false);
-          cxt.fillStyle = "rgba(252,184,19,0.5)";
-          cxt.fill();
-          cxt.stroke();
-          cxt.closePath();
-
-          cxt.save();
-          //边框
-          cxt.beginPath();
-          cxt.strokeStyle="rgb(252,184,19)";
-          cxt.translate(104, 1011);
-          cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
-          cxt.strokeRect(-14,1,112,8);
-          cxt.closePath();
-
-          //方块的颜色
-          cxt.beginPath();
-          cxt.fillStyle = "rgb(252,184,19)";
-          cxt.fillRect(-5, -5, 20, 20);
-          cxt.shadowOffsetX = -3; // 阴影Y轴偏移
-          cxt.shadowOffsetY = 0; // 阴影X轴偏移
-          cxt.shadowBlur = 4; // 模糊尺寸
-          cxt.shadowColor = '#000'; // 颜色
-          cxt.closePath();
-
-          //小球
-          cxt.beginPath();
-          cxt.arc(arrAmplitude[index]+25, 5, 1, 0, 360, false);
-          cxt.fillStyle = "rgb(252,184,19)";
-          cxt.fill();
-          cxt.stroke();
-          cxt.closePath();
-  
-          // cxt.restore();
-        }
-
-        var content = canvas1
-        let item = this.state.equipmentList[this.state.actionEquipmentListIndex]
-        let pageX = 0.05, pageY = 0.05
-        let bounds = new AMap.Bounds([+item.longitude - 0.006, +item.latitude - 0.008], [+item.longitude + 0.1, +item.latitude + 0.1])
-        
-        this.mapMarkerDraw = new AMap.CanvasLayer({
-          canvas: content,
-          bounds: bounds,
-          zooms: [3, 18],
-        })
-        this.mapMarkerDraw.setMap(this.map)
-
-        drawClock();
       }
-    })
+
+      let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
+
+      let pageX = 0.05, pageY = 0.05
+      let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
+
+      this.mapMarkerDraw = new AMap.CanvasLayer({
+        canvas: canvas1,
+        bounds: bounds,
+        zooms: [3, 18],
+      })
+
+      this.mapMarkerDraw.setMap(this.map)
+      drawClock();
+    }
+
+  })
+
   }
   //画定位2d图形
   map2D() {
@@ -1350,6 +1347,11 @@ class App extends Component {
         equipmentList: []
       })
       window.clearInterval(this.equipmentListTime)
+
+      for(let i=0;i<this.equipmentListTime01.length;i++){
+        window.clearInterval(this.equipmentListTime01[i])
+      }
+
       this.equipmentListTime = null
       this.map && this.initMap()
       return null
@@ -1590,7 +1592,7 @@ class App extends Component {
               }
             }
           }
-          localStorage.setItem('equipmentList',deviceList)
+          // localStorage.setItem('equipmentList',deviceList)
           this.setState(
             {
               equipmentList: deviceList,
