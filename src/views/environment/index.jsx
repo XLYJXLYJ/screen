@@ -953,6 +953,49 @@ class App extends Component {
       }, 1000)
     }
   }
+
+  fillRoundRect(cxt, x, y, width, height, radius, fillColor) {
+      //圆的直径必然要小于矩形的宽高          
+      if (2 * radius > width || 2 * radius > height) { return false; }
+
+      cxt.save();
+      cxt.translate(x, y);
+      //绘制圆角矩形的各个边  
+      this.drawRoundRectPath(cxt, width, height, radius);
+      cxt.fillStyle = fillColor || "#000"; //若是给定了值就用给定的值否则给予默认值  
+      cxt.fill();
+      cxt.restore();
+  }
+  drawRoundRectPath(cxt, width, height, radius) {
+    cxt.beginPath(0);
+    //从右下角顺时针绘制，弧度从0到1/2PI  
+    cxt.strokeStyle = "yellow";
+    cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
+
+    //矩形下边线  
+    cxt.lineTo(radius, height);
+
+    //左下角圆弧，弧度从1/2PI到PI  
+    cxt.arc(radius, height - radius, radius, Math.PI / 2, Math.PI);
+
+    //矩形左边线  
+    cxt.lineTo(0, radius);
+
+    //左上角圆弧，弧度从PI到3/2PI  
+    cxt.arc(radius, radius, radius, Math.PI, Math.PI * 3 / 2);
+
+    //上边线  
+    cxt.lineTo(width - radius, 0);
+
+    //右上角圆弧  
+    cxt.arc(width - radius, radius, radius, Math.PI * 3 / 2, Math.PI * 2);
+
+    //右边线  
+    cxt.lineTo(width, height - radius);
+    cxt.stroke();
+    cxt.closePath();
+  }
+
   // 重置地图标注
   resetMapMarker() {
     // 没有数据情况下
@@ -1024,22 +1067,28 @@ class App extends Component {
           context.strokeStyle="rgb(252,184,19)";
           context.translate(100, 100);
           context.rotate((item.rotary - 180) * Math.PI / 180);
-          context.strokeRect(-30,-1,125,12);
+          // context.strokeRect(-30,-1,125,12);
+
+          
+          this.fillRoundRect(context, -32,-5, 125,10, 4, 'rgba(252,184,19,0.8)');
+
           context.closePath();
           
           //方块的颜色
           context.beginPath();
           context.fillStyle = "rgb(252,184,19)";
-          context.fillRect(-15, -10, 30, 30);
-          context.shadowOffsetX = -3; // 阴影Y轴偏移
-          context.shadowOffsetY = 0; // 阴影X轴偏移
-          context.shadowBlur = 4; // 模糊尺寸
+          // context.fillRect(-15, -14, 30, 30);
+          context.shadowOffsetX = 0; // 阴影Y轴偏移
+          context.shadowOffsetY = 5; // 阴影X轴偏移
+          context.shadowBlur = 10; // 模糊尺寸
           context.shadowColor = '#000'; // 颜色
+          this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
+
           context.closePath();
 
           //小球
           context.beginPath();
-          context.arc(10+item.amplitude*3, 5, 3, 0, 360, false);
+          context.arc(5+item.amplitude*3, 0.5, 3, 0, 360, false);
           context.fillStyle = "rgb(252,184,19)";
           context.fill();
           context.stroke();
@@ -1056,7 +1105,7 @@ class App extends Component {
         // console.log(this.equipmentListTime01)
 
         // draw()
- 
+
 
         this.markerList.push(
           new AMap.Marker({
@@ -1080,7 +1129,7 @@ class App extends Component {
   }
   //地图标注选中效果
   selMapMarker() {
-
+    let that = this
     let arrRotary = [];
     let arrAmplitude = [];
     this.state.equipmentList.map((item, index) => {
@@ -1088,8 +1137,18 @@ class App extends Component {
     arrAmplitude.push(item.amplitude)
     if(index == this.state.actionEquipmentListIndex){
       var canvas1 = document.createElement('canvas');
-      canvas1.width = 600;
-      canvas1.height = 600;
+      // canvas1.style.width =  1200
+      // canvas1.style.height = 1200
+      // canvas1.width = 600;
+      // canvas1.height = 600;
+      let size = this.map.getSize() //resize
+
+      let width = size.width
+      let height = size.height
+      canvas1.style.width = width + "px"
+      canvas1.style.height = height + "px"
+      canvas1.width = width*devicePixelRatio
+      canvas1.height = height*devicePixelRatio
 
       var cxt = canvas1.getContext('2d');
       cxt.restore();
@@ -1097,11 +1156,10 @@ class App extends Component {
         cxt.clearRect(0, 0, 500, 500);
         //大圈
         cxt.beginPath();
-        cxt.lineWidth = 0.3;
+        cxt.lineWidth = 0.1;
         //大圈边框颜色
+        cxt.arc(585, 505, 100, 0, 360, false);
         cxt.strokeStyle = "rgba(252,184,19,0.5)";
-        cxt.arc(365, 325, 60, 0, 360, false);
-        //大圈颜色
         cxt.fillStyle = "rgba(252,184,19,0.5)";
         cxt.fill();
         cxt.stroke();
@@ -1112,26 +1170,28 @@ class App extends Component {
         cxt.beginPath();
         //边框颜色
         cxt.strokeStyle="rgb(252,184,19)";
-        // cxt.rect(230,245,220,10);
-        cxt.translate(365, 325);
+        cxt.translate(585, 505);
         console.log(arrRotary[index])
         cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
-        cxt.strokeRect(-10,-2,70,4);
+        // cxt.strokeRect(-10,-2,70,4);
+        that.fillRoundRect(cxt, -20,-3, 120,8, 4, 'rgba(252,184,19,0.6)');
         cxt.closePath();
 
         //方块的颜色
         cxt.beginPath();
         cxt.fillStyle = "rgb(252,184,19)";
-        cxt.fillRect(-5, -5, 10, 10);
-        cxt.shadowOffsetX = -3; // 阴影Y轴偏移
-        cxt.shadowOffsetY = 0; // 阴影X轴偏移
-        cxt.shadowBlur = 4; // 模糊尺寸
-        cxt.shadowColor = '#000'; // 颜色
+        cxt.shadowOffsetX = 0; // 阴影Y轴偏移
+        cxt.shadowOffsetY = 5; // 阴影X轴偏移
+        cxt.shadowBlur = 10; // 模糊尺寸
+        cxt.shadowColor = '#333'; // 颜色
+        // cxt.fillRect(-5, -5, 10, 10);
+        that.fillRoundRect(cxt, -8, -12, 25, 25, 2, 'rgba(252,184,19)');
+
         cxt.closePath();
 
         //小球
         cxt.beginPath();
-        cxt.arc(arrAmplitude[index]+15, 0, 1, 0, 360, false);
+        cxt.arc(12+arrAmplitude[index]*3, 0.5, 2, 0, 360, false);
         cxt.fillStyle = "rgb(252,184,19)";
         cxt.fill();
         cxt.stroke();
