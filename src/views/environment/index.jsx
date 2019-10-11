@@ -957,7 +957,6 @@ class App extends Component {
   fillRoundRect(cxt, x, y, width, height, radius, fillColor) {
       //圆的直径必然要小于矩形的宽高          
       if (2 * radius > width || 2 * radius > height) { return false; }
-
       cxt.save();
       cxt.translate(x, y);
       //绘制圆角矩形的各个边  
@@ -971,25 +970,18 @@ class App extends Component {
     //从右下角顺时针绘制，弧度从0到1/2PI  
     cxt.strokeStyle = "yellow";
     cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
-
     //矩形下边线  
     cxt.lineTo(radius, height);
-
     //左下角圆弧，弧度从1/2PI到PI  
     cxt.arc(radius, height - radius, radius, Math.PI / 2, Math.PI);
-
     //矩形左边线  
     cxt.lineTo(0, radius);
-
     //左上角圆弧，弧度从PI到3/2PI  
     cxt.arc(radius, radius, radius, Math.PI, Math.PI * 3 / 2);
-
     //上边线  
     cxt.lineTo(width - radius, 0);
-
     //右上角圆弧  
     cxt.arc(width - radius, radius, radius, Math.PI * 3 / 2, Math.PI * 2);
-
     //右边线  
     cxt.lineTo(width, height - radius);
     cxt.stroke();
@@ -1013,7 +1005,6 @@ class App extends Component {
       return null
     }
     // window.clearInterval(this.equipmentListTime01)
-    
     for(let i=0;i<this.equipmentListTime01.length;i++){
       window.clearInterval(this.equipmentListTime01[i])
       console.log(this.equipmentListTime01[i])
@@ -1021,13 +1012,10 @@ class App extends Component {
     this.map.remove(this.markerList)
     this.markerList = []
     this.equipmentListTime01 = []
-
     this.state.equipmentList.forEach((item, index) => {
         //光圈开始
         let canvasC = document.createElement('canvas')
-
         let size = this.map.getSize() //resize
-
         let width = size.width
         let height = size.height
         canvasC.style.width = width + "px"
@@ -1035,45 +1023,30 @@ class App extends Component {
         canvasC.width = width*devicePixelRatio
         canvasC.height = height*devicePixelRatio
         // canvasC.width = canvasC.height = 320
-    
         let context = canvasC.getContext('2d')
         context.fillStyle = 'rgba(252, 184, 19,1)'
         context.strokeStyle = 'rgba(252, 184, 19,1)'
     
         let radius = 0
         let draw = () => {
-
-
-
-        context.clearRect(0, 0, canvasC.width, canvasC.height)
-
-
-        context.beginPath()
-
-        context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-
-        radius = (radius + 1) % 100;
-        context.arc(102, 100, radius, 0, 2 * Math.PI)
-        context.fill()
-        context.stroke()
-        context.closePath();
-
-
+          context.clearRect(0, 0, canvasC.width, canvasC.height)
+          context.beginPath()
+          context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+          radius = (radius + 1) % 100;
+          context.arc(102, 80, radius, 0, 2 * Math.PI)
+          context.fill()
+          context.stroke()
+          context.closePath();
           context.lineWidth = 1;
           context.save();
-
           //边框颜色
           context.beginPath();
           context.strokeStyle="rgb(252,184,19)";
-          context.translate(100, 100);
+          context.translate(100, 80);
           context.rotate((item.rotary - 180) * Math.PI / 180);
           // context.strokeRect(-30,-1,125,12);
-
-          
           this.fillRoundRect(context, -32,-5, 125,10, 4, 'rgba(252,184,19,0.8)');
-
           context.closePath();
-          
           //方块的颜色
           context.beginPath();
           context.fillStyle = "rgb(252,184,19)";
@@ -1083,9 +1056,7 @@ class App extends Component {
           context.shadowBlur = 10; // 模糊尺寸
           context.shadowColor = '#000'; // 颜色
           this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
-
           context.closePath();
-
           //小球
           context.beginPath();
           context.arc(5+item.amplitude*3, 0.5, 3, 0, 360, false);
@@ -1099,14 +1070,7 @@ class App extends Component {
         let timer = setInterval(() => {
           draw()
         }, 100);
-        // console.log(timer)
         this.equipmentListTime01.push(timer)
-        console.log(this.equipmentListTime01)
-        // console.log(this.equipmentListTime01)
-
-        // draw()
-
-
         this.markerList.push(
           new AMap.Marker({
             content: canvasC,
@@ -1116,7 +1080,6 @@ class App extends Component {
             zIndex: 99 - index,
           })
         )
-
     })
 
     // // localStorage.setItem('markerList',JSON.stringify(this.markerList))
@@ -1137,19 +1100,13 @@ class App extends Component {
     arrAmplitude.push(item.amplitude)
     if(index == this.state.actionEquipmentListIndex){
       var canvas1 = document.createElement('canvas');
-      // canvas1.style.width =  1200
-      // canvas1.style.height = 1200
-      // canvas1.width = 600;
-      // canvas1.height = 600;
       let size = this.map.getSize() //resize
-
       let width = size.width
       let height = size.height
       canvas1.style.width = width + "px"
       canvas1.style.height = height + "px"
       canvas1.width = width*devicePixelRatio
       canvas1.height = height*devicePixelRatio
-
       var cxt = canvas1.getContext('2d');
       cxt.restore();
       function drawClock() {
@@ -1164,7 +1121,6 @@ class App extends Component {
         cxt.fill();
         cxt.stroke();
         cxt.closePath();
-
         cxt.save();
         //边框
         cxt.beginPath();
@@ -1174,9 +1130,8 @@ class App extends Component {
         console.log(arrRotary[index])
         cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
         // cxt.strokeRect(-10,-2,70,4);
-        that.fillRoundRect(cxt, -20,-3, 120,8, 4, 'rgba(252,184,19,0.6)');
+        that.fillRoundRect(cxt, -20,-3, 120,8, 4, 'rgba(252,174,19,0.3)');
         cxt.closePath();
-
         //方块的颜色
         cxt.beginPath();
         cxt.fillStyle = "rgb(252,184,19)";
@@ -1186,9 +1141,7 @@ class App extends Component {
         cxt.shadowColor = '#333'; // 颜色
         // cxt.fillRect(-5, -5, 10, 10);
         that.fillRoundRect(cxt, -8, -12, 25, 25, 2, 'rgba(252,184,19)');
-
         cxt.closePath();
-
         //小球
         cxt.beginPath();
         cxt.arc(12+arrAmplitude[index]*3, 0.5, 2, 0, 360, false);
@@ -1196,25 +1149,19 @@ class App extends Component {
         cxt.fill();
         cxt.stroke();
         cxt.closePath();
-
         cxt.restore();
       }
-
       let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
-
       let pageX = 0.05, pageY = 0.05
       let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
-
       this.mapMarkerDraw = new AMap.CanvasLayer({
         canvas: canvas1,
         bounds: bounds,
         zooms: [3, 18],
       })
-
       this.mapMarkerDraw.setMap(this.map)
       drawClock();
     }
-
   })
 
   }
@@ -1282,7 +1229,7 @@ class App extends Component {
         let ctx = canvas.getContext("2d")
 
         canvas.style.width = width + "px"
-        canvas.style.height = height + "px"
+        canvas.style.height = height - 60 + "px"
         canvas.width = width*devicePixelRatio
         canvas.height = height*devicePixelRatio // 适配设备像素比
         // alert(width*devicePixelRatio,height*devicePixelRatio)
@@ -1357,7 +1304,7 @@ class App extends Component {
         let ctx2 = canvas2.getContext("2d")
 
         canvas2.style.width = width + "px"
-        canvas2.style.height = height + "px"
+        canvas2.style.height = height - 60 + "px"
         canvas2.width = width*devicePixelRatio
         canvas2.height = height*devicePixelRatio // 适配设备像素比
         // alert(width*devicePixelRatio,height*devicePixelRatio)
