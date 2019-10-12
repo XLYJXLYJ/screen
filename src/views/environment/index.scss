@@ -292,16 +292,34 @@ body,
         }
       }
 
+      .left-middle {
+        font-family: MI-LANTING_GB-OUTSIDE-YS;
+        font-size: px-rem(40);
+        color: #ccc;
+        width: px-rem(400);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        justify-content: space-between;
+        top: px-rem(120);
+        img{
+          width:px-rem(36);
+          height:px-rem(36);
+          position: relative;
+          top:px-rem(5);
+        }
+      }
+
       .left-brokenlin-title {
         font-family: MI-LANTING_GB-OUTSIDE-YS;
         font-size: px-rem(40);
         color: #ccc;
-        margin: px-rem(100) 0 px-rem(40);
+        margin: px-rem(200) 0 px-rem(40);
       }
 
       .left-chart-brokenline {
         width: 100%;
-        height: px-rem(230);
+        height: px-rem(180);
 
         &.empty {
           color: #fff;
@@ -363,7 +381,7 @@ body,
 
       .left-chart-columnar {
         width: 100%;
-        height: px-rem(280);
+        height: px-rem(250);
 
         &.empty {
           color: #fff;
