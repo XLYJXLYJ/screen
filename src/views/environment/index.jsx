@@ -215,6 +215,7 @@ class App extends Component {
 
     this.figureOfBreadChart = null // 图饼图对象-成员数量
     this.markerList = '' // 地图标准列表
+    this.markerListCircle = '' // 地图光圈
     this.markerListText = '' // 地图文字列表
     this.aMapPolygon = null // 地图矩形对象
     this.aMapPolygonBottom = null
@@ -935,6 +936,7 @@ class App extends Component {
       this.selMapMarker()
       this.selMapText()
       this.resetMapMarker()
+      this.resetMapMarker1()
     } else {
       this.map = new AMap.Map("mapcontainer", {
         resizeEnable: true, // 是否监控地图容器尺寸变化，默认值为false
@@ -946,6 +948,7 @@ class App extends Component {
       });
       // 将图层添加至地图实例
       this.resetMapMarker(); //画地图圈圈
+      this.resetMapMarker1()
       this.selMapMarker();
       this.selMapText()
       //画定位2d图形
@@ -1009,11 +1012,7 @@ class App extends Component {
     if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
       return null
     }
-    // window.clearInterval(this.equipmentListTime01)
-    for(let i=0;i<this.equipmentListTime01.length;i++){
-      window.clearInterval(this.equipmentListTime01[i])
-      console.log(this.equipmentListTime01[i])
-    }
+
     this.map.remove(this.markerList)
     this.markerList = []
     this.equipmentListTime01 = []
@@ -1035,13 +1034,13 @@ class App extends Component {
         let radius = 0
         let draw = () => {
           context.clearRect(0, 0, canvasC.width, canvasC.height)
-          context.beginPath()
-          context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-          radius = (radius + 1) % 100;
-          context.arc(102, 95, radius, 0, 2 * Math.PI)
-          context.fill()
-          context.stroke()
-          context.closePath();
+          // context.beginPath()
+          // context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+          // radius = (radius + 1) % 100;
+          // context.arc(102, 95, radius, 0, 2 * Math.PI)
+          // context.fill()
+          // context.stroke()
+          // context.closePath();
           context.lineWidth = 1;
           context.save();
           //边框颜色
@@ -1071,10 +1070,7 @@ class App extends Component {
           // AMap.Util.requestAnimFrame(draw)
           context.restore();
         }
-        let timer = setInterval(() => {
-          draw()
-        }, 100);
-        this.equipmentListTime01.push(timer)
+        draw()
         this.markerList.push(
           new AMap.Marker({
             content: canvasC,
@@ -1093,11 +1089,89 @@ class App extends Component {
     })
     this.map.add(this.markerList)
   }
+
+    // 重置地图标注
+    resetMapMarker1() {
+      // 没有数据情况下
+      if(this.state.actionEquipmentListIndex>3){
+        let arr = Object.keys(this.refs)
+        if(arr.length!=0){
+          this.refs.content.style.top = -7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
+        }else{
+          console.log(this.refs)
+        }
+      }else{
+        this.refs.content.style.top = 0
+      }
+      if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
+        return null
+      }
+      // window.clearInterval(this.equipmentListTime01)
+      for(let i=0;i<this.equipmentListTime01.length;i++){
+        window.clearInterval(this.equipmentListTime01[i])
+        console.log(this.equipmentListTime01[i])
+      }
+      this.map.remove(this.markerListCircle)
+      this.markerListCircle = []
+      this.equipmentListTime01 = []
+      this.state.equipmentList.forEach((item, index) => {
+          //光圈开始
+          let canvasC = document.createElement('canvas')
+          let size = this.map.getSize() //resize
+          let width = size.width
+          let height = size.height
+          canvasC.style.width = width + "px"
+          canvasC.style.height = height + "px"
+          canvasC.width = width*devicePixelRatio
+          canvasC.height = height*devicePixelRatio
+          // canvasC.width = canvasC.height = 320
+          let context = canvasC.getContext('2d')
+          context.fillStyle = 'rgba(252, 184, 19,1)'
+          context.strokeStyle = 'rgba(252, 184, 19,1)'
+      
+          let radius = 0
+          let draw = () => {
+            context.clearRect(0, 0, canvasC.width, canvasC.height)
+            context.beginPath()
+            context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+            radius = (radius + 1) % 100;
+            context.arc(102, 95, radius, 0, 2 * Math.PI)
+            context.fill()
+            context.stroke()
+            context.closePath();
+            context.lineWidth = 1;
+            context.save();
+            context.restore();
+          }
+          let timer = setInterval(() => {
+            draw()
+          }, 50);
+          this.equipmentListTime01.push(timer)
+          this.markerListCircle.push(
+            new AMap.Marker({
+              content: canvasC,
+              position: new AMap.LngLat(item.longitude, item.latitude),
+              offset: new AMap.Pixel(-15, -17),
+              size: new AMap.Size(50, 60),
+              zIndex: 99 - index,
+            })
+          )
+      })
+      // // localStorage.setItem('markerList',JSON.stringify(this.markerList))
+      this.markerListCircle.forEach((e, i) => {
+        if(this.state.actionEquipmentListIndex == i){
+          this.markerListCircle.splice(i,1)
+        }
+      })
+      this.map.add(this.markerListCircle)
+    }
+
+
+
   selMapText(){
     this.map.remove(this.markerListText)
     this.markerListText = []
     this.state.equipmentList.forEach((item, index) => {
-      //光圈开始
       let canvasT = document.createElement('canvas')
       let size = this.map.getSize() //resize
       let width = size.width
@@ -1108,13 +1182,20 @@ class App extends Component {
       canvasT.height = height*devicePixelRatio
       // canvasC.width = canvasC.height = 320
       let ctx = canvasT.getContext('2d')
+      let txt = item.deviceName
+      ctx.beginPath();
+      ctx.font = "30px";
+      ctx.strokeStyle = 'rgb(252,184,19)';
+      ctx.strokeText(txt, 60, 143);
+      ctx.stroke();
+
       if(item.status == 2){
         ctx.beginPath();
         ctx.fillStyle = "rgba(0,0,0,0.3)";
         ctx.moveTo(50, 130);
         ctx.lineTo(50, 150);
-        ctx.lineTo(160, 150);
-        ctx.lineTo(160, 130);
+        ctx.lineTo(80 + ctx.measureText(txt).width, 150);
+        ctx.lineTo(80 + ctx.measureText(txt).width, 130);
         ctx.strokeStyle = "rgba(0,0,0,0)";
         ctx.closePath();
         ctx.fill();
@@ -1129,18 +1210,14 @@ class App extends Component {
         ctx.fillStyle = "rgba(0,0,0,0.3)";
         ctx.moveTo(50, 130);
         ctx.lineTo(50, 150);
-        ctx.lineTo(150, 150);
-        ctx.lineTo(150, 130);
+        ctx.lineTo(70 + ctx.measureText(txt).width, 150);
+        ctx.lineTo(70 + ctx.measureText(txt).width, 130);
         ctx.strokeStyle = "rgba(0,0,0,0)";
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
       }
-      ctx.beginPath();
-      ctx.font = "30px";
-      ctx.strokeStyle = 'rgb(252,184,19)';
-      ctx.strokeText(item.deviceName, 60, 143);
-      ctx.stroke();
+
       this.markerListText.push(
         new AMap.Marker({
           content: canvasT,
@@ -1162,7 +1239,7 @@ class App extends Component {
       arrRotary.push(item.rotary)
       arrAmplitude.push(item.amplitude)
       if(index == this.state.actionEquipmentListIndex){
-        var canvas1 = document.createElement('canvas');
+        let canvas1 = document.createElement('canvas');
         let size = this.map.getSize() //resize
         let width = size.width
         let height = size.height
@@ -1170,7 +1247,7 @@ class App extends Component {
         canvas1.style.height = height + "px"
         canvas1.width = width*devicePixelRatio
         canvas1.height = height*devicePixelRatio
-        var cxt = canvas1.getContext('2d');
+        let cxt = canvas1.getContext('2d');
         cxt.restore();
         function drawClock() {
           cxt.clearRect(0, 0, 500, 500);
@@ -1227,6 +1304,8 @@ class App extends Component {
       }
     })
   }
+
+  
   //画定位2d图形
   map2D() {
     new AMap.Polygon({
@@ -1296,7 +1375,7 @@ class App extends Component {
         canvas.height = height*devicePixelRatio // 适配设备像素比
         // alert(width*devicePixelRatio,height*devicePixelRatio)
         ctx.beginPath()
-        var my_strokeStyle = ctx.createLinearGradient(0, 0, 350, 550);
+        let my_strokeStyle = ctx.createLinearGradient(0, 0, 350, 550);
         my_strokeStyle.addColorStop(0, "rgba(108, 85, 38, 1)");
         my_strokeStyle.addColorStop(0.8, "rgba(108, 85, 38, 1)");
         my_strokeStyle.addColorStop(1, "rgba(108, 85, 38, 1)");
@@ -1305,7 +1384,7 @@ class App extends Component {
         ctx.lineWidth = 8;
 
         // 填充渐变
-        var my_gradient = ctx.createLinearGradient(0, 0, 500*devicePixelRatio, 500*devicePixelRatio);
+        let my_gradient = ctx.createLinearGradient(0, 0, 500*devicePixelRatio, 500*devicePixelRatio);
         my_gradient.addColorStop(0, "rgba(108, 85, 38, 1)");
         my_gradient.addColorStop(1, "rgba(62, 52, 34, .8)");
         ctx.fillStyle = my_gradient;
@@ -1374,7 +1453,7 @@ class App extends Component {
 
 
         // 填充渐变
-        var my_gradient = ctx2.createLinearGradient(0, 0, 500*devicePixelRatio, 500*devicePixelRatio);
+        let my_gradient = ctx2.createLinearGradient(0, 0, 500*devicePixelRatio, 500*devicePixelRatio);
         my_gradient.addColorStop(0, "rgba(108, 85, 38, 1)");
         my_gradient.addColorStop(1, "rgba(62, 52, 34, 1)");
         ctx2.fillStyle = my_gradient;
@@ -1550,57 +1629,57 @@ class App extends Component {
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          let data = res.response
-          // let data =  {
-          //   mapList: [{longitude: "114.03322516505993", latitude: "22.567655873539117"},
-          //   {longitude: "114.05741734885589", latitude: "22.570405120994014"},
-          //   {longitude: "114.05873565456415", latitude: "22.563237148348076"},
-          //   {longitude: "114.078177646276", latitude: "22.527747225143692"},
-          //   {longitude: "114.07508774154371", latitude: "22.525589270430714"},
-          //   {longitude: "114.07957105383541", latitude: "22.51918457950339"},
-          //   {longitude: "114.05102564488274", latitude: "22.513942918144956"},
-          //   {longitude: "114.02808873488428", latitude: "22.54069176808944"}],
-          //   deviceList: [{
-          //     deviceName: "1 号塔机监测系统",
-          //     longitude: "114.0399936290864",
-          //     latitude: "22.527919658186872",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 2197,
-          //     alarmTimes: 987,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
-          //   }, {
-          //     deviceName: "2 号塔机监测系统",
-          //     longitude: "114.0440153808594",
-          //     latitude: "22.56797929382324",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 2197,
-          //     alarmTimes: 1002,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
-          //   }, 
-          //   {
-          //     deviceName: "3 号塔机监测系统",
-          //     longitude: "114.05853808556",
-          //     latitude: "22.54797929382318",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 2197,
-          //     alarmTimes: 623,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          //   },
+          // let data = res.response
+          let data =  {
+            mapList: [{longitude: "114.03322516505993", latitude: "22.567655873539117"},
+            {longitude: "114.05741734885589", latitude: "22.570405120994014"},
+            {longitude: "114.05873565456415", latitude: "22.563237148348076"},
+            {longitude: "114.078177646276", latitude: "22.527747225143692"},
+            {longitude: "114.07508774154371", latitude: "22.525589270430714"},
+            {longitude: "114.07957105383541", latitude: "22.51918457950339"},
+            {longitude: "114.05102564488274", latitude: "22.513942918144956"},
+            {longitude: "114.02808873488428", latitude: "22.54069176808944"}],
+            deviceList: [{
+              deviceName: "1 号塔机监测系统",
+              longitude: "114.0399936290864",
+              latitude: "22.527919658186872",
+              status: Math.ceil(Math.random()*2),
+              orderProductList: 2197,
+              alarmTimes: 987,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
+            }, {
+              deviceName: "2 号塔机监测系统",
+              longitude: "114.0440153808594",
+              latitude: "22.56797929382324",
+              status: Math.ceil(Math.random()*2),
+              orderProductList: 2197,
+              alarmTimes: 1002,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
+            }, 
+            {
+              deviceName: "3 号塔机监测系统",
+              longitude: "114.05853808556",
+              latitude: "22.54797929382318",
+              status: Math.ceil(Math.random()*2),
+              orderProductList: 2197,
+              alarmTimes: 623,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            },
           //   {
           //     deviceName: "4 号塔机监测系统",
           //     longitude: "114.06853808556",
@@ -1643,8 +1722,8 @@ class App extends Component {
           //   //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
           //   //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
           //   // }
-          // ]
-          // }
+          ]
+          }
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
             return [item.longitude, item.latitude]
@@ -2179,8 +2258,8 @@ class App extends Component {
                   return (
                     item.indicatorName == '防撞' ? 
                       (item.indicatorValue == '已启用' ? 
-                      (<div><img src={require("../../assets/images/yes.png")} alt=""/><span>防撞已启用</span></div>) 
-                      : (<div><img src={require("../../assets/images/no.png")} alt=""/><span>防撞未启用</span></div>) )
+                      (<div key={index}><img src={require("../../assets/images/yes.png")} alt=""/><span>防撞已启用</span></div>) 
+                      : (<div key={index}><img src={require("../../assets/images/no.png")} alt=""/><span>防撞未启用</span></div>) )
                     :''
                   )
                 }):''
@@ -2284,7 +2363,7 @@ class App extends Component {
                           <div className='number'>
                             <span>{item.heavy}t</span><br/>
                             <span>{item.height}m</span><br/>
-                            {/* <span>幅{item.amplitude}m</span> */}
+                          
                           </div>
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
                           <img className='line'  style={{height:+item.height+4,left:-item.amplitude+56}} src={require("../../assets/images/line.png")} alt=""/>

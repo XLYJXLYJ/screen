@@ -526,9 +526,8 @@ body,
               margin-top: px-rem(16);
             }
             .taji{
-              width:px-rem(180);
-              height:px-rem(180);
-  
+              width:px-rem(184);
+              height:px-rem(190);
             }
             .line{
               width:px-rem(8);
@@ -537,7 +536,7 @@ body,
               left:px-rem(76);
               top: px-rem(34);
               right: px-rem(76);
-              transition: all 6s;
+              transition: all 1s;
             }
             .breathe-line {
               position:relative;
@@ -571,7 +570,7 @@ body,
               left:px-rem(8);
               top: px-rem(128);
               right: px-rem(76);
-              transition: all 6s;
+              transition: all 1s;
   
             }
         }
