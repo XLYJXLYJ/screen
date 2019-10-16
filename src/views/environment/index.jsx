@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 // import ReactDom from "react-dom"
-import { CSSTransition } from 'react-transition-group'
 import { DataSet, DataView } from "@antv/data-set"
 import G2 from "@antv/g2"
 
@@ -11,7 +10,7 @@ import * as tools from "../../tools/index"
 import danger from "../../assets/images/danger.png"
 
 import mapbg from "../../assets/images/mapbg.png"
-import warnMarker from "../../assets/images/warnMarker.png"
+// import warnMarker from "../../assets/images/warnMarker.png"
 import "./index.scss"
 
 // 跑马灯组件
@@ -204,6 +203,7 @@ class App extends Component {
     this.columnarTSPDom = React.createRef() //PMTSP 7天柱状图对象
     this.proportionDom = React.createRef() //24小时报警次数饼图对象
     this.map = null // 地图对象
+    this.mapMarkerDrawCircle = null//选中地图圆圈对象
     this.mapMarkerDraw = null//选中地图光标对象
 
     this.equipmentListTime = null // 设备列表定时器对象
@@ -214,9 +214,13 @@ class App extends Component {
     this.proportion24th = null //24小时报警次数饼图对象
 
     this.figureOfBreadChart = null // 图饼图对象-成员数量
-    this.markerList = '' // 地图标准列表
-    this.markerListCircle = '' // 地图光圈
+
+    this.markerList = [] // 地图标准列表
+    this.removeMarkerList = [] // 需要移除的地图列表
+    this.markerListCircle = [] // 地图光圈
+    this.removeMarkerListCircle = [] // 移除地图光圈
     this.markerListText = '' // 地图文字列表
+
     this.aMapPolygon = null // 地图矩形对象
     this.aMapPolygonBottom = null
     this.brokenLineLableIndex = [] // 标注的索引
@@ -933,10 +937,14 @@ class App extends Component {
   initMap() {
     if (this.map) {
       this.mapMarkerDraw && this.map.remove(this.mapMarkerDraw)
-      this.selMapMarker()
-      this.selMapText()
+      this.mapMarkerDrawCircle && this.map.remove(this.mapMarkerDrawCircle)
       this.resetMapMarker()
-      this.resetMapMarker1()
+      this.resetMapMarkerIris()
+
+      this.selMapMarker()
+      this.selMapMarkerCircle()
+      
+      this.selMapText()
     } else {
       this.map = new AMap.Map("mapcontainer", {
         resizeEnable: true, // 是否监控地图容器尺寸变化，默认值为false
@@ -947,9 +955,12 @@ class App extends Component {
         mapStyle: "amap://styles/e82b537e91ee2e22c215325293b01d70" //设置地图的显示样式
       });
       // 将图层添加至地图实例
-      this.resetMapMarker(); //画地图圈圈
-      this.resetMapMarker1()
+      this.resetMapMarker();
+      this.resetMapMarkerIris()
+
       this.selMapMarker();
+      this.selMapMarkerCircle()
+
       this.selMapText()
       //画定位2d图形
       this.map2D();
@@ -996,25 +1007,43 @@ class App extends Component {
     cxt.closePath();
   }
 
-  // 重置地图标注
+  // 画没有选中的塔机臂
   resetMapMarker() {
     // 没有数据情况下
-    if(this.state.actionEquipmentListIndex>3){
-      let arr = Object.keys(this.refs)
-      if(arr.length!=0){
-        this.refs.content.style.top = -7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
-      }else{
-        console.log(this.refs)
+    // if(this.state.actionEquipmentListIndex>3){
+    //   let arr = Object.keys(this.refs)
+    //   if(arr.length!=0){
+    //     this.refs.content.style.top = -7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
+    //   }else{
+    //     console.log(this.refs)
+    //   }
+    // }else{
+    //   this.refs.content.style.top = 0
+    // }
+    // if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
+    //   return null
+    // }
+
+    if(this.markerList.length !== 0){
+      this.map.remove(this.removeMarkerList)
+      this.removeMarkerList = [];
+      this.removeMarkerList = copyArr(this.markerList)
+      function copyArr(arr) {
+          let res = []
+          for (let i = 0; i < arr.length; i++) {
+            res.push(arr[i])
+          }
+          return res
       }
-    }else{
-      this.refs.content.style.top = 0
-    }
-    if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
+      this.markerList.forEach((e, i) => {
+        if(this.state.actionEquipmentListIndex == i){
+          this.removeMarkerList.splice(i,1)
+        }
+      })
+      this.map.add(this.removeMarkerList)
       return null
     }
-
-    this.map.remove(this.markerList)
-    this.markerList = []
+    // this.markerList = []
     this.equipmentListTime01 = []
     this.state.equipmentList.forEach((item, index) => {
         //光圈开始
@@ -1082,16 +1111,25 @@ class App extends Component {
         )
     })
     // // localStorage.setItem('markerList',JSON.stringify(this.markerList))
-    this.markerList.forEach((e, i) => {
+    // this.removeMarkerList = this.markerList
+    this.removeMarkerList = copyArr(this.markerList)
+    function copyArr(arr) {
+        let res = []
+        for (let i = 0; i < arr.length; i++) {
+          res.push(arr[i])
+        }
+        return res
+    }
+    this.removeMarkerList.forEach((e, i) => {
       if(this.state.actionEquipmentListIndex == i){
-        this.markerList.splice(i,1)
+        this.removeMarkerList.splice(i,1)
       }
     })
-    this.map.add(this.markerList)
+    this.map.add(this.removeMarkerList)
   }
 
-    // 重置地图标注
-    resetMapMarker1() {
+    // 画没有选中塔机的发光光圈
+    resetMapMarkerIris() {
       // 没有数据情况下
       if(this.state.actionEquipmentListIndex>3){
         let arr = Object.keys(this.refs)
@@ -1107,11 +1145,32 @@ class App extends Component {
         return null
       }
       // window.clearInterval(this.equipmentListTime01)
-      for(let i=0;i<this.equipmentListTime01.length;i++){
-        window.clearInterval(this.equipmentListTime01[i])
-        console.log(this.equipmentListTime01[i])
+      // for(let i=0;i<this.equipmentListTime01.length;i++){
+      //   window.clearInterval(this.equipmentListTime01[i])
+      // }
+
+      // this.map.remove(this.markerListCircle)
+
+      if(this.markerListCircle.length !== 0){
+        this.map.remove(this.removeMarkerListCircle)
+        this.removeMarkerListCircle = [];
+        this.removeMarkerListCircle = copyArr(this.markerListCircle)
+        function copyArr(arr) {
+            let res = []
+            for (let i = 0; i < arr.length; i++) {
+              res.push(arr[i])
+            }
+            return res
+        }
+        this.markerListCircle.forEach((e, i) => {
+          if(this.state.actionEquipmentListIndex == i){
+            this.removeMarkerListCircle.splice(i,1)
+          }
+        })
+        this.map.add(this.removeMarkerListCircle)
+        return null
       }
-      this.map.remove(this.markerListCircle)
+
       this.markerListCircle = []
       this.equipmentListTime01 = []
       this.state.equipmentList.forEach((item, index) => {
@@ -1142,11 +1201,12 @@ class App extends Component {
             context.lineWidth = 1;
             context.save();
             context.restore();
+            AMap.Util.requestAnimFrame(draw)
           }
-          let timer = setInterval(() => {
-            draw()
-          }, 50);
-          this.equipmentListTime01.push(timer)
+          // let timer = setInterval(() => {
+
+          // }, 50);
+          // this.equipmentListTime01.push(timer)
           this.markerListCircle.push(
             new AMap.Marker({
               content: canvasC,
@@ -1156,21 +1216,113 @@ class App extends Component {
               zIndex: 99 - index,
             })
           )
+          draw()
       })
-      // // localStorage.setItem('markerList',JSON.stringify(this.markerList))
+
+      this.removeMarkerListCircle = copyArr(this.markerListCircle)
+      function copyArr(arr) {
+          let res = []
+          for (let i = 0; i < arr.length; i++) {
+            res.push(arr[i])
+          }
+          return res
+      }
       this.markerListCircle.forEach((e, i) => {
         if(this.state.actionEquipmentListIndex == i){
-          this.markerListCircle.splice(i,1)
+          this.removeMarkerListCircle.splice(i,1)
         }
       })
-      this.map.add(this.markerListCircle)
+      this.map.add(this.removeMarkerListCircle)
+
+      // this.markerListCircle.forEach((e, i) => {
+      //   if(this.state.actionEquipmentListIndex == i){
+      //     this.markerListCircle.splice(i,1)
+      //   }
+      // })
+      // this.map.add(this.markerListCircle)
     }
-
-
-
   selMapText(){
-    this.map.remove(this.markerListText)
+    // this.map.remove(this.markerListText)
+    if(this.markerListText.length !=0 ){
+      return;
+    }
     this.markerListText = []
+
+    // for(let i=0;i<this.state.equipmentList.length;i++){
+    //   for(let j=0;j<this.state.equipmentList.length - i;j++){
+    //       console.log(i)
+    //       console.log(Math.abs(this.state.equipmentList[i].longitude - this.state.equipmentList[j].longitude < 0.0001))
+    //       console.log(Math.abs(this.state.equipmentList[i].latitude - this.state.equipmentList[j].latitude < 0.0001))
+    //       if(Math.abs(this.state.equipmentList[i].longitude - this.state.equipmentList[j].longitude)  < 0.001 || Math.abs(this.state.equipmentList[i].latitude - this.state.equipmentList[j].latitude)  < 0.001){
+    //           console.log('这个距离太近了')
+    //       }else{
+    //         let canvasT = document.createElement('canvas')
+    //         let size = this.map.getSize() //resize
+    //         let width = size.width
+    //         let height = size.height
+    //         canvasT.style.width = width + "px"
+    //         canvasT.style.height = height + "px"
+    //         canvasT.width = width*devicePixelRatio
+    //         canvasT.height = height*devicePixelRatio
+    //         // canvasC.width = canvasC.height = 320
+    //         let ctx = canvasT.getContext('2d')
+    //         let txt = this.state.equipmentList[i].deviceName
+    //         console.log(i)
+    //         console.log(txt)
+    //         ctx.beginPath();
+    //         ctx.font = "30px";
+    //         ctx.strokeStyle = 'rgb(252,184,19)';
+    //         ctx.strokeText(txt, 60, 143);
+    //         ctx.stroke();
+      
+    //         if(this.state.equipmentList[i].status == 2){
+    //           ctx.beginPath();
+    //           ctx.fillStyle = "rgba(0,0,0,0.3)";
+    //           ctx.moveTo(50, 130);
+    //           ctx.lineTo(50, 150);
+    //           ctx.lineTo(80 + ctx.measureText(txt).width, 150);
+    //           ctx.lineTo(80 + ctx.measureText(txt).width, 130);
+    //           ctx.strokeStyle = "rgba(0,0,0,0)";
+    //           ctx.closePath();
+    //           ctx.fill();
+    //           ctx.stroke();
+    //           let img = new Image();
+    //           img.onload = function() {
+    //             ctx.drawImage(img, 142, 134);
+    //           };
+    //           img.src = danger;
+    //         }else{
+    //           ctx.beginPath();
+    //           ctx.fillStyle = "rgba(0,0,0,0.3)";
+    //           ctx.moveTo(50, 130);
+    //           ctx.lineTo(50, 150);
+    //           ctx.lineTo(70 + ctx.measureText(txt).width, 150);
+    //           ctx.lineTo(70 + ctx.measureText(txt).width, 130);
+    //           ctx.strokeStyle = "rgba(0,0,0,0)";
+    //           ctx.closePath();
+    //           ctx.fill();
+    //           ctx.stroke();
+    //         }
+      
+    //         this.markerListText.push(
+    //           new AMap.Marker({
+    //             content: canvasT,
+    //             position: new AMap.LngLat(this.state.equipmentList[i].longitude, this.state.equipmentList[i].latitude),
+    //             offset: new AMap.Pixel(-15, -17),
+    //             size: new AMap.Size(50, 60),
+    //             zIndex: 99 - i,
+    //           })
+    //         )
+
+    //       }
+    //   }
+    // }
+
+
+
+
+    // this.map.add(this.markerListText)
+
     this.state.equipmentList.forEach((item, index) => {
       let canvasT = document.createElement('canvas')
       let size = this.map.getSize() //resize
@@ -1230,7 +1382,7 @@ class App extends Component {
     })
     this.map.add(this.markerListText)
   }
-  //地图标注选中效果
+  //地图标注选中臂长效果
   selMapMarker() {
     let that = this
     let arrRotary = [];
@@ -1251,23 +1403,11 @@ class App extends Component {
         cxt.restore();
         function drawClock() {
           cxt.clearRect(0, 0, 500, 500);
-          //大圈
-          cxt.beginPath();
-          cxt.lineWidth = 0.1;
-          //大圈边框颜色
-          cxt.arc(585, 505, 100, 0, 360, false);
-          cxt.strokeStyle = "rgba(252,184,19,0.5)";
-          cxt.fillStyle = "rgba(252,184,19,0.5)";
-          cxt.fill();
-          cxt.stroke();
-          cxt.closePath();
-          cxt.save();
           //边框
           cxt.beginPath();
           //边框颜色
           cxt.strokeStyle="rgb(252,184,19)";
           cxt.translate(585, 505);
-          console.log(arrRotary[index])
           cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
           // cxt.strokeRect(-10,-2,70,4);
           that.fillRoundRect(cxt, -20,-3, 120,8, 4, 'rgba(252,174,19,0.3)');
@@ -1304,8 +1444,49 @@ class App extends Component {
       }
     })
   }
-
-  
+  //地图标注选中圆圈效果
+  selMapMarkerCircle() {
+    let that = this
+    this.state.equipmentList.map((item, index) => {
+      let canvasCircle = document.createElement('canvas');
+      let size = this.map.getSize() //resize
+      let width = size.width
+      let height = size.height
+      canvasCircle.style.width = width + "px"
+      canvasCircle.style.height = height + "px"
+      canvasCircle.width = width*devicePixelRatio
+      canvasCircle.height = height*devicePixelRatio
+      let cxt = canvasCircle.getContext('2d');
+      cxt.clearRect(0, 0, 5000, 5000);
+      if(index == this.state.actionEquipmentListIndex){
+        cxt.restore();
+        function drawClock() {
+          //大圈
+          cxt.beginPath();
+          cxt.lineWidth = 0.1;
+          //大圈边框颜色
+          cxt.arc(585, 505, 100, 0, 360, false);
+          cxt.strokeStyle = "rgba(252,184,19,0.5)";
+          cxt.fillStyle = "rgba(252,184,19,0.5)";
+          cxt.fill();
+          cxt.stroke();
+          cxt.closePath();
+          cxt.save();
+          cxt.restore();
+        }
+        let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
+        let pageX = 0.05, pageY = 0.05
+        let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
+        this.mapMarkerDrawCircle = new AMap.CanvasLayer({
+          canvas: canvasCircle,
+          bounds: bounds,
+          zooms: [3, 18],
+        })
+        this.mapMarkerDrawCircle.setMap(this.map)
+        drawClock();
+      }
+    })
+  }
   //画定位2d图形
   map2D() {
     new AMap.Polygon({
@@ -1364,7 +1545,6 @@ class App extends Component {
       })
       customLayer.render = () => {
         let size = this.map.getSize() //resize
-        console.log(size)
         let width = size.width
         let height = size.height
         let ctx = canvas.getContext("2d")
@@ -1507,6 +1687,8 @@ class App extends Component {
     if (this.equipmentListTime) {
       return null
     }
+    // let updateTime = this.state.equipmentList.length == 1 ? 60 : 30
+    //切换时间
     let updateTime = this.state.equipmentList.length == 1 ? 60 : 30
     this.updateDate('init')
     this.updateIndicators(updateTime)//更新指数
@@ -1642,7 +1824,7 @@ class App extends Component {
             deviceList: [{
               deviceName: "1 号塔机监测系统",
               longitude: "114.0399936290864",
-              latitude: "22.527919658186872",
+              latitude: "22.547919658186872",
               status: Math.ceil(Math.random()*2),
               orderProductList: 2197,
               alarmTimes: 987,
@@ -1680,20 +1862,20 @@ class App extends Component {
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
             },
-          //   {
-          //     deviceName: "4 号塔机监测系统",
-          //     longitude: "114.06853808556",
-          //     latitude: "22.56797929382318",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 2197,
-          //     alarmTimes: 623,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          //   },
+            {
+              deviceName: "4 号塔机监测系统",
+              longitude: "114.06453808556",
+              latitude: "22.56997929382318",
+              status: Math.ceil(Math.random()*2),
+              orderProductList: 2197,
+              alarmTimes: 623,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            },
           //   // {
           //   //   deviceName: "5 号塔机监测系统",
           //   //   longitude: "114.07853808556",
@@ -1935,8 +2117,6 @@ class App extends Component {
   }
   //获取12小时内统计数据
   get12Hours() {
-
-
     this.$http
       .post("/rest/tower/getStatisticDataIn12Hours", {
         orderProductList: this.state.equipmentList[
@@ -2237,7 +2417,14 @@ class App extends Component {
                                   useEasing={true}
                                   useGrouping={true}
                                 />
-                                <span className="list-unit">{item.unit}</span>
+                                <span className={
+                                  item.unit=="°"
+                                    ? "list-unit-point"
+                                    : "list-unit"
+                                }>
+                                  {item.unit}
+                                </span>
+                                {/* <span className="list-unit">{item.unit}</span> */}
                               </span>
                             )
                         ) : (

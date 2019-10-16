@@ -288,6 +288,12 @@ body,
               font-size: px-rem(40);
               font-weight: bold;
             }
+            .list-unit-point {
+              font-size: px-rem(40);
+              font-weight: bold;
+              position: relative;
+              top: px-rem(-22);
+            }
           }
         }
       }
@@ -307,6 +313,10 @@ body,
           height:px-rem(36);
           position: relative;
           top:px-rem(5);
+        }
+        span{
+          position: relative;
+          left:px-rem(15);
         }
       }
 
@@ -647,6 +657,7 @@ body,
         font-size: px-rem(100);
 
         .warn-24th-li {
+          margin-bottom: px-rem(-15);
           .warn-num {
             display: flex;
             justify-content: space-between;
