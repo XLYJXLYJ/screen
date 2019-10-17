@@ -480,6 +480,7 @@ body,
       width: px-rem(1800);
       position: absolute;
       bottom: px-rem(180);
+
       //enter是入场前的刹那（点击按钮），appear指页面第一次加载前的一刹那（自动）
       .title{
         font-family: MI-LANTING_GB-OUTSIDE-YS;
@@ -538,6 +539,7 @@ body,
             .taji{
               width:px-rem(184);
               height:px-rem(190);
+              z-index: -100;
             }
             .line{
               width:px-rem(8);
@@ -553,24 +555,51 @@ body,
               width:px-rem(220);
               height:px-rem(4);
               background: -webkit-linear-gradient(left, rgb(33, 34, 2) -4%,rgb(215, 218, 40) 50%,rgb(33, 34, 2) 100%);
-              box-shadow:0 -10px px-rem(40) rgb(215, 218, 40);
+              // box-shadow:0 px-rem(-100) px-rem(50) yellow;
+              // -moz-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+              // -webkit-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
               overflow:hidden;
               background-image:gradient(linear,left top,left bottom,from(rgb(215, 218, 40)),to(rgb(215, 218, 40)));
+              // animation-timing-function:ease-in-out;
+              // animation-name:breathe1;
+              // animation-duration:2700ms;
+              // animation-iteration-count:infinite;
+              // animation-direction:alternate;
+              margin: 0 auto;
+              z-index: 999;
+              top: px-rem(-10);
+            }
+            .breathe-line1 {
+              position:relative;
+              width:px-rem(220);
+              height:px-rem(10);
               animation-timing-function:ease-in-out;
               animation-name:breathe1;
               animation-duration:2700ms;
               animation-iteration-count:infinite;
               animation-direction:alternate;
               margin: 0 auto;
+              z-index: 999;
+              top: px-rem(10);
             }
             @keyframes breathe1 {
               0% {
                 opacity:.2;
-                box-shadow:0 -10px px-rem(40) yellow;
+                box-shadow:0 px-rem(-100) px-rem(50) yellow;
+                -moz-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+                -webkit-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+                /*显示下边阴影*/
+                position: relative;
+                z-index: 999;
               }
               100% {
                 opacity:1;
-                box-shadow:0 -10px px-rem(40) yellow;
+                box-shadow:0 px-rem(-100) px-rem(50) yellow;
+                -moz-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+                -webkit-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+                /*显示下边阴影*/
+                position: relative;
+                z-index: 999;
               }
             }
             .thing{
@@ -657,7 +686,7 @@ body,
         font-size: px-rem(100);
 
         .warn-24th-li {
-          margin-bottom: px-rem(-15);
+          // margin-bottom: px-rem(-15);
           .warn-num {
             display: flex;
             justify-content: space-between;

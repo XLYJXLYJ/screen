@@ -1336,7 +1336,7 @@ class App extends Component {
       let ctx = canvasT.getContext('2d')
       let txt = item.deviceName
       ctx.beginPath();
-      ctx.font = "30px";
+      ctx.font =  "10px SimHei";
       ctx.strokeStyle = 'rgb(252,184,19)';
       ctx.strokeText(txt, 60, 143);
       ctx.stroke();
@@ -1826,7 +1826,7 @@ class App extends Component {
               longitude: "114.0399936290864",
               latitude: "22.547919658186872",
               status: Math.ceil(Math.random()*2),
-              orderProductList: 2197,
+              orderProductList: 297,
               alarmTimes: 987,
               rotary: Math.ceil(Math.random()*360),
               amplitude:30-Math.ceil(Math.random()*30),
@@ -1840,7 +1840,7 @@ class App extends Component {
               latitude: "22.56797929382324",
               status: Math.ceil(Math.random()*2),
               orderProductList: 2197,
-              alarmTimes: 1002,
+              alarmTimes: 502,
               rotary: Math.ceil(Math.random()*360),
               amplitude:30-Math.ceil(Math.random()*30),
               height:Math.ceil(Math.random()*30),
@@ -2557,6 +2557,8 @@ class App extends Component {
                           <img className='thing' style={{top:+item.height+8,left:-item.amplitude+54}} src={require("../../assets/images/thing.png")} alt=""/>
                           <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <p>{item.deviceName}</p>
+                          <div className='breathe-line1' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
+
                           {/* <p>{this.state.equipmentList[this.state.actionEquipmentListIndex]}</p>
                           <p>{index}</p> */}
                         </li>
@@ -2626,7 +2628,8 @@ class App extends Component {
                 ? this.state.warnStatistic.indicatorWarnList.map(
                   (item, index) => {
                     return (
-                      <div className="warn-24th-li" key={index}>
+                      item.indicatorName !== '幅度'?
+                      (<div className="warn-24th-li" key={index}>
                         <div className="warn-num">
                           <span className="warn-name">
                             {item.indicatorName}
@@ -2645,7 +2648,7 @@ class App extends Component {
                             />
                           }
                         </div>
-                      </div>
+                      </div>):''
                     )
                   }
                 )
