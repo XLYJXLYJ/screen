@@ -7,10 +7,9 @@ import CountUp from "react-countup"
 import solarLunar from "../../assets/js/solarlunar"
 import * as config from "../../config/index"
 import * as tools from "../../tools/index"
-import danger from "../../assets/images/danger.png"
 
 import mapbg from "../../assets/images/mapbg.png"
-// import warnMarker from "../../assets/images/warnMarker.png"
+import warnMarker from "../../assets/images/warnMarker.png"
 import "./index.scss"
 
 // 跑马灯组件
@@ -198,9 +197,9 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.brokenlinContainerDom = React.createRef() // 近 12 小时数据统计 折线图对象
-    this.columnarPM25Dom = React.createRef() //PM10 7天柱状图对象
-    this.columnarPM10Dom = React.createRef() //PM2.5 7天柱状图对象
-    this.columnarTSPDom = React.createRef() //PMTSP 7天柱状图对象
+    this.columnarTorqueDom = React.createRef() //PM10 7天柱状图对象
+    this.columnarHeavyDom = React.createRef() //PM2.5 7天柱状图对象
+    this.columnarAmplitudeDom = React.createRef() //PMTSP 7天柱状图对象
     this.proportionDom = React.createRef() //24小时报警次数饼图对象
     this.map = null // 地图对象
     this.mapMarkerDrawCircle = null//选中地图圆圈对象
@@ -208,9 +207,9 @@ class App extends Component {
 
     this.equipmentListTime = null // 设备列表定时器对象
     this.brokenLineChart = null // 折线图对象
-    this.columnarPM10 = null //PM10 7天柱状图对象
-    this.columnarPM25 = null //PM25 7天柱状图对象
-    this.columnarTSP = null //PMTSP 7天柱状图对象
+    this.columnarHeavy = null //PM10 7天柱状图对象
+    this.columnarTorque = null //PM25 7天柱状图对象
+    this.columnarAmplitude = null //PMTSP 7天柱状图对象
     this.proportion24th = null //24小时报警次数饼图对象
 
     this.figureOfBreadChart = null // 图饼图对象-成员数量
@@ -358,17 +357,17 @@ class App extends Component {
     let tickCount = maxValue == 0 ? 6 : 4
 
     this.brokenLineChart.source(this.state.brokenLineList.indicatorDateList)
-    this.brokenLineChart.scale("幅度", {
+    this.brokenLineChart.scale("amplitude", {
       min,
       max,
       tickCount
     })
-    this.brokenLineChart.scale("载重", {
+    this.brokenLineChart.scale("heavy", {
       min,
       max,
       tickCount
     })
-    this.brokenLineChart.scale("力矩", {
+    this.brokenLineChart.scale("torque", {
       min,
       max,
       tickCount
@@ -399,19 +398,19 @@ class App extends Component {
     })
     this.brokenLineChart
       .line()
-      .position("dateHour*tsp")
+      .position("dateHour*heavy")
       .color("#9013fe").style({
         lineWidth: 1
       })
     this.brokenLineChart
       .line()
-      .position("dateHour*pm10")
+      .position("dateHour*torque")
       .color("#8b572a").style({
         lineWidth: 1
       })
     this.brokenLineChart
       .line()
-      .position("dateHour*pm25")
+      .position("dateHour*torque")
       .color("#62a3f1").style({
         lineWidth: 1
       })
@@ -441,7 +440,7 @@ class App extends Component {
         })
         let height = targetDom.current.offsetHeight
         target = new G2.Chart({
-            container: "columnar-pm25",
+            container: "columnar-torque",
             pixelRatio: devicePixelRatio,
             forceFit: true,
             height: height,
@@ -465,10 +464,10 @@ class App extends Component {
 
         target.render()
   }
-  //初始化7天 PM2.5 柱状图
-  initColumnarPM25() {
-    if (this.columnarPM25) {
-      this.columnarPM25.changeData(this.state.sevenDays.pm25.dayValue)
+  //初始化7天 力矩 柱状图
+  initColumnarTorque() {
+    if (this.columnarTorque) {
+      this.columnarTorque.changeData(this.state.sevenDays.torque.dayValue)
       return null
     }
     G2.Global.registerTheme("themeOne", {
@@ -486,35 +485,35 @@ class App extends Component {
         }
       }
     })
-    let height = this.columnarPM25Dom.current.offsetHeight
-    this.columnarPM25 = new G2.Chart({
-      container: "columnar-pm25",
+    let height = this.columnarTorqueDom.current.offsetHeight
+    this.columnarTorque = new G2.Chart({
+      container: "columnar-torque",
       pixelRatio: devicePixelRatio,
       forceFit: true,
       height: height,
       padding: [0, 'auto', 0, 'auto'],
       theme: "themeOne"
     })
-    this.columnarPM25.source(this.state.sevenDays.pm25.dayValue, {
+    this.columnarTorque.source(this.state.sevenDays.torque.dayValue, {
       value: {
         type: "linear",
         values: ["min"],
-        tickInterval: this.state.sevenDays.pm25.maxValue //设置最大高度
+        tickInterval: this.state.sevenDays.torque.maxValue //设置最大高度
       },
     })
 
-    this.columnarPM25
+    this.columnarTorque
       .interval()
       .position("day*value")
       .size(7)
       .shape("borderRadius")
       .color("#fcb813")
-    this.columnarPM25.render()
+    this.columnarTorque.render()
   }
   //初始化7天 PM10 柱状图
-  initColumnarPM10() {
-    if (this.columnarPM10) {
-      this.columnarPM10.changeData(this.state.sevenDays.pm10.dayValue)
+  initColumnarAmplitude() {
+    if (this.columnarHeavy) {
+      this.columnarHeavy.changeData(this.state.sevenDays.heavy.dayValue)
       return null
     }
     G2.Global.registerTheme("themeOne", {
@@ -532,34 +531,34 @@ class App extends Component {
         }
       }
     })
-    let height = this.columnarPM10Dom.current.offsetHeight
-    this.columnarPM10 = new G2.Chart({
-      container: "columnar-pm10",
+    let height = this.columnarHeavyDom.current.offsetHeight
+    this.columnarHeavy = new G2.Chart({
+      container: "columnar-heavy",
       pixelRatio: devicePixelRatio,
       forceFit: true,
       height: height,
       padding: [0, 'auto', 0, 'auto'],
       theme: "themeOne"
     })
-    this.columnarPM10.source(this.state.sevenDays.pm10.dayValue, {
+    this.columnarHeavy.source(this.state.sevenDays.heavy.dayValue, {
       value: {
         type: "linear",
         values: ["min"],
-        tickInterval: this.state.sevenDays.pm10.maxValue //设置最大高度
+        tickInterval: this.state.sevenDays.heavy.maxValue //设置最大高度
       }
     })
-    this.columnarPM10
+    this.columnarHeavy
       .interval()
       .position("day*value")
       .size(7)
       .shape("borderRadius")
       .color("#fcb813")
-    this.columnarPM10.render()
+    this.columnarHeavy.render()
   }
   //初始化7天 TSP 柱状图
-  initColumnarTSP() {
-    if (this.columnarTSP) {
-      this.columnarTSP.changeData(this.state.sevenDays.tsp.dayValue)
+  initColumnarHeavy() {
+    if (this.columnarAmplitude) {
+      this.columnarAmplitude.changeData(this.state.sevenDays.amplitude.dayValue)
       return null
     }
     G2.Global.registerTheme("themeOne", {
@@ -577,29 +576,29 @@ class App extends Component {
         }
       }
     })
-    let height = this.columnarTSPDom.current.offsetHeight
-    this.columnarTSP = new G2.Chart({
-      container: "columnar-tsp",
+    let height = this.columnarAmplitudeDom.current.offsetHeight
+    this.columnarAmplitude = new G2.Chart({
+      container: "columnar-amplitude",
       pixelRatio: devicePixelRatio,
       forceFit: true,
       height: height,
       padding: [0, 'auto', 0, 'auto'],
       theme: "themeOne"
     })
-    this.columnarTSP.source(this.state.sevenDays.tsp.dayValue, {
+    this.columnarAmplitude.source(this.state.sevenDays.amplitude.dayValue, {
       value: {
         type: "linear",
         values: ["min"],
-        tickInterval: this.state.sevenDays.tsp.maxValue //设置最大高度
+        tickInterval: this.state.sevenDays.amplitude.maxValue //设置最大高度
       }
     })
-    this.columnarTSP
+    this.columnarAmplitude
       .interval()
       .position("day*value")
       .size(7)
       .shape("borderRadius")
       .color("#fcb813")
-    this.columnarTSP.render()
+    this.columnarAmplitude.render()
   }
   //初始化24th 设备告警次数
   initProportion24th() {
@@ -679,7 +678,7 @@ class App extends Component {
               fill: "#000",
               textBaseline: 'middle',
               textAlign: 'center',
-              fontSize: 10
+              fontSize: 8
             }
           }
           : null
@@ -1242,151 +1241,49 @@ class App extends Component {
       // this.map.add(this.markerListCircle)
     }
   selMapText(){
-    // this.map.remove(this.markerListText)
-    if(this.markerListText.length !=0 ){
-      return;
-    }
-    this.markerListText = []
-
-    // for(let i=0;i<this.state.equipmentList.length;i++){
-    //   for(let j=0;j<this.state.equipmentList.length - i;j++){
-    //       console.log(i)
-    //       console.log(Math.abs(this.state.equipmentList[i].longitude - this.state.equipmentList[j].longitude < 0.0001))
-    //       console.log(Math.abs(this.state.equipmentList[i].latitude - this.state.equipmentList[j].latitude < 0.0001))
-    //       if(Math.abs(this.state.equipmentList[i].longitude - this.state.equipmentList[j].longitude)  < 0.001 || Math.abs(this.state.equipmentList[i].latitude - this.state.equipmentList[j].latitude)  < 0.001){
-    //           console.log('这个距离太近了')
-    //       }else{
-    //         let canvasT = document.createElement('canvas')
-    //         let size = this.map.getSize() //resize
-    //         let width = size.width
-    //         let height = size.height
-    //         canvasT.style.width = width + "px"
-    //         canvasT.style.height = height + "px"
-    //         canvasT.width = width*devicePixelRatio
-    //         canvasT.height = height*devicePixelRatio
-    //         // canvasC.width = canvasC.height = 320
-    //         let ctx = canvasT.getContext('2d')
-    //         let txt = this.state.equipmentList[i].deviceName
-    //         console.log(i)
-    //         console.log(txt)
-    //         ctx.beginPath();
-    //         ctx.font = "30px";
-    //         ctx.strokeStyle = 'rgb(252,184,19)';
-    //         ctx.strokeText(txt, 60, 143);
-    //         ctx.stroke();
-      
-    //         if(this.state.equipmentList[i].status == 2){
-    //           ctx.beginPath();
-    //           ctx.fillStyle = "rgba(0,0,0,0.3)";
-    //           ctx.moveTo(50, 130);
-    //           ctx.lineTo(50, 150);
-    //           ctx.lineTo(80 + ctx.measureText(txt).width, 150);
-    //           ctx.lineTo(80 + ctx.measureText(txt).width, 130);
-    //           ctx.strokeStyle = "rgba(0,0,0,0)";
-    //           ctx.closePath();
-    //           ctx.fill();
-    //           ctx.stroke();
-    //           let img = new Image();
-    //           img.onload = function() {
-    //             ctx.drawImage(img, 142, 134);
-    //           };
-    //           img.src = danger;
-    //         }else{
-    //           ctx.beginPath();
-    //           ctx.fillStyle = "rgba(0,0,0,0.3)";
-    //           ctx.moveTo(50, 130);
-    //           ctx.lineTo(50, 150);
-    //           ctx.lineTo(70 + ctx.measureText(txt).width, 150);
-    //           ctx.lineTo(70 + ctx.measureText(txt).width, 130);
-    //           ctx.strokeStyle = "rgba(0,0,0,0)";
-    //           ctx.closePath();
-    //           ctx.fill();
-    //           ctx.stroke();
-    //         }
-      
-    //         this.markerListText.push(
-    //           new AMap.Marker({
-    //             content: canvasT,
-    //             position: new AMap.LngLat(this.state.equipmentList[i].longitude, this.state.equipmentList[i].latitude),
-    //             offset: new AMap.Pixel(-15, -17),
-    //             size: new AMap.Size(50, 60),
-    //             zIndex: 99 - i,
-    //           })
-    //         )
-
-    //       }
-    //   }
-    // }
-
-
-
-
-    // this.map.add(this.markerListText)
-
-    this.state.equipmentList.forEach((item, index) => {
-      let canvasT = document.createElement('canvas')
-      let size = this.map.getSize() //resize
-      let width = size.width
-      let height = size.height
-      canvasT.style.width = width + "px"
-      canvasT.style.height = height + "px"
-      canvasT.width = width*devicePixelRatio
-      canvasT.height = height*devicePixelRatio
-      // canvasC.width = canvasC.height = 320
-      let ctx = canvasT.getContext('2d')
-      let txt = item.deviceName
-      ctx.beginPath();
-      ctx.font =  "10px SimHei";
-      ctx.strokeStyle = 'rgb(252,184,19)';
-      ctx.strokeText(txt, 60, 143);
-      ctx.stroke();
-
-      if(item.status == 2){
-        ctx.beginPath();
-        ctx.fillStyle = "rgba(0,0,0,0.3)";
-        ctx.moveTo(50, 130);
-        ctx.lineTo(50, 150);
-        ctx.lineTo(80 + ctx.measureText(txt).width, 150);
-        ctx.lineTo(80 + ctx.measureText(txt).width, 130);
-        ctx.strokeStyle = "rgba(0,0,0,0)";
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        let img = new Image();
-        img.onload = function() {
-          ctx.drawImage(img, 142, 134);
-        };
-        img.src = danger;
-      }else{
-        ctx.beginPath();
-        ctx.fillStyle = "rgba(0,0,0,0.3)";
-        ctx.moveTo(50, 130);
-        ctx.lineTo(50, 150);
-        ctx.lineTo(70 + ctx.measureText(txt).width, 150);
-        ctx.lineTo(70 + ctx.measureText(txt).width, 130);
-        ctx.strokeStyle = "rgba(0,0,0,0)";
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-      }
-
-      this.markerListText.push(
-        new AMap.Marker({
-          content: canvasT,
-          position: new AMap.LngLat(item.longitude, item.latitude),
-          offset: new AMap.Pixel(-15, -17),
-          size: new AMap.Size(50, 60),
-          zIndex: 99 - index,
+        // 没有数据情况下
+        if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
+          return null
+        }
+        if (this.markerListText) {
+          //重置标记index 层级
+          this.markerListText.forEach((e, i) => {
+            e.setzIndex(this.state.actionEquipmentListIndex == i ? 100 : 10)
+          })
+          return null
+        }
+    
+        this.markerListText = []
+        this.state.equipmentList.map((item, index) => {
+          let content = `<div class="marker-marker-bus-from" style="animation: fadeShow 3s ease-in-out;">
+            <div class="marker-marker-name ${item.status != 1 && 'marker-padding'}">${item.deviceName}
+            ${item.status != 1 ? `<div class="marker-marker-warn" style="background-image:url(${warnMarker}";></div>` : ''}
+            </div>
+          </div>`
+          this.markerListText.push(
+            new AMap.Marker({
+              content: content,
+              position: new AMap.LngLat(item.longitude, item.latitude),
+              offset: new AMap.Pixel(-23, 40),
+              size: new AMap.Size(40, 50),
+              zIndex: 3 - index,
+            })
+          )
         })
-      )
-    })
-    this.map.add(this.markerListText)
+        this.map.add(this.markerListText)
   }
   //地图标注选中臂长效果
   selMapMarker() {
     let that = this
     let arrRotary = [];
     let arrAmplitude = [];
+
+
+    console.log(this.state.startIndicators)
+    console.log(this.state.endIndicators)
+    console.log(this.state.equipmentList)
+
+
     this.state.equipmentList.map((item, index) => {
       arrRotary.push(item.rotary)
       arrAmplitude.push(item.amplitude)
@@ -1404,14 +1301,23 @@ class App extends Component {
         function drawClock() {
           cxt.clearRect(0, 0, 500, 500);
           //边框
+        
           cxt.beginPath();
           //边框颜色
           cxt.strokeStyle="rgb(252,184,19)";
-          cxt.translate(585, 505);
+          // cxt.save();
+          // cxt.restore();
+          cxt.translate(575, 515);
+          // arrRotary[index] = arrRotary[index]+1
+          console.log(arrRotary[index])
           cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
           // cxt.strokeRect(-10,-2,70,4);
           that.fillRoundRect(cxt, -20,-3, 120,8, 4, 'rgba(252,174,19,0.3)');
+     
           cxt.closePath();
+
+
+
           //方块的颜色
           cxt.beginPath();
           cxt.fillStyle = "rgb(252,184,19)";
@@ -1424,12 +1330,15 @@ class App extends Component {
           cxt.closePath();
           //小球
           cxt.beginPath();
-          cxt.arc(12+arrAmplitude[index]*3, 0.5, 2, 0, 360, false);
+          // arrAmplitude[index] = arrAmplitude[index]+0.1
+          cxt.arc(16+arrAmplitude[index]*3, 0.5, 2, 0, 360, false);
           cxt.fillStyle = "rgb(252,184,19)";
           cxt.fill();
           cxt.stroke();
           cxt.closePath();
+
           cxt.restore();
+
         }
         let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
         let pageX = 0.05, pageY = 0.05
@@ -1438,9 +1347,13 @@ class App extends Component {
           canvas: canvas1,
           bounds: bounds,
           zooms: [3, 18],
+          zIndex: 999,
         })
         this.mapMarkerDraw.setMap(this.map)
         drawClock();
+        // setInterval(() => {
+        //   drawClock();
+        // }, 100);
       }
     })
   }
@@ -1465,7 +1378,7 @@ class App extends Component {
           cxt.beginPath();
           cxt.lineWidth = 0.1;
           //大圈边框颜色
-          cxt.arc(585, 505, 100, 0, 360, false);
+          cxt.arc(575, 515, 100, 0, 360, false);
           cxt.strokeStyle = "rgba(252,184,19,0.5)";
           cxt.fillStyle = "rgba(252,184,19,0.5)";
           cxt.fill();
@@ -1687,9 +1600,9 @@ class App extends Component {
     if (this.equipmentListTime) {
       return null
     }
-    // let updateTime = this.state.equipmentList.length == 1 ? 60 : 30
+    let updateTime = this.state.equipmentList.length == 1 ? 60 : 10
     //切换时间
-    let updateTime = this.state.equipmentList.length == 1 ? 60 : 30
+    // let updateTime = 200
     this.updateDate('init')
     this.updateIndicators(updateTime)//更新指数
     this.equipmentListTime = setInterval(() => {
@@ -1826,8 +1739,8 @@ class App extends Component {
               longitude: "114.0399936290864",
               latitude: "22.547919658186872",
               status: Math.ceil(Math.random()*2),
-              orderProductList: 297,
-              alarmTimes: 987,
+              orderProductList: 2137,
+              alarmTimes: 2197,
               rotary: Math.ceil(Math.random()*360),
               amplitude:30-Math.ceil(Math.random()*30),
               height:Math.ceil(Math.random()*30),
@@ -1853,7 +1766,7 @@ class App extends Component {
               longitude: "114.05853808556",
               latitude: "22.54797929382318",
               status: Math.ceil(Math.random()*2),
-              orderProductList: 2197,
+              orderProductList: 197,
               alarmTimes: 623,
               rotary: Math.ceil(Math.random()*360),
               amplitude:30-Math.ceil(Math.random()*30),
@@ -1862,34 +1775,34 @@ class App extends Component {
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
             },
-            {
-              deviceName: "4 号塔机监测系统",
-              longitude: "114.06453808556",
-              latitude: "22.56997929382318",
-              status: Math.ceil(Math.random()*2),
-              orderProductList: 2197,
-              alarmTimes: 623,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:30-Math.ceil(Math.random()*30),
-              height:Math.ceil(Math.random()*30),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            },
-          //   // {
-          //   //   deviceName: "5 号塔机监测系统",
-          //   //   longitude: "114.07853808556",
-          //   //   latitude: "22.57797929382318",
-          //   //   status: 1,
-          //   //   orderProductList: 12,
-          //   //   alarmTimes: 623,
-          //   //   rotary: Math.ceil(Math.random()*360),
-          //   //   amplitude:30-Math.ceil(Math.random()*30),
-          //   //   height:Math.ceil(Math.random()*30),
-          //   //   heavy:Math.ceil(Math.random()*100),
-          //   //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //   //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          //   // },
+          //   {
+          //     deviceName: "4 号塔机监测系统",
+          //     longitude: "114.06453808556",
+          //     latitude: "22.56997929382318",
+          //     status: Math.ceil(Math.random()*2),
+          //     orderProductList: 297,
+          //     alarmTimes: 623,
+          //     rotary: Math.ceil(Math.random()*360),
+          //     amplitude:30-Math.ceil(Math.random()*30),
+          //     height:Math.ceil(Math.random()*30),
+          //     heavy:Math.ceil(Math.random()*100),
+          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+          //   },
+            // {
+            //   deviceName: "5 号塔机监测系统",
+            //   longitude: "114.07853808556",
+            //   latitude: "22.57797929382318",
+            //   status: 1,
+            //   orderProductList: 12,
+            //   alarmTimes: 623,
+            //   rotary: Math.ceil(Math.random()*360),
+            //   amplitude:30-Math.ceil(Math.random()*30),
+            //   height:Math.ceil(Math.random()*30),
+            //   heavy:Math.ceil(Math.random()*100),
+            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            // },
           //   // {
           //   //   deviceName: "6 号塔机监测系统",
           //   //   longitude: "114.08853808556",
@@ -2209,10 +2122,10 @@ class App extends Component {
           //     dateHour: "20:00"
           //   }]
           // }
-          // data.indicatorDateList = [{ "pm25": 10, "pm10": 20, "tsp": 10, "dateHour": "08:00" }, { "pm25": 30, "pm10": 0, "tsp": 50, "dateHour": "09:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "10:00" }, { "pm25": 10, "pm10": 0, "tsp": 80, "dateHour": "11:00" }, { "pm25": 0, "pm10": 0, "tsp": 90, "dateHour": "12:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "13:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "14:00" }, { "pm25": 0, "pm10": 0, "tsp": 110, "dateHour": "15:00" }, { "pm25": 20, "pm10": 0, "tsp": 0, "dateHour": "16:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "17:00" }, { "pm25": 0, "pm10": 0, "tsp": 0, "dateHour": "18:00" }, { "pm25": 80, "pm10": 0, "tsp": 0, "dateHour": "19:00" }]
-          // data.pm10.maxValue = 20
+          // data.indicatorDateList = [{ "pm25": 10, "heavy": 20, "amplitude": 10, "dateHour": "08:00" }, { "pm25": 30, "heavy": 0, "amplitude": 50, "dateHour": "09:00" }, { "pm25": 0, "heavy": 0, "amplitude": 0, "dateHour": "10:00" }, { "pm25": 10, "heavy": 0, "amplitude": 80, "dateHour": "11:00" }, { "pm25": 0, "heavy": 0, "amplitude": 90, "dateHour": "12:00" }, { "pm25": 0, "heavy": 0, "amplitude": 0, "dateHour": "13:00" }, { "pm25": 0, "heavy": 0, "amplitude": 0, "dateHour": "14:00" }, { "pm25": 0, "heavy": 0, "amplitude": 110, "dateHour": "15:00" }, { "pm25": 20, "heavy": 0, "amplitude": 0, "dateHour": "16:00" }, { "pm25": 0, "heavy": 0, "amplitude": 0, "dateHour": "17:00" }, { "pm25": 0, "heavy": 0, "amplitude": 0, "dateHour": "18:00" }, { "pm25": 80, "heavy": 0, "amplitude": 0, "dateHour": "19:00" }]
+          // data.heavy.maxValue = 20
           // data.pm25.maxValue = 80
-          // data.tsp.maxValue = 110
+          // data.amplitude.maxValue = 110
           this.setState(
             {
               brokenLineList: data
@@ -2253,14 +2166,14 @@ class App extends Component {
               sevenDays: data
             },
             () => {
-              if (data.pm10 && data.pm25 && data.tsp) {
-                this.initColumnarPM25()
-                this.initColumnarPM10()
-                this.initColumnarTSP()
+              if (data.heavy && data.amplitude && data.torque) {
+                this.initColumnarTorque()
+                this.initColumnarAmplitude()
+                this.initColumnarHeavy()
               } else {
-                this.columnarPM25 = null;
-                this.columnarPM10 = null;
-                this.columnarTSP = null;
+                this.columnarTorque = null;
+                this.columnarHeavy = null;
+                this.columnarAmplitude = null;
               }
             }
           )
@@ -2464,9 +2377,9 @@ class App extends Component {
                   <div className="brokenlin-mark">
                     <div className="brokenlin-mark-li">
                       <i className="brokenlin-mark-icon icon2"></i>
-                      {"力矩（" + this.state.brokenLineList.torque.minValue}~{
-                        this.state.brokenLineList.torque.maxValue
-                      }）
+
+                      <MarqueeWrap title={"力矩（" + this.state.brokenLineList.torque.minValue + "~" +
+                          this.state.brokenLineList.torque.maxValue + "）"} />
                     </div>
                     <div className="brokenlin-mark-li">
                       <i className="brokenlin-mark-icon icon1"></i>
@@ -2488,42 +2401,42 @@ class App extends Component {
             </div>
             <div className="left-columnar-title">近 7 天平均数据</div>
             <div className={this.state.sevenDays &&
-              this.state.sevenDays.pm10 &&
-              this.state.sevenDays.pm25 &&
-              this.state.sevenDays.tsp ? 'left-chart-columnar' : 'left-chart-columnar empty'}>
+              this.state.sevenDays.heavy &&
+              this.state.sevenDays.torque &&
+              this.state.sevenDays.amplitude ? 'left-chart-columnar' : 'left-chart-columnar empty'}>
               {this.state.sevenDays &&
-                this.state.sevenDays.pm10 &&
-                this.state.sevenDays.pm25 &&
-                this.state.sevenDays.tsp ? (
+                this.state.sevenDays.heavy &&
+                this.state.sevenDays.torque &&
+                this.state.sevenDays.amplitude ? (
                   <div className="columnar-group">
-                    <div className="columnarPM25">
-                      <div ref={this.columnarPM25Dom} id="columnar-pm25" />
-                      <div className="columnarPM25-name">
+                    <div className="columnarTorque">
+                      <div ref={this.columnarTorqueDom} id="columnar-torque" />
+                      <div className="columnarTorque-name">
                         {/* {`PM2.5(${this.state.sevenDays.pm25.minValue}~${
                           this.state.sevenDays.pm25.maxValue
                           })`} */}
-                        <MarqueeWrap title={"力矩（" + this.state.sevenDays.pm25.minValue + "~" +
-                          this.state.sevenDays.pm25.maxValue + "）"} />
+                        <MarqueeWrap title={"力矩（" + this.state.sevenDays.torque.minValue + "~" +
+                          this.state.sevenDays.torque.maxValue + "）"} />
                       </div>
                     </div>
-                    <div className="columnarPM10">
-                      <div ref={this.columnarPM10Dom} id="columnar-pm10" />
-                      <div className="columnarPM10-name">
-                        {/* {`PM10(${this.state.sevenDays.pm10.minValue}~${
-                          this.state.sevenDays.pm10.maxValue
+                    <div className="columnarHeavy">
+                      <div ref={this.columnarHeavyDom} id="columnar-heavy" />
+                      <div className="columnarHeavy-name">
+                        {/* {`PM10(${this.state.sevenDays.heavy.minValue}~${
+                          this.state.sevenDays.heavy.maxValue
                           })`} */}
-                        <MarqueeWrap title={"载重（" + this.state.sevenDays.pm10.minValue + "~" +
-                          this.state.sevenDays.pm10.maxValue + "）"} />
+                        <MarqueeWrap title={"载重（" + this.state.sevenDays.heavy.minValue + "~" +
+                          this.state.sevenDays.heavy.maxValue + "）"} />
                       </div>
                     </div>
-                    <div className="columnarTSP">
-                      <div ref={this.columnarTSPDom} id="columnar-tsp" />
-                      <div className="columnarTSP-name">
-                        {/* {`TSP(${this.state.sevenDays.tsp.minValue}~${
-                          this.state.sevenDays.tsp.maxValue
+                    <div className="columnarAmplitude">
+                      <div ref={this.columnarAmplitudeDom} id="columnar-amplitude" />
+                      <div className="columnarAmplitude-name">
+                        {/* {`TSP(${this.state.sevenDays.amplitude.minValue}~${
+                          this.state.sevenDays.amplitude.maxValue
                           })`} */}
-                        <MarqueeWrap title={"幅度（" + this.state.sevenDays.tsp.minValue + "~" +
-                          this.state.sevenDays.tsp.maxValue + "）"} />
+                        <MarqueeWrap title={"幅度（" + this.state.sevenDays.amplitude.minValue + "~" +
+                          this.state.sevenDays.amplitude.maxValue + "）"} />
                       </div>
                     </div>
                   </div>
@@ -2547,18 +2460,26 @@ class App extends Component {
                     (item,index)=>{
                       return(
                         <li className='content' key={index}>
-                          <div className='number'>
-                            <span>{item.heavy}t</span><br/>
-                            <span>{item.height}m</span><br/>
-                          
-                          </div>
+                          {
+                            item.height>23 ? (
+                              <div className='number' style={{top:+item.height-4,left:-item.amplitude+34}}>
+                                <span>{item.heavy}t</span><br/>
+                                <span>{item.height}m</span><br/>
+                              </div>
+                            ) : (
+                              <div className='number' style={{top:+item.height+10,left:-item.amplitude+34}}>
+                                <span>{item.heavy}t</span><br/>
+                                <span>{item.height}m</span><br/>
+                              </div>
+                            )
+                          }
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
                           <img className='line'  style={{height:+item.height+4,left:-item.amplitude+56}} src={require("../../assets/images/line.png")} alt=""/>
-                          <img className='thing' style={{top:+item.height+8,left:-item.amplitude+54}} src={require("../../assets/images/thing.png")} alt=""/>
-                          <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
+                          <img className='thing' style={{top:+item.height+10,left:-item.amplitude+54}} src={require("../../assets/images/thing.png")} alt=""/>
+                          <img className='breathe-line-gif' src={require("../../assets/images/tajigif.gif")} style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}} alt=""/>
+                          {/* <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div> */}
                           <p>{item.deviceName}</p>
-                          <div className='breathe-line1' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
-
+                          {/* <div className='breathe-line1' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div> */}
                           {/* <p>{this.state.equipmentList[this.state.actionEquipmentListIndex]}</p>
                           <p>{index}</p> */}
                         </li>

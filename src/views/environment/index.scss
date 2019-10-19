@@ -86,6 +86,7 @@ body,
 .marker-marker-bus-from {
   position: relative;
   z-index: 100;
+  top:px-rem(-40);
 
   .marker-target {
     width: px-rem(134);
@@ -102,30 +103,31 @@ body,
     position: absolute;
     white-space: nowrap;
     color: #fcb813;
-    height: px-rem(96);
+    font-size: px-rem(10)!important;
+    height: px-rem(56);
     border-radius: px-rem(8);
     background-color: rgba(0, 0, 0, 0.4);
     width: fit-content;
     z-index: 10;
-    text-indent: px-rem(86);
+    text-indent: px-rem(10);
     padding-right: px-rem(10);
-    top: px-rem(18);
-    left: px-rem(56);
+    top: px-rem(60);
+    left: px-rem(76);
     display: flex;
     align-items: center;
     padding-top: px-rem(10);
 
     &.marker-padding {
-      padding-right: px-rem(90);
+      padding-right: px-rem(50);
     }
 
     .marker-marker-warn {
       position: absolute;
-      width: px-rem(48);
-      height: px-rem(48);
-      top: px-rem(24);
-      right: px-rem(30);
-      background-size: px-rem(48) px-rem(48);
+      width: px-rem(30);
+      height: px-rem(30);
+      top: px-rem(14);
+      right: px-rem(10);
+      background-size: px-rem(30) px-rem(30);
       background-repeat: no-repeat;
       background-position: right;
       background-repeat: no-repeat;
@@ -324,12 +326,12 @@ body,
         font-family: MI-LANTING_GB-OUTSIDE-YS;
         font-size: px-rem(40);
         color: #ccc;
-        margin: px-rem(200) 0 px-rem(40);
+        margin: px-rem(230) 0 px-rem(40);
       }
 
       .left-chart-brokenline {
         width: 100%;
-        height: px-rem(180);
+        height: px-rem(130);
 
         &.empty {
           color: #fff;
@@ -353,10 +355,10 @@ body,
             font-size: px-rem(28);
             color: #ccc;
             &:nth-child(1){
-                margin-right: px-rem(92);
+                margin-right: px-rem(82);
             }
             &:nth-child(2){
-                margin-right: px-rem(68);
+                margin-right: px-rem(28);
             }
 
             .brokenlin-mark-icon {
@@ -386,7 +388,7 @@ body,
         font-family: MI-LANTING_GB-OUTSIDE-YS;
         font-size: px-rem(40);
         color: #ccc;
-        margin: px-rem(152) 0 px-rem(40);
+        margin: px-rem(162) 0 px-rem(40);
       }
 
       .left-chart-columnar {
@@ -403,26 +405,26 @@ body,
           display: flex;
           justify-content: space-between;
 
-          .columnarPM25,
-          .columnarPM10,
-          .columnarTSP {
+          .columnarTorque,
+          .columnarHeavy,
+          .columnarAmplitude {
             height: px-rem(160);
             flex: 1;
             margin-right: px-rem(92);
           }
 
-          .columnarTSP {
+          .columnarAmplitude {
             margin-right: 0;
           }
 
-          .columnarPM25-name,
-          .columnarPM10-name,
-          .columnarTSP-name {
+          .columnarTorque-name,
+          .columnarHeavy-name,
+          .columnarAmplitude-name {
               span {
                   font-size: px-rem(28);
               }
             margin-top: px-rem(16);
-            width: px-rem(273);
+            width: px-rem(295);
             color: #ccc;
             text-overflow: -o-ellipsis-lastline;
             overflow: hidden;
@@ -432,14 +434,14 @@ body,
             -webkit-box-orient: vertical;
           }
 
-          #columnar-pm25,
-          #columnar-pm10,
-          #columnar-tsp {
+          #columnar-torque,
+          #columnar-heavy,
+          #columnar-amplitude {
             flex: 1;
-            height: px-rem(160);
+            height: px-rem(130);
           }
 
-          #columnar-tsp {
+          #columnar-amplitude {
             margin-right: 0;
           }
         }
@@ -454,7 +456,7 @@ body,
         flex: 1;
         border-radius: px-rem(16);
         padding: 0 px-rem(40);
-
+        margin-top:px-rem(-110);
         overflow: hidden;
       }
 
@@ -478,8 +480,9 @@ body,
       // background: red;
       height: px-rem(400);
       width: px-rem(1800);
-      position: absolute;
-      bottom: px-rem(180);
+      position: relative;
+      bottom: px-rem(420);
+      left: px-rem(120);
 
       //enter是入场前的刹那（点击按钮），appear指页面第一次加载前的一刹那（自动）
       .title{
@@ -487,7 +490,7 @@ body,
         font-size: px-rem(40);
         color: #cccccc;
         position: absolute;
-        top: px-rem(32);
+        top: px-rem(52);
         left: px-rem(130);
       }
       .app-content-bottom-content{
@@ -502,9 +505,9 @@ body,
 
         .app-content-bottom-content-1{
           position: relative;
-          transition: all 3s;
+          transition: all 1s;
           .content{
-            height: px-rem(232);
+            height: px-rem(254);
             width: px-rem(400);
             list-style: none;
             position: relative;
@@ -512,8 +515,9 @@ body,
             float:left;
             margin-right: px-rem(40);
             margin-bottom: px-rem(80);
-            transition: all 3s;
-            top:px-rem(0);
+            transition: all 1s;
+            top:px-rem(14);
+            z-index: 999;
             .number{
               position: absolute;
               background: #FCB813;
@@ -523,8 +527,13 @@ body,
               left:px-rem(30);
               font-size: px-rem(28);
               padding:px-rem(6);
+              padding-bottom: px-rem(5);
+              padding-right: px-rem(7);
+              font-family: AvenirNext;
+              text-align: left;
+              transition: all 1s;
               span{
-                font-family: AvenirNextCondensed-Bold;
+                // font-family: AvenirNextCondensed-Bold;
                 color: #222233;
                 width: auto;
                 height: px-rem(30);
@@ -535,44 +544,52 @@ body,
               font-size: px-rem(28);
               color: #cccccc;
               margin-top: px-rem(16);
+              position: absolute;
+              bottom: px-rem(8);
+              left:px-rem(65);
+              z-index: 999;
             }
             .taji{
               width:px-rem(184);
               height:px-rem(190);
-              z-index: -100;
+              z-index: 999;
+              margin-top:px-rem(5);
+              margin-left: px-rem(10);
             }
             .line{
               width:px-rem(8);
               height:px-rem(20);
               position: absolute;
               left:px-rem(76);
-              top: px-rem(34);
+              top: px-rem(44);
               right: px-rem(76);
               transition: all 1s;
             }
-            .breathe-line {
-              position:relative;
-              width:px-rem(220);
-              height:px-rem(4);
-              background: -webkit-linear-gradient(left, rgb(33, 34, 2) -4%,rgb(215, 218, 40) 50%,rgb(33, 34, 2) 100%);
+            .breathe-line-gif {
+              position: absolute;
+              width:px-rem(320);
+              height:px-rem(80);
+              // background: -webkit-linear-gradient(left, rgb(33, 34, 2) -4%,rgb(215, 218, 40) 50%,rgb(33, 34, 2) 100%);
               // box-shadow:0 px-rem(-100) px-rem(50) yellow;
               // -moz-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
               // -webkit-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
-              overflow:hidden;
-              background-image:gradient(linear,left top,left bottom,from(rgb(215, 218, 40)),to(rgb(215, 218, 40)));
+              // overflow:hidden;
+              // background-image:gradient(linear,left top,left bottom,from(rgb(215, 218, 40)),to(rgb(215, 218, 40)));
               // animation-timing-function:ease-in-out;
               // animation-name:breathe1;
               // animation-duration:2700ms;
               // animation-iteration-count:infinite;
               // animation-direction:alternate;
               margin: 0 auto;
-              z-index: 999;
-              top: px-rem(-10);
+              z-index: -1;
+              bottom: px-rem(54);
+              left: px-rem(30);
+              // opacity: .6;
             }
             .breathe-line1 {
               position:relative;
-              width:px-rem(220);
-              height:px-rem(10);
+              width:px-rem(320);
+              height:px-rem(20);
               animation-timing-function:ease-in-out;
               animation-name:breathe1;
               animation-duration:2700ms;
@@ -581,22 +598,23 @@ body,
               margin: 0 auto;
               z-index: 999;
               top: px-rem(10);
+              left:px-rem(-10);
             }
             @keyframes breathe1 {
               0% {
                 opacity:.2;
-                box-shadow:0 px-rem(-100) px-rem(50) yellow;
-                -moz-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
-                -webkit-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+                box-shadow:0 px-rem(-65) px-rem(40) yellow;
+                -moz-box-shadow: 0 px-rem(-65) px-rem(40) yellow;
+                -webkit-box-shadow: 0 px-rem(-65) px-rem(40) yellow;
                 /*显示下边阴影*/
                 position: relative;
                 z-index: 999;
               }
               100% {
                 opacity:1;
-                box-shadow:0 px-rem(-100) px-rem(50) yellow;
-                -moz-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
-                -webkit-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+                box-shadow:0 px-rem(-65) px-rem(40) yellow;
+                -moz-box-shadow: 0 px-rem(-65) px-rem(40) yellow;
+                -webkit-box-shadow: 0 px-rem(-65) px-rem(40) yellow;
                 /*显示下边阴影*/
                 position: relative;
                 z-index: 999;
@@ -607,10 +625,9 @@ body,
               height:px-rem(18);
               position: absolute;
               left:px-rem(8);
-              top: px-rem(128);
+              top: px-rem(178);
               right: px-rem(76);
               transition: all 1s;
-  
             }
         }
         }
@@ -669,9 +686,11 @@ body,
         font-size: px-rem(100);
         font-weight: bold;
         height: px-rem(400);
+        // font-family: AvenirNext;
 
         #proportion-24th {
           height: 100%;
+          // font-family: AvenirNext;
         }
       }
 
