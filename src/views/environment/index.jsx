@@ -10,6 +10,9 @@ import * as tools from "../../tools/index"
 
 import mapbg from "../../assets/images/mapbg.png"
 import warnMarker from "../../assets/images/warnMarker.png"
+import biPng from "../../assets/images/bi.png"
+import biPng1 from "../../assets/images/bi1.png"
+
 import "./index.scss"
 
 // 跑马灯组件
@@ -277,6 +280,7 @@ class App extends Component {
     gaodeMapsDom.src = `https://webapi.amap.com/maps?v=1.4.15&key=34dda2918eee145d1520d8a7c59c3408&plugin=AMap.Geocoder,AMap.Object3DLayer,AMap.Scale&callback=init`
 
     window.init = () => {
+      console.log(111111)
       this.initMap()
     }
     headerDom.appendChild(gaodeMapsDom)
@@ -942,6 +946,7 @@ class App extends Component {
 
       this.selMapMarker()
       this.selMapMarkerCircle()
+      console.log('第一次')
       
       this.selMapText()
     } else {
@@ -958,6 +963,7 @@ class App extends Component {
       this.resetMapMarkerIris()
 
       this.selMapMarker();
+      console.log('第二次')
       this.selMapMarkerCircle()
 
       this.selMapText()
@@ -978,10 +984,69 @@ class App extends Component {
       cxt.translate(x, y);
       //绘制圆角矩形的各个边  
       this.drawRoundRectPath(cxt, width, height, radius);
+      cxt.shadowOffsetX = 0; // 阴影Y轴偏移
+      cxt.shadowOffsetY = 5; // 阴影X轴偏移
+      cxt.shadowBlur = 10; // 模糊尺寸
+      cxt.shadowColor = '#333'; // 颜色
+
       cxt.fillStyle = fillColor || "#000"; //若是给定了值就用给定的值否则给予默认值  
       cxt.fill();
       cxt.restore();
   }
+  fillRoundRectLong(cxt, x, y, width, height, radius, fillColor) {
+    //圆的直径必然要小于矩形的宽高          
+    if (2 * radius > width || 2 * radius > height) { return false; }
+    cxt.save();
+    cxt.translate(x, y);
+    //绘制圆角矩形的各个边  
+    var img = new Image()
+    img.src = biPng1
+    //图片加载完后，将其显示在canvas中
+    img.onload = function(){
+        cxt.rotate(-Math.PI / 2);
+        cxt.drawImage(this, x, y,9,120)
+        // context.drawImage(this, 0, 0, 1080, 980)改变图片大小到1080*980
+    }
+    // this.drawRoundRectPath(cxt, width, height, radius);
+    // let linear = cxt.createLinearGradient(x,y,x,y + height);
+    // linear.addColorStop(0,"rgba(252,184,19,0.2)");
+    // linear.addColorStop(0.25,"rgba(252,184,19,0.2)");
+    // linear.addColorStop(0.5,"rgba(252,184,19,0.2)");
+    // linear.addColorStop(0.8,"rgba(124,96,34,0.2)");
+    // linear.addColorStop(1,"rgba(252,184,19,0.2)");
+    // cxt.fillStyle = linear; //把渐变赋给填充样式
+    // // cxt.fillStyle = fillColor || "#000"; //若是给定了值就用给定的值否则给予默认值  
+    cxt.fill();
+    cxt.restore();
+}
+
+fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
+  //圆的直径必然要小于矩形的宽高          
+  if (2 * radius > width || 2 * radius > height) { return false; }
+  cxt.save();
+  cxt.translate(x, y);
+  //绘制圆角矩形的各个边  
+  var img = new Image()
+  img.src = biPng
+  //图片加载完后，将其显示在canvas中
+  img.onload = function(){
+      cxt.rotate(-Math.PI / 2);
+      cxt.drawImage(this, x, y,8,120)
+      // context.drawImage(this, 0, 0, 1080, 980)改变图片大小到1080*980
+  }
+  // this.drawRoundRectPath(cxt, width, height, radius);
+  // let linear = cxt.createLinearGradient(x,y,x,y + height);
+  // linear.addColorStop(0,"rgba(252,184,19,0.2)");
+  // linear.addColorStop(0.25,"rgba(252,184,19,0.2)");
+  // linear.addColorStop(0.5,"rgba(252,184,19,0.2)");
+  // linear.addColorStop(0.8,"rgba(124,96,34,0.2)");
+  // linear.addColorStop(1,"rgba(252,184,19,0.2)");
+  // cxt.fillStyle = linear; //把渐变赋给填充样式
+  // // cxt.fillStyle = fillColor || "#000"; //若是给定了值就用给定的值否则给予默认值  
+  // cxt.fill();
+  cxt.restore();
+}
+
 
   drawRoundRectPath(cxt, width, height, radius) {
     cxt.beginPath(0);
@@ -1023,108 +1088,111 @@ class App extends Component {
     //   return null
     // }
 
-    if(this.markerList.length !== 0){
-      this.map.remove(this.removeMarkerList)
-      this.removeMarkerList = [];
-      this.removeMarkerList = copyArr(this.markerList)
-      function copyArr(arr) {
-          let res = []
-          for (let i = 0; i < arr.length; i++) {
-            res.push(arr[i])
-          }
-          return res
-      }
-      this.markerList.forEach((e, i) => {
-        if(this.state.actionEquipmentListIndex == i){
-          this.removeMarkerList.splice(i,1)
-        }
-      })
-      this.map.add(this.removeMarkerList)
-      return null
-    }
+    // if(this.markerList.length !== 0){
+    //   this.map.remove(this.removeMarkerList)
+    //   this.removeMarkerList = [];
+    //   this.removeMarkerList = copyArr(this.markerList)
+    //   function copyArr(arr) {
+    //       let res = []
+    //       for (let i = 0; i < arr.length; i++) {
+    //         res.push(arr[i])
+    //       }
+    //       return res
+    //   }
+    //   this.markerList.forEach((e, i) => {
+    //     if(this.state.actionEquipmentListIndex == i){
+    //       this.removeMarkerList.splice(i,1)
+    //     }
+    //   })
+    //   this.map.add(this.removeMarkerList)
+    //   return null
+    // }
+    this.map.remove(this.markerList)
+    this.removeMarkerList = []
+    this.markerList = []
     // this.markerList = []
     this.equipmentListTime01 = []
     this.state.equipmentList.forEach((item, index) => {
-        //光圈开始
-        let canvasC = document.createElement('canvas')
-        let size = this.map.getSize() //resize
-        let width = size.width
-        let height = size.height
-        canvasC.style.width = width + "px"
-        canvasC.style.height = height + "px"
-        canvasC.width = width*devicePixelRatio
-        canvasC.height = height*devicePixelRatio
-        // canvasC.width = canvasC.height = 320
-        let context = canvasC.getContext('2d')
-        context.fillStyle = 'rgba(252, 184, 19,1)'
-        context.strokeStyle = 'rgba(252, 184, 19,1)'
-    
-        let radius = 0
-        let draw = () => {
-          context.clearRect(0, 0, canvasC.width, canvasC.height)
-          // context.beginPath()
-          // context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-          // radius = (radius + 1) % 100;
-          // context.arc(102, 95, radius, 0, 2 * Math.PI)
-          // context.fill()
-          // context.stroke()
-          // context.closePath();
-          context.lineWidth = 1;
-          context.save();
-          //边框颜色
-          context.beginPath();
-          context.strokeStyle="rgb(252,184,19)";
-          context.translate(100, 95);
-          context.rotate((item.rotary - 180) * Math.PI / 180);
-          // context.strokeRect(-30,-1,125,12);
-          this.fillRoundRect(context, -32,-5, 125,10, 4, 'rgba(252,184,19,0.8)');
-          context.closePath();
-          //方块的颜色
-          context.beginPath();
-          context.fillStyle = "rgb(252,184,19)";
-          context.shadowOffsetX = 0; // 阴影Y轴偏移
-          context.shadowOffsetY = 5; // 阴影X轴偏移
-          context.shadowBlur = 10; // 模糊尺寸
-          context.shadowColor = '#000'; // 颜色
-          this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
-          context.closePath();
-          //小球
-          context.beginPath();
-          context.arc(5+item.amplitude*3, 0.5, 3, 0, 360, false);
-          context.fillStyle = "rgb(252,184,19)";
-          context.fill();
-          context.stroke();
-          context.closePath();
-          // AMap.Util.requestAnimFrame(draw)
-          context.restore();
+        if(index !== this.state.actionEquipmentListIndex){
+          let canvasC = document.createElement('canvas')
+          let size = this.map.getSize() //resize
+          let width = size.width
+          let height = size.height
+          canvasC.style.width = width + "px"
+          canvasC.style.height = height + "px"
+          canvasC.width = width*devicePixelRatio
+          canvasC.height = height*devicePixelRatio
+          // canvasC.width = canvasC.height = 320
+          let context = canvasC.getContext('2d')
+          context.fillStyle = 'rgba(252, 184, 19,1)'
+          context.strokeStyle = 'rgba(252, 184, 19,1)'
+      
+          let radius = 0
+          let draw = () => {
+            context.clearRect(0, 0, canvasC.width, canvasC.height)
+            // context.beginPath()
+            // context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+            // radius = (radius + 1) % 100;
+            // context.arc(102, 95, radius, 0, 2 * Math.PI)
+            // context.fill()
+            // context.stroke()
+            // context.closePath();
+            context.lineWidth = 1;
+            // context.save();
+            //边框颜色
+            context.beginPath();
+            context.strokeStyle="rgb(252,184,19)";
+            context.translate(100, 95);
+            context.rotate((item.rotary - 180) * Math.PI / 180);
+            // context.strokeRect(-30,-1,125,12);
+            this.fillRoundRectLong(context, -5,-25, 125,10, 2, 'rgba(252,184,19,0.8)');
+            context.closePath();
+            //方块的颜色
+            context.beginPath();
+            context.fillStyle = "rgb(252,184,19)";
+  
+            this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
+            context.closePath();
+            //小球
+            context.beginPath();
+            context.arc(8+item.amplitude*3, 0.5, 2, 0, 360, false);
+            context.fillStyle = "rgb(252,184,19)";
+            context.fill();
+            context.stroke();
+            context.closePath();
+            // AMap.Util.requestAnimFrame(draw)
+            context.restore();
+          }
+          draw()
+          this.markerList.push(
+            new AMap.Marker({
+              content: canvasC,
+              position: new AMap.LngLat(item.longitude, item.latitude),
+              offset: new AMap.Pixel(-15, -17),
+              size: new AMap.Size(50, 60),
+              zIndex: 999,
+            })
+          )
         }
-        draw()
-        this.markerList.push(
-          new AMap.Marker({
-            content: canvasC,
-            position: new AMap.LngLat(item.longitude, item.latitude),
-            offset: new AMap.Pixel(-15, -17),
-            size: new AMap.Size(50, 60),
-            zIndex: 99 - index,
-          })
-        )
+
     })
     // // localStorage.setItem('markerList',JSON.stringify(this.markerList))
     // this.removeMarkerList = this.markerList
-    this.removeMarkerList = copyArr(this.markerList)
-    function copyArr(arr) {
-        let res = []
-        for (let i = 0; i < arr.length; i++) {
-          res.push(arr[i])
-        }
-        return res
-    }
-    this.removeMarkerList.forEach((e, i) => {
-      if(this.state.actionEquipmentListIndex == i){
-        this.removeMarkerList.splice(i,1)
-      }
-    })
-    this.map.add(this.removeMarkerList)
+    // this.removeMarkerList = copyArr(this.markerList)
+    // function copyArr(arr) {
+    //     let res = []
+    //     for (let i = 0; i < arr.length; i++) {
+    //       res.push(arr[i])
+    //     }
+    //     return res
+    // }
+    // this.removeMarkerList.forEach((e, i) => {
+    //   if(this.state.actionEquipmentListIndex == i){
+    //     this.removeMarkerList.splice(i,1)
+    //   }
+    // })
+    // this.map.add(this.removeMarkerList)
+    this.map.add(this.markerList)
   }
 
     // 画没有选中塔机的发光光圈
@@ -1266,7 +1334,7 @@ class App extends Component {
               position: new AMap.LngLat(item.longitude, item.latitude),
               offset: new AMap.Pixel(-23, 40),
               size: new AMap.Size(40, 50),
-              zIndex: 3 - index,
+              zIndex: -100,
             })
           )
         })
@@ -1282,29 +1350,30 @@ class App extends Component {
     console.log(this.state.startIndicators)
     console.log(this.state.endIndicators)
     console.log(this.state.equipmentList)
-
+    let canvas1 = document.createElement('canvas');
+    let size = this.map.getSize() //resize
+    let width = size.width
+    let height = size.height
+    canvas1.style.width = width + "px"
+    canvas1.style.height = height + "px"
+    canvas1.width = width*devicePixelRatio
+    canvas1.height = height*devicePixelRatio
+    let cxt = canvas1.getContext('2d');
 
     this.state.equipmentList.map((item, index) => {
       arrRotary.push(item.rotary)
       arrAmplitude.push(item.amplitude)
       if(index == this.state.actionEquipmentListIndex){
-        let canvas1 = document.createElement('canvas');
-        let size = this.map.getSize() //resize
-        let width = size.width
-        let height = size.height
-        canvas1.style.width = width + "px"
-        canvas1.style.height = height + "px"
-        canvas1.width = width*devicePixelRatio
-        canvas1.height = height*devicePixelRatio
-        let cxt = canvas1.getContext('2d');
+        console.log('画了几次')
+
         cxt.restore();
         function drawClock() {
           cxt.clearRect(0, 0, 500, 500);
           //边框
-        
+          cxt.lineWidth = 1;
           cxt.beginPath();
           //边框颜色
-          cxt.strokeStyle="rgb(252,184,19)";
+          // cxt.strokeStyle="rgb(252,184,19)";
           // cxt.save();
           // cxt.restore();
           cxt.translate(575, 515);
@@ -1312,26 +1381,26 @@ class App extends Component {
           console.log(arrRotary[index])
           cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
           // cxt.strokeRect(-10,-2,70,4);
-          that.fillRoundRect(cxt, -20,-3, 120,8, 4, 'rgba(252,174,19,0.3)');
-     
+          that.fillRoundRectLong1(cxt, -5,-20, 120,8, 2, 'rgba(252,184,19,0.8)');
+          // that.fillRoundRectLong(cxt, -5,-25, 125,10, 2, 'rgba(252,184,19,0.8)');
           cxt.closePath();
-
-
 
           //方块的颜色
           cxt.beginPath();
           cxt.fillStyle = "rgb(252,184,19)";
-          cxt.shadowOffsetX = 0; // 阴影Y轴偏移
-          cxt.shadowOffsetY = 5; // 阴影X轴偏移
-          cxt.shadowBlur = 10; // 模糊尺寸
-          cxt.shadowColor = '#333'; // 颜色
+          // cxt.shadowOffsetX = 0; // 阴影Y轴偏移
+          // cxt.shadowOffsetY = 5; // 阴影X轴偏移
+          // cxt.shadowBlur = 10; // 模糊尺寸
+          // cxt.shadowColor = '#333'; // 颜色
           // cxt.fillRect(-5, -5, 10, 10);
+
           that.fillRoundRect(cxt, -8, -12, 25, 25, 2, 'rgba(252,184,19)');
           cxt.closePath();
           //小球
           cxt.beginPath();
           // arrAmplitude[index] = arrAmplitude[index]+0.1
-          cxt.arc(16+arrAmplitude[index]*3, 0.5, 2, 0, 360, false);
+          cxt.strokeStyle="rgb(252,184,19)";
+          cxt.arc(14+arrAmplitude[index]*3, 0.5, 2, 0, 360, false);
           cxt.fillStyle = "rgb(252,184,19)";
           cxt.fill();
           cxt.stroke();
@@ -1370,7 +1439,7 @@ class App extends Component {
       canvasCircle.width = width*devicePixelRatio
       canvasCircle.height = height*devicePixelRatio
       let cxt = canvasCircle.getContext('2d');
-      cxt.clearRect(0, 0, 5000, 5000);
+      cxt.clearRect(0, 0, 500, 500);
       if(index == this.state.actionEquipmentListIndex){
         cxt.restore();
         function drawClock() {
@@ -1594,13 +1663,14 @@ class App extends Component {
       }
 
       this.equipmentListTime = null
+      console.log(222222)
       this.map && this.initMap()
       return null
     }
     if (this.equipmentListTime) {
       return null
     }
-    let updateTime = this.state.equipmentList.length == 1 ? 60 : 10
+    let updateTime = this.state.equipmentList.length == 1 ? 60 : 30
     //切换时间
     // let updateTime = 200
     this.updateDate('init')
@@ -1643,6 +1713,7 @@ class App extends Component {
   updateDate(type) {
     !type && this.getBaseInfo()
     !type && this.getDevice()
+    console.log(333333)
     this.map && this.initMap()
     this.getIndicators()
     this.get12Hours()
@@ -1857,6 +1928,7 @@ class App extends Component {
                 }
                 if (data.mapList) {
                     !this.map && this.initEquipmentList();
+                    console.log(444444)
                     this.map && this.initMap();
 
                     //初始化24小时设置告警 环形图
