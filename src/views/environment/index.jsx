@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-// import ReactDom from "react-dom"
 import { DataSet, DataView } from "@antv/data-set"
 import G2 from "@antv/g2"
 
@@ -222,7 +221,7 @@ class App extends Component {
     this.markerListCircle = [] // 地图光圈
     this.removeMarkerListCircle = [] // 移除地图光圈
     this.markerListText = '' // 地图文字列表
-
+    this.changeCircle = '' // 清楚变大圆的定时器
     this.aMapPolygon = null // 地图矩形对象
     this.aMapPolygonBottom = null
     this.brokenLineLableIndex = [] // 标注的索引
@@ -280,7 +279,6 @@ class App extends Component {
     gaodeMapsDom.src = `https://webapi.amap.com/maps?v=1.4.15&key=34dda2918eee145d1520d8a7c59c3408&plugin=AMap.Geocoder,AMap.Object3DLayer,AMap.Scale&callback=init`
 
     window.init = () => {
-      console.log(111111)
       this.initMap()
     }
     headerDom.appendChild(gaodeMapsDom)
@@ -946,7 +944,6 @@ class App extends Component {
 
       this.selMapMarker()
       this.selMapMarkerCircle()
-      console.log('第一次')
       
       this.selMapText()
     } else {
@@ -963,7 +960,6 @@ class App extends Component {
       this.resetMapMarkerIris()
 
       this.selMapMarker();
-      console.log('第二次')
       this.selMapMarkerCircle()
 
       this.selMapText()
@@ -1005,25 +1001,14 @@ class App extends Component {
     img.onload = function(){
         cxt.rotate(-Math.PI / 2);
         cxt.drawImage(this, x, y,9,120)
-        // context.drawImage(this, 0, 0, 1080, 980)改变图片大小到1080*980
     }
-    // this.drawRoundRectPath(cxt, width, height, radius);
-    // let linear = cxt.createLinearGradient(x,y,x,y + height);
-    // linear.addColorStop(0,"rgba(252,184,19,0.2)");
-    // linear.addColorStop(0.25,"rgba(252,184,19,0.2)");
-    // linear.addColorStop(0.5,"rgba(252,184,19,0.2)");
-    // linear.addColorStop(0.8,"rgba(124,96,34,0.2)");
-    // linear.addColorStop(1,"rgba(252,184,19,0.2)");
-    // cxt.fillStyle = linear; //把渐变赋给填充样式
-    // // cxt.fillStyle = fillColor || "#000"; //若是给定了值就用给定的值否则给予默认值  
     cxt.fill();
     cxt.restore();
 }
 
 fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
   //圆的直径必然要小于矩形的宽高          
-  if (2 * radius > width || 2 * radius > height) { return false; }
-  cxt.save();
+
   cxt.translate(x, y);
   //绘制圆角矩形的各个边  
   var img = new Image()
@@ -1032,19 +1017,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
   img.onload = function(){
       cxt.rotate(-Math.PI / 2);
       cxt.drawImage(this, x, y,10,150)
-      // context.drawImage(this, 0, 0, 1080, 980)改变图片大小到1080*980
   }
-  // this.drawRoundRectPath(cxt, width, height, radius);
-  // let linear = cxt.createLinearGradient(x,y,x,y + height);
-  // linear.addColorStop(0,"rgba(252,184,19,0.2)");
-  // linear.addColorStop(0.25,"rgba(252,184,19,0.2)");
-  // linear.addColorStop(0.5,"rgba(252,184,19,0.2)");
-  // linear.addColorStop(0.8,"rgba(124,96,34,0.2)");
-  // linear.addColorStop(1,"rgba(252,184,19,0.2)");
-  // cxt.fillStyle = linear; //把渐变赋给填充样式
-  // // cxt.fillStyle = fillColor || "#000"; //若是给定了值就用给定的值否则给予默认值  
-  // cxt.fill();
-  cxt.restore();
 }
 
 
@@ -1073,44 +1046,9 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
 
   // 画没有选中的塔机臂
   resetMapMarker() {
-    // 没有数据情况下
-    // if(this.state.actionEquipmentListIndex>3){
-    //   let arr = Object.keys(this.refs)
-    //   if(arr.length!=0){
-    //     this.refs.content.style.top = -7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
-    //   }else{
-    //     console.log(this.refs)
-    //   }
-    // }else{
-    //   this.refs.content.style.top = 0
-    // }
-    // if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
-    //   return null
-    // }
-
-    // if(this.markerList.length !== 0){
-    //   this.map.remove(this.removeMarkerList)
-    //   this.removeMarkerList = [];
-    //   this.removeMarkerList = copyArr(this.markerList)
-    //   function copyArr(arr) {
-    //       let res = []
-    //       for (let i = 0; i < arr.length; i++) {
-    //         res.push(arr[i])
-    //       }
-    //       return res
-    //   }
-    //   this.markerList.forEach((e, i) => {
-    //     if(this.state.actionEquipmentListIndex == i){
-    //       this.removeMarkerList.splice(i,1)
-    //     }
-    //   })
-    //   this.map.add(this.removeMarkerList)
-    //   return null
-    // }
     this.map.remove(this.markerList)
     this.removeMarkerList = []
     this.markerList = []
-    // this.markerList = []
     this.equipmentListTime01 = []
     this.state.equipmentList.forEach((item, index) => {
         if(index !== this.state.actionEquipmentListIndex){
@@ -1122,7 +1060,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           canvasC.style.height = height + "px"
           canvasC.width = width*devicePixelRatio
           canvasC.height = height*devicePixelRatio
-          // canvasC.width = canvasC.height = 320
           let context = canvasC.getContext('2d')
           context.fillStyle = 'rgba(252, 184, 19,1)'
           context.strokeStyle = 'rgba(252, 184, 19,1)'
@@ -1130,27 +1067,17 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           let radius = 0
           let draw = () => {
             context.clearRect(0, 0, canvasC.width, canvasC.height)
-            // context.beginPath()
-            // context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-            // radius = (radius + 1) % 100;
-            // context.arc(102, 95, radius, 0, 2 * Math.PI)
-            // context.fill()
-            // context.stroke()
-            // context.closePath();
             context.lineWidth = 1;
-            // context.save();
             //边框颜色
             context.beginPath();
             context.strokeStyle="rgb(252,184,19)";
             context.translate(100, 95);
             context.rotate((item.rotary - 180) * Math.PI / 180);
-            // context.strokeRect(-30,-1,125,12);
             this.fillRoundRectLong(context, -5,-25, 125,10, 2, 'rgba(252,184,19,0.8)');
             context.closePath();
             //方块的颜色
             context.beginPath();
             context.fillStyle = "rgb(252,184,19)";
-  
             this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
             context.closePath();
             //小球
@@ -1174,24 +1101,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
             })
           )
         }
-
     })
-    // // localStorage.setItem('markerList',JSON.stringify(this.markerList))
-    // this.removeMarkerList = this.markerList
-    // this.removeMarkerList = copyArr(this.markerList)
-    // function copyArr(arr) {
-    //     let res = []
-    //     for (let i = 0; i < arr.length; i++) {
-    //       res.push(arr[i])
-    //     }
-    //     return res
-    // }
-    // this.removeMarkerList.forEach((e, i) => {
-    //   if(this.state.actionEquipmentListIndex == i){
-    //     this.removeMarkerList.splice(i,1)
-    //   }
-    // })
-    // this.map.add(this.removeMarkerList)
     this.map.add(this.markerList)
   }
 
@@ -1211,13 +1121,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
       if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
         return null
       }
-      // window.clearInterval(this.equipmentListTime01)
-      // for(let i=0;i<this.equipmentListTime01.length;i++){
-      //   window.clearInterval(this.equipmentListTime01[i])
-      // }
-
-      // this.map.remove(this.markerListCircle)
-
       if(this.markerListCircle.length !== 0){
         this.map.remove(this.removeMarkerListCircle)
         this.removeMarkerListCircle = [];
@@ -1270,10 +1173,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
             context.restore();
             AMap.Util.requestAnimFrame(draw)
           }
-          // let timer = setInterval(() => {
-
-          // }, 50);
-          // this.equipmentListTime01.push(timer)
           this.markerListCircle.push(
             new AMap.Marker({
               content: canvasC,
@@ -1300,13 +1199,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
         }
       })
       this.map.add(this.removeMarkerListCircle)
-
-      // this.markerListCircle.forEach((e, i) => {
-      //   if(this.state.actionEquipmentListIndex == i){
-      //     this.markerListCircle.splice(i,1)
-      //   }
-      // })
-      // this.map.add(this.markerListCircle)
     }
   selMapText(){
         // 没有数据情况下
@@ -1345,11 +1237,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
     let that = this
     let arrRotary = [];
     let arrAmplitude = [];
-
-
-    console.log(this.state.startIndicators)
-    console.log(this.state.endIndicators)
-    console.log(this.state.equipmentList)
     let canvas1 = document.createElement('canvas');
     let size = this.map.getSize() //resize
     let width = size.width
@@ -1365,8 +1252,8 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
       arrRotary.push(item.rotary)
       arrAmplitude.push(item.amplitude)
       if(index == this.state.actionEquipmentListIndex){
-        console.log('画了几次')
-
+        console.log(this.state.endIndicators)
+        console.log(this.state.startIndicators)
         cxt.restore();
         function drawClock() {
           cxt.clearRect(0, 0, 500, 500);
@@ -1374,46 +1261,31 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           cxt.lineWidth = 1;
           cxt.beginPath();
           //边框颜色
-          // cxt.strokeStyle="rgb(252,184,19)";
-          // cxt.save();
-          // cxt.restore();
           cxt.translate(575, 515);
-          // arrRotary[index] = arrRotary[index]+1
-          console.log(arrRotary[index])
           cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
-          // cxt.strokeRect(-10,-2,70,4);
           that.fillRoundRectLong1(cxt, -5,-20, 120,8, 2, 'rgba(252,184,19,0.8)');
-          // that.fillRoundRectLong(cxt, -5,-25, 125,10, 2, 'rgba(252,184,19,0.8)');
           cxt.closePath();
 
           //方块的颜色
           cxt.beginPath();
           cxt.fillStyle = "rgb(252,184,19)";
-          // cxt.shadowOffsetX = 0; // 阴影Y轴偏移
-          // cxt.shadowOffsetY = 5; // 阴影X轴偏移
-          // cxt.shadowBlur = 10; // 模糊尺寸
-          // cxt.shadowColor = '#333'; // 颜色
-          // cxt.fillRect(-5, -5, 10, 10);
-
           that.fillRoundRect(cxt, -8, -15, 30, 30, 2, 'rgba(252,184,19)');
           cxt.closePath();
           //小球
           cxt.beginPath();
-          // arrAmplitude[index] = arrAmplitude[index]+0.1
           cxt.strokeStyle="rgb(252,184,19)";
           cxt.arc(14+arrAmplitude[index]*3, 0.5, 2, 0, 360, false);
           cxt.fillStyle = "rgb(252,184,19)";
           cxt.fill();
           cxt.stroke();
           cxt.closePath();
-
           cxt.restore();
-
+          
+          // AMap.Util.requestAnimFrame(drawClock)
         }
         let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
         let pageX = 0.05, pageY = 0.05
         let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
-        
         
         this.mapMarkerDraw.push(
           new AMap.Marker({
@@ -1425,22 +1297,12 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           })
         )
       this.map.add(this.mapMarkerDraw)
-
-       
-        // this.mapMarkerDraw = new AMap.CanvasLayer({
-        //   canvas: canvas1,
-        //   bounds: bounds,
-        //   zooms: [3, 18],
-        //   zIndex: 999,
-        // })
-        // this.mapMarkerDraw.setMap(this.map)
-        drawClock();
-        // setInterval(() => {
-        //   drawClock();
-        // }, 100);
+      drawClock();
       }
     })
   }
+
+
   //地图标注选中圆圈效果
   selMapMarkerCircle() {
     let that = this
@@ -1453,23 +1315,35 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
       canvasCircle.style.height = height + "px"
       canvasCircle.width = width*devicePixelRatio
       canvasCircle.height = height*devicePixelRatio
-      let cxt = canvasCircle.getContext('2d');
-      cxt.clearRect(0, 0, 500, 500);
+      let context = canvasCircle.getContext('2d');
+      context.clearRect(0, 0, 500, 500);
+      let radius = 0
       if(index == this.state.actionEquipmentListIndex){
-        cxt.restore();
-        function drawClock() {
-          //大圈
-          cxt.beginPath();
-          cxt.lineWidth = 0.1;
-          //大圈边框颜色
-          cxt.arc(575, 515, 100, 0, 360, false);
-          cxt.strokeStyle = "rgba(252,184,19,0.5)";
-          cxt.fillStyle = "rgba(252,184,19,0.5)";
-          cxt.fill();
-          cxt.stroke();
-          cxt.closePath();
-          cxt.save();
-          cxt.restore();
+        // context.restore();
+        let draw = () => {
+          if(radius>98){
+            console.log('none')
+          }else{
+            context.fillStyle = 'rgba(252, 184, 19,1)'
+            context.strokeStyle = 'rgba(252, 184, 19,1)'
+            context.clearRect(0, 0, canvasCircle.width, canvasCircle.height)
+            context.beginPath()
+            if(radius>97){
+              context.globalAlpha = 0.5
+            }else{
+              context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+            }
+            context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+            radius = (radius + 1) % 100;
+            context.arc(562, 515, radius, 0, 2 * Math.PI)
+            context.fill()
+            context.stroke()
+            context.closePath();
+            context.lineWidth = 1;
+            context.save();
+            context.restore();
+            AMap.Util.requestAnimFrame(draw)
+          }
         }
         let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
         let pageX = 0.05, pageY = 0.05
@@ -1480,7 +1354,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           zooms: [3, 18],
         })
         this.mapMarkerDrawCircle.setMap(this.map)
-        drawClock();
+        draw()
       }
     })
   }
@@ -1568,10 +1442,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
 
 
         itemBB.forEach((pos, i) => {
-        //     let x = pos.x*devicePixelRatio, y = pos.y*devicePixelRatio
-        //     i == 0 && ctx.moveTo(x,y)
-        //     ctx.lineTo(x, y)
-
             i == 0 && ctx.moveTo(itemBB[itemBB.length - 1].x * devicePixelRatio, itemBB[itemBB.length - 1].y * devicePixelRatio);
             if (i == itemBB.length - 1) {
                 ctx.arcTo(pos.x * devicePixelRatio, pos.y * devicePixelRatio, itemBB[0].x * devicePixelRatio, itemBB[0].y *
@@ -1628,7 +1498,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
         // alert(width*devicePixelRatio,height*devicePixelRatio)
         ctx2.beginPath()
 
-
         // 填充渐变
         let my_gradient = ctx2.createLinearGradient(0, 0, 500*devicePixelRatio, 500*devicePixelRatio);
         my_gradient.addColorStop(0, "rgba(108, 85, 38, 1)");
@@ -1653,7 +1522,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
         ctx2.shadowOffsetX = 0
         ctx2.shadowOffsetY = 15
 
-        
         ctx2.closePath()
         ctx2.stroke()
         ctx2.fill()
@@ -1678,7 +1546,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
       }
 
       this.equipmentListTime = null
-      console.log(222222)
       this.map && this.initMap()
       return null
     }
@@ -1728,7 +1595,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
   updateDate(type) {
     !type && this.getBaseInfo()
     !type && this.getDevice()
-    console.log(333333)
     this.map && this.initMap()
     this.getIndicators()
     this.get12Hours()
@@ -1743,7 +1609,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
             footerInfoStatus: 'noNetwork',
         })
     }
-
     this.$http
       .post("/rest/tower/getTvBasicInfo", {
         deviceCode: this.deviceCode,
@@ -1833,7 +1698,8 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
               heavy:Math.ceil(Math.random()*100),
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
-            }, {
+            }, 
+            {
               deviceName: "2 号塔机监测系统",
               longitude: "114.0440153808594",
               latitude: "22.56797929382324",
@@ -1847,34 +1713,34 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
             }, 
-            {
-              deviceName: "3 号塔机监测系统",
-              longitude: "114.05853808556",
-              latitude: "22.54797929382318",
-              status: Math.ceil(Math.random()*2),
-              orderProductList: 197,
-              alarmTimes: 623,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:30-Math.ceil(Math.random()*30),
-              height:Math.ceil(Math.random()*30),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            },
-            {
-              deviceName: "4 号塔机监测系统",
-              longitude: "114.06453808556",
-              latitude: "22.56997929382318",
-              status: Math.ceil(Math.random()*2),
-              orderProductList: 297,
-              alarmTimes: 623,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:30-Math.ceil(Math.random()*30),
-              height:Math.ceil(Math.random()*30),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            },
+            // {
+            //   deviceName: "3 号塔机监测系统",
+            //   longitude: "114.05853808556",
+            //   latitude: "22.54797929382318",
+            //   status: Math.ceil(Math.random()*2),
+            //   orderProductList: 197,
+            //   alarmTimes: 623,
+            //   rotary: Math.ceil(Math.random()*360),
+            //   amplitude:30-Math.ceil(Math.random()*30),
+            //   height:Math.ceil(Math.random()*30),
+            //   heavy:Math.ceil(Math.random()*100),
+            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            // },
+            // {
+            //   deviceName: "4 号塔机监测系统",
+            //   longitude: "114.06453808556",
+            //   latitude: "22.56997929382318",
+            //   status: Math.ceil(Math.random()*2),
+            //   orderProductList: 297,
+            //   alarmTimes: 623,
+            //   rotary: Math.ceil(Math.random()*360),
+            //   amplitude:30-Math.ceil(Math.random()*30),
+            //   height:Math.ceil(Math.random()*30),
+            //   heavy:Math.ceil(Math.random()*100),
+            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            // },
             // {
             //   deviceName: "5 号塔机监测系统",
             //   longitude: "114.07853808556",
@@ -1943,7 +1809,6 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
                 }
                 if (data.mapList) {
                     !this.map && this.initEquipmentList();
-                    console.log(444444)
                     this.map && this.initMap();
 
                     //初始化24小时设置告警 环形图
