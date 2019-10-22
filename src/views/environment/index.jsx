@@ -206,7 +206,7 @@ class App extends Component {
     this.proportionDom = React.createRef() //24小时报警次数饼图对象
     this.map = null // 地图对象
     this.mapMarkerDrawCircle = null//选中地图圆圈对象
-    this.mapMarkerDraw = null//选中地图光标对象
+    this.mapMarkerDraw = []//选中地图光标对象
 
     this.equipmentListTime = null // 设备列表定时器对象
     this.brokenLineChart = null // 折线图对象
@@ -1031,7 +1031,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
   //图片加载完后，将其显示在canvas中
   img.onload = function(){
       cxt.rotate(-Math.PI / 2);
-      cxt.drawImage(this, x, y,8,120)
+      cxt.drawImage(this, x, y,10,150)
       // context.drawImage(this, 0, 0, 1080, 980)改变图片大小到1080*980
   }
   // this.drawRoundRectPath(cxt, width, height, radius);
@@ -1155,7 +1155,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
             context.closePath();
             //小球
             context.beginPath();
-            context.arc(8+item.amplitude*3, 0.5, 2, 0, 360, false);
+            context.arc(10+item.amplitude*2.9, 0.5, 2, 0, 360, false);
             context.fillStyle = "rgb(252,184,19)";
             context.fill();
             context.stroke();
@@ -1359,6 +1359,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
     canvas1.width = width*devicePixelRatio
     canvas1.height = height*devicePixelRatio
     let cxt = canvas1.getContext('2d');
+    this.mapMarkerDraw = []
 
     this.state.equipmentList.map((item, index) => {
       arrRotary.push(item.rotary)
@@ -1394,7 +1395,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           // cxt.shadowColor = '#333'; // 颜色
           // cxt.fillRect(-5, -5, 10, 10);
 
-          that.fillRoundRect(cxt, -8, -12, 25, 25, 2, 'rgba(252,184,19)');
+          that.fillRoundRect(cxt, -8, -15, 30, 30, 2, 'rgba(252,184,19)');
           cxt.closePath();
           //小球
           cxt.beginPath();
@@ -1412,13 +1413,27 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
         let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
         let pageX = 0.05, pageY = 0.05
         let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
-        this.mapMarkerDraw = new AMap.CanvasLayer({
-          canvas: canvas1,
-          bounds: bounds,
-          zooms: [3, 18],
-          zIndex: 999,
-        })
-        this.mapMarkerDraw.setMap(this.map)
+        
+        
+        this.mapMarkerDraw.push(
+          new AMap.Marker({
+            content: canvas1,
+            position: new AMap.LngLat(item1.longitude, item1.latitude),
+            offset: new AMap.Pixel(-255, -237),
+            size: new AMap.Size(40, 50),
+            zIndex: 999,
+          })
+        )
+      this.map.add(this.mapMarkerDraw)
+
+       
+        // this.mapMarkerDraw = new AMap.CanvasLayer({
+        //   canvas: canvas1,
+        //   bounds: bounds,
+        //   zooms: [3, 18],
+        //   zIndex: 999,
+        // })
+        // this.mapMarkerDraw.setMap(this.map)
         drawClock();
         // setInterval(() => {
         //   drawClock();
@@ -1846,20 +1861,20 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
             },
-          //   {
-          //     deviceName: "4 号塔机监测系统",
-          //     longitude: "114.06453808556",
-          //     latitude: "22.56997929382318",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 297,
-          //     alarmTimes: 623,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          //   },
+            {
+              deviceName: "4 号塔机监测系统",
+              longitude: "114.06453808556",
+              latitude: "22.56997929382318",
+              status: Math.ceil(Math.random()*2),
+              orderProductList: 297,
+              alarmTimes: 623,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            },
             // {
             //   deviceName: "5 号塔机监测系统",
             //   longitude: "114.07853808556",
