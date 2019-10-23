@@ -228,6 +228,9 @@ class App extends Component {
     this.oldMapPolygonPath = "" // 上一次黄色区域经纬度
     this.bannerTime = null // banner轮播
     this.equipmentListTime01 = [] // 发光设备定时器
+    this.equipmentListTime02 = [] // 转动设备定时器
+    this.oldIndicators1 = '' // 旧值
+    this.startIndicators1 = '' // 新值
     this.ulTop = ''
     this.state = {
       equipmentListAnimation: true, // 设备动画
@@ -942,11 +945,12 @@ class App extends Component {
       this.resetMapMarker()
       this.resetMapMarkerIris()
 
-      this.selMapMarker()
+      // this.selMapMarker()
       this.selMapMarkerCircle()
       
       this.selMapText()
     } else {
+
       this.map = new AMap.Map("mapcontainer", {
         resizeEnable: true, // 是否监控地图容器尺寸变化，默认值为false
         zooms: [3, 18],
@@ -956,10 +960,11 @@ class App extends Component {
         mapStyle: "amap://styles/e82b537e91ee2e22c215325293b01d70" //设置地图的显示样式
       });
       // 将图层添加至地图实例
+
       this.resetMapMarker();
       this.resetMapMarkerIris()
 
-      this.selMapMarker();
+      // this.selMapMarker();
       this.selMapMarkerCircle()
 
       this.selMapText()
@@ -1024,7 +1029,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
   drawRoundRectPath(cxt, width, height, radius) {
     cxt.beginPath(0);
     //从右下角顺时针绘制，弧度从0到1/2PI  
-    cxt.strokeStyle = "yellow";
+    cxt.strokeStyle = "rgba(255,255,255,0)";
     cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
     //矩形下边线  
     cxt.lineTo(radius, height);
@@ -1077,7 +1082,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
             context.closePath();
             //方块的颜色
             context.beginPath();
-            context.fillStyle = "rgb(252,184,19)";
+            // context.fillStyle = "rgb(252,184,19)";
             this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
             context.closePath();
             //小球
@@ -1243,8 +1248,8 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
     let height = size.height
     canvas1.style.width = width + "px"
     canvas1.style.height = height + "px"
-    canvas1.width = width*devicePixelRatio
-    canvas1.height = height*devicePixelRatio
+    canvas1.width = width*devicePixelRatio * 1.2
+    canvas1.height = height*devicePixelRatio * 1.2
     let cxt = canvas1.getContext('2d');
     this.mapMarkerDraw = []
 
@@ -1253,54 +1258,140 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
       arrAmplitude.push(item.amplitude)
       if(index == this.state.actionEquipmentListIndex){
         console.log(this.state.endIndicators)
-        console.log(this.state.startIndicators)
-        cxt.restore();
-        function drawClock() {
-          cxt.clearRect(0, 0, 500, 500);
-          //边框
-          cxt.lineWidth = 1;
-          cxt.beginPath();
-          //边框颜色
-          cxt.translate(575, 515);
-          cxt.rotate((arrRotary[index] - 180)*Math.PI/180);
-          that.fillRoundRectLong1(cxt, -5,-20, 120,8, 2, 'rgba(252,184,19,0.8)');
-          cxt.closePath();
+        if(this.state.endIndicators){
+          // console.log(this.state.endIndicators);
+          // console.log(this.state.startIndicators);
+          let oldIndicators = parseInt(this.state.endIndicators[2].indicatorValue);
+          let newIndicators = parseInt(this.state.startIndicators[2].indicatorValue);
+          that.oldIndicators1 = parseInt(this.state.endIndicators[4].indicatorValue);
+          that.startIndicators1 = parseInt(this.state.startIndicators[4].indicatorValue);
+          console.log(that.oldIndicators1)
+          console.log(that.startIndicators1)
 
-          //方块的颜色
-          cxt.beginPath();
-          cxt.fillStyle = "rgb(252,184,19)";
-          that.fillRoundRect(cxt, -8, -15, 30, 30, 2, 'rgba(252,184,19)');
-          cxt.closePath();
-          //小球
-          cxt.beginPath();
-          cxt.strokeStyle="rgb(252,184,19)";
-          cxt.arc(14+arrAmplitude[index]*3, 0.5, 2, 0, 360, false);
-          cxt.fillStyle = "rgb(252,184,19)";
-          cxt.fill();
-          cxt.stroke();
-          cxt.closePath();
-          cxt.restore();
-          
-          // AMap.Util.requestAnimFrame(drawClock)
+          function drawBackground() {
+            cxt.save();
+            cxt.translate(200, 200);
+            cxt.beginPath();
+            cxt.lineWidth = 10;
+            //以0，0为原点，r为半径，0为起始角，2*Math.PI为结束角，顺时针画圆
+            cxt.arc(0, 0,cxt.lineWidth / 2, 0, 2 * Math.PI, false);
+            cxt.stroke();
         }
-        let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
-        let pageX = 0.05, pageY = 0.05
-        let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
-        
-        this.mapMarkerDraw.push(
-          new AMap.Marker({
-            content: canvas1,
-            position: new AMap.LngLat(item1.longitude, item1.latitude),
-            offset: new AMap.Pixel(-255, -237),
-            size: new AMap.Size(40, 50),
-            zIndex: 999,
-          })
-        )
-      this.map.add(this.mapMarkerDraw)
-      drawClock();
+    
+        //绘制秒针
+        function drawSecond(second,rem) {
+    
+            cxt.beginPath();
+            cxt.fillStyle = '#c14443';
+            var rad = 2 * Math.PI / 60 * second;
+            cxt.rotate(rad);
+            
+            console.log(rad)
+            cxt.arc(this.state.endIndicators[2].indicatorValue*20, 0.5, 2, 0, 360, false);
+            cxt.fill();
+
+        }
+    
+        //画时钟上的中心白色原点
+        function drawDot(j) {
+            cxt.beginPath();
+            cxt.fillStyle = 'rgba(252,184,19)';
+            var rad = (j - 180) * Math.PI / 180;
+            cxt.rotate(rad);
+            that.fillRoundRect(cxt, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
+            // that.fillRoundRect(cxt, -15, -15, 130, 10, 2, 'rgba(252,184,19,0.1)');
+            cxt.arc(14+newIndicators*3, -1.5, 2.5, 0, 360, false);
+            // cxt.translate(-15, -15);
+            //绘制圆角矩形的各个边  
+            var img = new Image()
+            img.src = biPng
+            //图片加载完后，将其显示在canvas中
+            cxt.rotate(-Math.PI / 2);
+            cxt.drawImage(img,-3.7, -25,10,150)
+
+
+            cxt.fill();
+        }
+
+          cxt.restore();
+          function drawClock() {
+            cxt.clearRect(0, 0, width, height);
+            console.log(that.oldIndicators1)
+            console.log(that.startIndicators1)
+            if(that.oldIndicators1 == that.startIndicators1){
+              for(let i=0;i<that.equipmentListTime02.length;i++){
+                window.clearInterval(that.equipmentListTime02[i])
+              }
+          
+              that.equipmentListTime02 = []
+              console.log('相等')
+              drawBackground();
+              drawDot(that.oldIndicators1);
+              // cxt.restore();
+              return;
+            }
+            if(that.oldIndicators1 > that.startIndicators1){
+
+              that.oldIndicators1 = that.oldIndicators1 - 1;
+            }else{
+              that.oldIndicators1 = that.oldIndicators1 + 1;
+            }
+            
+            drawBackground();
+            // drawSecond(oldIndicators1,2);
+            drawDot(that.oldIndicators1);
+            cxt.restore();
+        }
+          let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
+          let pageX = 0.05, pageY = 0.05
+          let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
+          
+          this.mapMarkerDraw.push(
+            new AMap.Marker({
+              content: canvas1,
+              position: new AMap.LngLat(item1.longitude, item1.latitude),
+              offset: new AMap.Pixel(-255, -237),
+              size: new AMap.Size(80, 100),
+              zIndex: 999,
+            })
+          )
+        this.map.add(this.mapMarkerDraw)
+        this.equipmentListTime02.push(setInterval(drawClock, 50)); 
+        } else {
+          console.log('初始化画图')
+          function initDraw(){
+            console.log('进来了没')
+            cxt.save();
+            cxt.translate(200, 200);
+            cxt.beginPath();
+            cxt.lineWidth = 10;
+            //以0，0为原点，r为半径，0为起始角，2*Math.PI为结束角，顺时针画圆
+            cxt.arc(0, 0,cxt.lineWidth / 2, 0, 2 * Math.PI, false);
+            cxt.stroke();
+
+            cxt.beginPath();
+            cxt.fillStyle = 'rgba(252,184,19)';
+            cxt.rotate(2 * Math.PI / 60);
+            that.fillRoundRect(cxt, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
+            // that.fillRoundRect(cxt, -15, -15, 130, 10, 2, 'rgba(252,184,19,0.1)');
+            cxt.arc(14*3, -1.5, 2.5, 0, 360, false);
+            // cxt.translate(-15, -15);
+            //绘制圆角矩形的各个边  
+            let img1 = new Image()
+            img1.src = biPng
+            //图片加载完后，将其显示在canvas中
+            cxt.rotate(-Math.PI / 2);
+            cxt.drawImage(img1,-3.7, -25,10,150)
+            cxt.fill();
+          }
+          
+          initDraw()
+        }
       }
     })
   }
+
+
 
 
   //地图标注选中圆圈效果
@@ -1552,7 +1643,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
     if (this.equipmentListTime) {
       return null
     }
-    let updateTime = this.state.equipmentList.length == 1 ? 60 : 30
+    let updateTime = this.state.equipmentList.length == 1 ? 60 : 10
     //切换时间
     // let updateTime = 200
     this.updateDate('init')
@@ -1713,34 +1804,34 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
               img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
               deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
             }, 
-            // {
-            //   deviceName: "3 号塔机监测系统",
-            //   longitude: "114.05853808556",
-            //   latitude: "22.54797929382318",
-            //   status: Math.ceil(Math.random()*2),
-            //   orderProductList: 197,
-            //   alarmTimes: 623,
-            //   rotary: Math.ceil(Math.random()*360),
-            //   amplitude:30-Math.ceil(Math.random()*30),
-            //   height:Math.ceil(Math.random()*30),
-            //   heavy:Math.ceil(Math.random()*100),
-            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            // },
-            // {
-            //   deviceName: "4 号塔机监测系统",
-            //   longitude: "114.06453808556",
-            //   latitude: "22.56997929382318",
-            //   status: Math.ceil(Math.random()*2),
-            //   orderProductList: 297,
-            //   alarmTimes: 623,
-            //   rotary: Math.ceil(Math.random()*360),
-            //   amplitude:30-Math.ceil(Math.random()*30),
-            //   height:Math.ceil(Math.random()*30),
-            //   heavy:Math.ceil(Math.random()*100),
-            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            // },
+            {
+              deviceName: "3 号塔机监测系统",
+              longitude: "114.05853808556",
+              latitude: "22.54797929382318",
+              status: Math.ceil(Math.random()*2),
+              orderProductList: 197,
+              alarmTimes: 623,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            },
+            {
+              deviceName: "4 号塔机监测系统",
+              longitude: "114.06453808556",
+              latitude: "22.56997929382318",
+              status: Math.ceil(Math.random()*2),
+              orderProductList: 297,
+              alarmTimes: 623,
+              rotary: Math.ceil(Math.random()*360),
+              amplitude:30-Math.ceil(Math.random()*30),
+              height:Math.ceil(Math.random()*30),
+              heavy:Math.ceil(Math.random()*100),
+              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+            },
             // {
             //   deviceName: "5 号塔机监测系统",
             //   longitude: "114.07853808556",
@@ -1809,7 +1900,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
                 }
                 if (data.mapList) {
                     !this.map && this.initEquipmentList();
-                    this.map && this.initMap();
+                    // this.map && this.initMap();
 
                     //初始化24小时设置告警 环形图
                     // console.log("初始化24小时设置告警 环形图", this.state.equipmentList, this.state.actionEquipmentListIndex, this.state.equipmentList[this.state.actionEquipmentListIndex].alarmTimes)
@@ -1858,7 +1949,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           //     dataType: 1
           //   }, {
           //     indicatorName: "TSP",
-          //     indicatorValue: "89",
+          //     indicatorValue: "9",
           //     unit: "μg/m³",
           //     statusName: "正常",
           //     status: 0,
@@ -1915,7 +2006,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           //     dataType: 1
           //   }, {
           //     indicatorName: "TSP",
-          //     indicatorValue: "189",
+          //     indicatorValue: "49",
           //     unit: "μg/m³",
           //     statusName: "超标",
           //     status: 1,
@@ -1929,7 +2020,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           //     dataType: 1
           //   }, {
           //     indicatorName: "温度",
-          //     indicatorValue: "25",
+          //     indicatorValue: "15",
           //     unit: "℃",
           //     statusName: "正常",
           //     status: 0,
@@ -1958,19 +2049,26 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           //   }]
           // }
           let backData = JSON.parse(JSON.stringify(data))
-          this.setState({
-            indicators: data,
-            startIndicators: data.newInd ? data.newInd : backData.oldInd,
-            // this.state.startIndicators
-            //   ? this.state.endIndicators
-            //   : backData.newInd.map(e => {
-            //     e.indicatorValue = '-'
-            //     return e
-            //   }),
-            endIndicators: data.oldInd ? data.oldInd : backData.newInd
-          },()=>{
-            // console.log(this.state.indicators,this.state.startIndicators, this.state.endIndicators)
-          })
+
+ 
+            this.setState({
+              indicators: data,
+              startIndicators: data.newInd ? data.newInd : backData.oldInd,
+              // this.state.startIndicators
+              //   ? this.state.endIndicators
+              //   : backData.newInd.map(e => {
+              //     e.indicatorValue = '-'
+              //     return e
+              //   }),
+              endIndicators: data.oldInd ? data.oldInd : backData.newInd
+            },()=>{
+              // console.log(this.state.indicators,this.state.startIndicators, this.state.endIndicators)
+              this.selMapMarker()
+            })
+
+
+
+
         }
       }).catch(error => {
         if (this.state.footerInfoStatus !== 'noNetwork') {
@@ -2243,8 +2341,8 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
               )}
 
             <div className="left-supervise-value">
-              {this.state.endIndicators
-                ? this.state.endIndicators.map((item, index) => {
+              {this.state.startIndicators
+                ? this.state.startIndicators.map((item, index) => {
                   return (
                     item.indicatorName !== "防撞" ? (
                       <div 
