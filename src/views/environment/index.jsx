@@ -204,7 +204,7 @@ class App extends Component {
     this.columnarAmplitudeDom = React.createRef() //PMTSP 7天柱状图对象
     this.proportionDom = React.createRef() //24小时报警次数饼图对象
     this.map = null // 地图对象
-    this.mapMarkerDrawCircle = null//选中地图圆圈对象
+    this.mapMarkerDrawCircle = []//选中地图圆圈对象
     this.mapMarkerDraw = []//选中地图光标对象
 
     this.equipmentListTime = null // 设备列表定时器对象
@@ -219,7 +219,7 @@ class App extends Component {
     this.markerList = [] // 地图标准列表
     this.removeMarkerList = [] // 需要移除的地图列表
     this.markerListCircle = [] // 地图光圈
-    this.removeMarkerListCircle = [] // 移除地图光圈
+    this.removeMarkerListCircle = [] // 移除选中地图光圈
     this.markerListText = '' // 地图文字列表
     this.changeCircle = '' // 清楚变大圆的定时器
     this.aMapPolygon = null // 地图矩形对象
@@ -1011,6 +1011,24 @@ class App extends Component {
     cxt.restore();
 }
 
+fillRoundRectLong2(cxt, x, y, width, height, radius, fillColor) {
+  //圆的直径必然要小于矩形的宽高          
+  if (2 * radius > width || 2 * radius > height) { return false; }
+  cxt.save();
+  cxt.translate(x, y);
+  //绘制圆角矩形的各个边  
+  var img = new Image()
+  img.src = biPng1
+  //图片加载完后，将其显示在canvas中
+  img.onload = function(){
+      cxt.rotate(-Math.PI / 2);
+      cxt.drawImage(this, x, y,9,140)
+  }
+  cxt.fill();
+  cxt.restore();
+}
+
+
 fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
   //圆的直径必然要小于矩形的宽高          
 
@@ -1055,47 +1073,72 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
     this.removeMarkerList = []
     this.markerList = []
     this.equipmentListTime01 = []
+
+    if(this.markerList.length !== 0){
+      // this.state.equipmentList.forEach((item, index) => {
+      //   console.log('jinlailalalalal')
+      // })
+      return;
+    }
     this.state.equipmentList.forEach((item, index) => {
-        if(index !== this.state.actionEquipmentListIndex){
-          let canvasC = document.createElement('canvas')
-          let size = this.map.getSize() //resize
-          let width = size.width
-          let height = size.height
-          canvasC.style.width = width + "px"
-          canvasC.style.height = height + "px"
-          canvasC.width = width*devicePixelRatio
-          canvasC.height = height*devicePixelRatio
-          let context = canvasC.getContext('2d')
-          context.fillStyle = 'rgba(252, 184, 19,1)'
-          context.strokeStyle = 'rgba(252, 184, 19,1)'
+        if(index == this.state.actionEquipmentListIndex){
+        //   let canvasC = document.createElement('canvas')
+        //   let size = this.map.getSize() //resize
+        //   let width = size.width
+        //   let height = size.height
+        //   canvasC.style.width = width + "px"
+        //   canvasC.style.height = height + "px"
+        //   canvasC.width = width*devicePixelRatio
+        //   canvasC.height = height*devicePixelRatio
+        //   let context = canvasC.getContext('2d')
+        //   context.fillStyle = 'rgba(252, 184, 19,1)'
+        //   context.strokeStyle = 'rgba(252, 184, 19,1)'
       
-          let radius = 0
-          let draw = () => {
-            context.clearRect(0, 0, canvasC.width, canvasC.height)
-            context.lineWidth = 1;
-            //边框颜色
-            context.beginPath();
-            context.strokeStyle="rgb(252,184,19)";
-            context.translate(100, 95);
-            context.rotate((item.rotary - 180) * Math.PI / 180);
-            this.fillRoundRectLong(context, -5,-25, 125,10, 2, 'rgba(252,184,19,0.8)');
-            context.closePath();
-            //方块的颜色
-            context.beginPath();
-            // context.fillStyle = "rgb(252,184,19)";
-            this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
-            context.closePath();
-            //小球
-            context.beginPath();
-            context.arc(10+item.amplitude*2.9, 0.5, 2, 0, 360, false);
-            context.fillStyle = "rgb(252,184,19)";
-            context.fill();
-            context.stroke();
-            context.closePath();
-            // AMap.Util.requestAnimFrame(draw)
-            context.restore();
-          }
-          draw()
+        //   let radius = 0
+        //   let draw = () => {
+        //     context.clearRect(0, 0, canvasC.width, canvasC.height)
+        //     context.lineWidth = 1;
+        //     //边框颜色
+        //     context.beginPath();
+        //     context.strokeStyle="rgb(252,184,19)";
+        //     context.translate(100, 95);
+        //     context.rotate((item.rotary - 180) * Math.PI / 180);
+        //     this.fillRoundRectLong(context, -5,-25, 125,10, 2, 'rgba(252,184,19,0.8)');
+        //     context.closePath();
+        //     //方块的颜色
+        //     context.beginPath();
+        //     // context.fillStyle = "rgb(252,184,19)";
+        //     this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
+        //     context.closePath();
+        //     //小球
+        //     context.beginPath();
+        //     context.arc(10+item.amplitude*2.9, 0.5, 2, 0, 360, false);
+        //     context.fillStyle = "rgb(252,184,19)";
+        //     context.fill();
+        //     context.stroke();
+        //     context.closePath();
+        //     // AMap.Util.requestAnimFrame(draw)
+        //     context.restore();
+        //   }
+        //   draw()
+        //   this.markerList.push(
+        //     new AMap.Marker({
+        //       content: canvasC,
+        //       position: new AMap.LngLat(item.longitude, item.latitude),
+        //       offset: new AMap.Pixel(-15, -17),
+        //       size: new AMap.Size(50, 60),
+        //       zIndex: 999,
+        //     })
+        //   )
+        // }else{
+          console.log(item)
+          console.log(item.rotary)
+          // let canvasC = `<div id="square" style="transform:rotate(${item.rotary}deg);transition: all 3s;" ></div>
+          
+          // `
+          let canvasC = this.refs.square;
+
+    
           this.markerList.push(
             new AMap.Marker({
               content: canvasC,
@@ -1110,6 +1153,67 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
     this.map.add(this.markerList)
   }
 
+    //地图标注选中圆圈效果
+    selMapMarkerCircle() {
+      let that = this
+
+      if(this.mapMarkerDrawCircle.length !== 0){
+        this.map.remove(this.removeMapMarkerDrawCircle)
+        this.removeMapMarkerDrawCircle = [];
+        this.removeMapMarkerDrawCircle = copyArr(this.mapMarkerDrawCircle)
+        function copyArr(arr) {
+            let res = []
+            for (let i = 0; i < arr.length; i++) {
+              res.push(arr[i])
+            }
+            return res
+        }
+        this.mapMarkerDrawCircle.forEach((e, i) => {
+          if(this.state.actionEquipmentListIndex == i){
+            this.removeMapMarkerDrawCircle = this.removeMapMarkerDrawCircle.slice(i,i+1)
+          }
+        })
+        this.map.add(this.removeMapMarkerDrawCircle)
+        
+        return null
+      }
+
+      this.state.equipmentList.map((item, index) => {
+        let canvasCircle = `<div class="select-pulse"></div>`
+          let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
+          let pageX = 0.05, pageY = 0.05
+          let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
+          this.mapMarkerDrawCircle.push(
+            new AMap.Marker({
+            content: canvasCircle,
+            position: new AMap.LngLat(item.longitude, item.latitude),
+            offset: new AMap.Pixel(27, 19),
+            size: new AMap.Size(50, 60),
+            zIndex: 99 - index,
+            })
+          )
+
+
+          this.removeMapMarkerDrawCircle = copyArr(this.mapMarkerDrawCircle)
+          function copyArr(arr) {
+              let res = []
+              for (let i = 0; i < arr.length; i++) {
+                res.push(arr[i])
+              }
+              return res
+          }
+          this.mapMarkerDrawCircle.forEach((e, i) => {
+            if(this.state.actionEquipmentListIndex == i){
+              this.removeMapMarkerDrawCircle = this.removeMapMarkerDrawCircle.slice(i,i+1)
+            }
+          })
+          this.map.add(this.removeMapMarkerDrawCircle)
+          
+          // this.mapMarkerDrawCircle.setMap(this.map)
+          // draw()
+      })
+    }
+    
     // 画没有选中塔机的发光光圈
     resetMapMarkerIris() {
       // 没有数据情况下
@@ -1143,6 +1247,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
           }
         })
         this.map.add(this.removeMarkerListCircle)
+        
         return null
       }
 
@@ -1150,44 +1255,17 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
       this.equipmentListTime01 = []
       this.state.equipmentList.forEach((item, index) => {
           //光圈开始
-          let canvasC = document.createElement('canvas')
-          let size = this.map.getSize() //resize
-          let width = size.width
-          let height = size.height
-          canvasC.style.width = width + "px"
-          canvasC.style.height = height + "px"
-          canvasC.width = width*devicePixelRatio
-          canvasC.height = height*devicePixelRatio
-          // canvasC.width = canvasC.height = 320
-          let context = canvasC.getContext('2d')
-          context.fillStyle = 'rgba(252, 184, 19,1)'
-          context.strokeStyle = 'rgba(252, 184, 19,1)'
-      
-          let radius = 0
-          let draw = () => {
-            context.clearRect(0, 0, canvasC.width, canvasC.height)
-            context.beginPath()
-            context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-            radius = (radius + 1) % 100;
-            context.arc(102, 95, radius, 0, 2 * Math.PI)
-            context.fill()
-            context.stroke()
-            context.closePath();
-            context.lineWidth = 1;
-            context.save();
-            context.restore();
-            AMap.Util.requestAnimFrame(draw)
-          }
+          let canvasC = `<div class="pulse"></div>`
           this.markerListCircle.push(
             new AMap.Marker({
               content: canvasC,
               position: new AMap.LngLat(item.longitude, item.latitude),
-              offset: new AMap.Pixel(-15, -17),
+              offset: new AMap.Pixel(27, 19),
               size: new AMap.Size(50, 60),
               zIndex: 99 - index,
             })
           )
-          draw()
+          // draw()
       })
 
       this.removeMarkerListCircle = copyArr(this.markerListCircle)
@@ -1394,61 +1472,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
 
 
 
-  //地图标注选中圆圈效果
-  selMapMarkerCircle() {
-    let that = this
-    this.state.equipmentList.map((item, index) => {
-      let canvasCircle = document.createElement('canvas');
-      let size = this.map.getSize() //resize
-      let width = size.width
-      let height = size.height
-      canvasCircle.style.width = width + "px"
-      canvasCircle.style.height = height + "px"
-      canvasCircle.width = width*devicePixelRatio
-      canvasCircle.height = height*devicePixelRatio
-      let context = canvasCircle.getContext('2d');
-      context.clearRect(0, 0, 500, 500);
-      let radius = 0
-      if(index == this.state.actionEquipmentListIndex){
-        // context.restore();
-        let draw = () => {
-          if(radius>98){
-            console.log('none')
-          }else{
-            context.fillStyle = 'rgba(252, 184, 19,1)'
-            context.strokeStyle = 'rgba(252, 184, 19,1)'
-            context.clearRect(0, 0, canvasCircle.width, canvasCircle.height)
-            context.beginPath()
-            if(radius>97){
-              context.globalAlpha = 0.5
-            }else{
-              context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-            }
-            context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
-            radius = (radius + 1) % 100;
-            context.arc(562, 515, radius, 0, 2 * Math.PI)
-            context.fill()
-            context.stroke()
-            context.closePath();
-            context.lineWidth = 1;
-            context.save();
-            context.restore();
-            AMap.Util.requestAnimFrame(draw)
-          }
-        }
-        let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
-        let pageX = 0.05, pageY = 0.05
-        let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
-        this.mapMarkerDrawCircle = new AMap.CanvasLayer({
-          canvas: canvasCircle,
-          bounds: bounds,
-          zooms: [3, 18],
-        })
-        this.mapMarkerDrawCircle.setMap(this.map)
-        draw()
-      }
-    })
-  }
+
   //画定位2d图形
   map2D() {
     new AMap.Polygon({
@@ -2063,7 +2087,7 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
               endIndicators: data.oldInd ? data.oldInd : backData.newInd
             },()=>{
               // console.log(this.state.indicators,this.state.startIndicators, this.state.endIndicators)
-              this.selMapMarker()
+              // this.selMapMarker()
             })
 
 
@@ -2416,6 +2440,10 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
               }
             </div>
 
+
+
+            
+
             <div className="left-brokenlin-title">近 12 小时数据统计</div>
             <div className={this.state.brokenLineList && this.state.brokenLineList.indicatorDateList ? 'left-chart-brokenline' : 'left-chart-brokenline empty'}>
               {this.state.brokenLineList && this.state.brokenLineList.indicatorDateList ?
@@ -2526,7 +2554,8 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
                           <img className='line'  style={{height:+item.height+4,left:-item.amplitude+56}} src={require("../../assets/images/line.png")} alt=""/>
                           <img className='thing' style={{top:+item.height+10,left:-item.amplitude+54}} src={require("../../assets/images/thing.png")} alt=""/>
-                          <img className='breathe-line-gif' src={require("../../assets/images/tajigif.gif")} style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}} alt=""/>
+                          {/* <img className='breathe-line-gif' src={require("../../assets/images/tajigif.gif")} style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}} alt=""/> */}
+                          <div id="breathe-line-gif" style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           {/* <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div> */}
                           <p>{item.deviceName}</p>
                           {/* <div className='breathe-line1' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div> */}
@@ -2543,6 +2572,19 @@ fillRoundRectLong1(cxt, x, y, width, height, radius, fillColor) {
               
             </div>
             {/* 地图 end */}
+
+            <div>
+
+            {this.state.endIndicators
+                ? (
+                  <div id="square" ref='square' style={{transform:`rotate(${this.state.startIndicators[4].indicatorValue}deg)`}}>{this.state.startIndicators[4].indicatorValue}</div>
+                ):<div id="square" ref='square'></div>
+              }
+
+            
+
+
+              </div>
 
           </div>
           <div className="app-content-right">

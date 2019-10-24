@@ -83,6 +83,205 @@ body,
   }
 }
 
+@keyframes warn {
+  0% {
+      transform: scale(0);
+      opacity: 0.9;
+  }
+  20% {
+      transform: scale(1);
+      opacity: 0.8;
+  }
+  30% {
+      transform: scale(2);
+      opacity: 0.7;
+  }
+  40% {
+      transform: scale(3);
+      opacity: 0.6;
+  }
+  50% {
+      transform: scale(4);
+      opacity: 0.5;
+  }
+  60% {
+      transform: scale(5);
+      opacity: 0.4;
+  }
+  70% {
+      transform: scale(6);
+      opacity: 0.3;
+  }
+  80% {
+      transform: scale(7);
+      opacity: 0.2;
+  }
+  90% {
+    transform: scale(8);
+    opacity: 0.1;
+  }
+  100% {
+      transform: scale(9);
+      opacity: 0.0;
+  }
+}
+
+
+/* 未选中产生动画（向外扩散变大）的圆圈  */
+.pulse {
+  position: absolute;
+  width: 0px; 
+  height: 0px;
+  left: 2px;
+  top: 2px;
+  border: 6px solid rgb(252,184,19);
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  z-index: 1;
+  opacity: 0;
+  -webkit-animation: warn 3s ease-out;
+  -moz-animation: warn 3s ease-out;
+  animation: warn 3s ease-out;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
+@keyframes select-warn {
+  0% {
+      transform: scale(0);
+      opacity: 0.9;
+  }
+  20% {
+      transform: scale(1);
+      opacity: 0.1;
+  }
+  30% {
+      transform: scale(2);
+      opacity: 0.15;
+  }
+  40% {
+      transform: scale(3);
+      opacity: 0.2;
+  }
+  50% {
+      transform: scale(4);
+      opacity: 0.25;
+  }
+  60% {
+      transform: scale(5);
+      opacity: 0.3;
+  }
+  70% {
+      transform: scale(6);
+      opacity: 0.35;
+  }
+  80% {
+      transform: scale(7);
+      opacity: 0.4;
+  }
+  90% {
+    transform: scale(8.5);
+    opacity: 0.45;
+  }
+  100% {
+      transform: scale(10);
+      opacity: 0.5;
+  }
+}
+
+#breathe-line-gif {
+  position: absolute;
+
+  width:px-rem(270);
+  height: px-rem(100);
+  margin: px-rem(50);
+  z-index: -1;
+  bottom: px-rem(10);
+  left: px-rem(0);
+  /* -moz-border-radius: 50px;
+  -webkit-border-radius: 50px; */
+  border-radius: 50% / 100% 100% 0 0;
+  // -webkit-transform: rotate(45deg);  
+  // -ms-transform: rotate(45deg);  
+  // -o-transform: rotate(45deg);  
+  // transform: rotate(45deg);  
+
+  -webkit-animation: select-warn-c 3s ease-out;
+ -moz-animation: select-warn-c 3s ease-out;
+ animation: select-warn-c 3s ease-out;
+ -webkit-animation-iteration-count: infinite;
+ -moz-animation-iteration-count: infinite;
+ animation-iteration-count: infinite;
+//  background: linear-gradient(to top, rgba(252,184,19,1), rgba(255, 255, 255,0));
+ background: radial-gradient( at px-rem(135) px-rem(100),rgba(252,184,19,1) , rgba(0,0,0,0));
+ z-index: 999;
+}
+@keyframes select-warn-c {
+0% {
+   opacity: 0.1;
+}
+20% {
+   opacity: 0.15;
+}
+30% {
+   opacity: 0.2;
+}
+40% {
+   opacity: 0.25;
+}
+50% {
+   opacity: 0.3;
+}
+60% {
+   opacity: 0.25;
+}
+70% {
+   opacity: 0.2;
+}
+80% {
+   opacity: 0.15;
+}
+90% {
+ opacity: 0.1;
+}
+100% {
+   opacity: 0;
+}
+}
+
+/* 选中产生动画（向外扩散变大）的圆圈  */
+.select-pulse {
+  position: absolute;
+  width: 0px; 
+  height: 0px;
+  left: 2px;
+  top: 2px;
+  border: 6px solid rgb(252,184,19);
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  z-index: 1;
+  opacity: 0;
+  -webkit-animation: select-warn 3s ease-out;
+  -moz-animation: select-warn 3s ease-out;
+  animation: select-warn 3s ease-out;
+  -webkit-animation-iteration-count: 1;
+  -moz-animation-iteration-count: 1;
+  animation-iteration-count: 1;
+  animation-fill-mode : forwards;
+}
+
+#square {
+  width: 50px;
+  height: 50px;
+  background: red;
+  z-index: 10;
+  transform:rotate(9deg);
+  transition: all 3s;
+}
+
 .marker-marker-bus-from {
   position: relative;
   z-index: -100;
@@ -566,27 +765,27 @@ body,
               right: px-rem(76);
               transition: all 1s;
             }
-            .breathe-line-gif {
-              position: absolute;
-              width:px-rem(320);
-              height:px-rem(80);
-              // background: -webkit-linear-gradient(left, rgb(33, 34, 2) -4%,rgb(215, 218, 40) 50%,rgb(33, 34, 2) 100%);
-              // box-shadow:0 px-rem(-100) px-rem(50) yellow;
-              // -moz-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
-              // -webkit-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
-              // overflow:hidden;
-              // background-image:gradient(linear,left top,left bottom,from(rgb(215, 218, 40)),to(rgb(215, 218, 40)));
-              // animation-timing-function:ease-in-out;
-              // animation-name:breathe1;
-              // animation-duration:2700ms;
-              // animation-iteration-count:infinite;
-              // animation-direction:alternate;
-              margin: 0 auto;
-              z-index: -1;
-              bottom: px-rem(54);
-              left: px-rem(30);
-              // opacity: .6;
-            }
+            // .breathe-line-gif {
+            //   position: absolute;
+            //   width:px-rem(320);
+            //   height:px-rem(80);
+            //   // background: -webkit-linear-gradient(left, rgb(33, 34, 2) -4%,rgb(215, 218, 40) 50%,rgb(33, 34, 2) 100%);
+            //   // box-shadow:0 px-rem(-100) px-rem(50) yellow;
+            //   // -moz-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+            //   // -webkit-box-shadow: 0 px-rem(-100) px-rem(50) yellow;
+            //   // overflow:hidden;
+            //   // background-image:gradient(linear,left top,left bottom,from(rgb(215, 218, 40)),to(rgb(215, 218, 40)));
+            //   // animation-timing-function:ease-in-out;
+            //   // animation-name:breathe1;
+            //   // animation-duration:2700ms;
+            //   // animation-iteration-count:infinite;
+            //   // animation-direction:alternate;
+            //   margin: 0 auto;
+            //   z-index: -1;
+            //   bottom: px-rem(54);
+            //   left: px-rem(30);
+            //   // opacity: .6;
+            // }
             .breathe-line1 {
               position:relative;
               width:px-rem(320);
