@@ -90,6 +90,31 @@ body,
   transition: all 3s;
   transform:rotate(0deg);
   position: relative;
+  position:absolute;    
+  -webkit-animation-name: fadeInOut;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-duration: 3s;
+  -webkit-animation-direction: alternate;
+  animation-name: fadeInOut;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: 3s;
+  animation-direction: alternate;
+  @keyframes fadeInOut {
+    0% {
+      opacity:0;
+    }
+    25% {
+        opacity:0.3;
+    }
+    50% {
+        opacity: 0.7;    
+    }
+    75% {
+        opacity:1;
+    }
+  }
   #square-taji{
     height:px-rem(316); 
     width: px-rem(20); 
@@ -179,57 +204,76 @@ body,
   -webkit-border-radius: px-rem(200); 
   -moz-border-radius: px-rem(200); 
   border-radius: px-rem(200); 
-  z-index: 1;
-  background:rgba(252,184,19,0.5);
-  // -webkit-animation: warn 3s ease-out;
-  // -moz-animation: warn 3s ease-out;
-  // animation: warn 3s ease-out;
-  // -webkit-animation-iteration-count: infinite;
-  // -moz-animation-iteration-count: infinite;
-  // animation-iteration-count: infinite;
+  z-index: -100;
+  background:radial-gradient(rgba(252,184,19,0.2), rgba(252,184,19,0));
+  -webkit-animation-name: fadeInOut;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-duration: 3s;
+  -webkit-animation-direction: alternate;
+  animation-name: fadeInOut;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: 3s;
+  animation-direction: alternate;
+  @keyframes fadeInOut {
+    0% {
+        opacity:0;
+    }
+    25% {
+        opacity:0.3;
+    }
+    50% {
+        opacity: 0.7;    
+    }
+    75% {
+        opacity:1;
+    }
+  }
 }
 
 @keyframes select-warn {
   0% {
       transform: scale(0);
-      opacity: 0.9;
+      opacity: 0;
   }
   20% {
-      transform: scale(1);
-      opacity: 0.1;
+      transform: scale(3.2);
+      opacity: 0;
   }
   30% {
-      transform: scale(2);
-      opacity: 0.15;
+      transform: scale(4.2);
+      opacity: 0.1;
   }
   40% {
-      transform: scale(3);
+      transform: scale(5.2);
       opacity: 0.2;
   }
   50% {
-      transform: scale(4);
-      opacity: 0.25;
-  }
-  60% {
-      transform: scale(5);
+      transform: scale(6.2);
       opacity: 0.3;
   }
-  70% {
-      transform: scale(6);
-      opacity: 0.35;
-  }
-  80% {
-      transform: scale(7);
+  60% {
+      transform: scale(7.2);
       opacity: 0.4;
   }
+  70% {
+      transform: scale(8.2);
+      opacity: 0.3;
+  }
+  80% {
+      transform: scale(9.2);
+      opacity: 0.2;
+  }
   90% {
-    transform: scale(8.5);
-    opacity: 0.45;
+    transform: scale(10.2);
+    opacity: 0.1;
   }
   100% {
       transform: scale(11.2);
-      opacity: 0.5;
+      opacity: 0;
   }
+ 
 }
 
 #breathe-line-gif {
@@ -304,7 +348,43 @@ body,
   -moz-animation-iteration-count: infinite;
   animation-iteration-count: infinite;
   animation-fill-mode : forwards;
-  background-image: radial-gradient(rgba(252,184,19,1), rgba(252,184,19,0));
+  background: radial-gradient(rgba(252,184,19,1), rgba(252,184,19,0));
+}
+.select-pulse1 {
+  position: absolute;
+  width: px-rem(520); 
+  height: px-rem(520); 
+  left: px-rem(-15); 
+  top: px-rem(-65); 
+  -webkit-border-radius: px-rem(260); 
+  -moz-border-radius: px-rem(260); 
+  border-radius: px-rem(260); 
+  z-index: 1;
+  background:radial-gradient(rgba(252,184,19,0.5), rgba(252,184,19,0));
+  -webkit-animation-name: fadeInOut;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-duration: 3s;
+  -webkit-animation-direction: alternate;
+  animation-name: fadeInOut;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: 3s;
+  animation-direction: alternate;
+  @keyframes fadeInOut {
+    0% {
+      opacity:0;
+    }
+    25% {
+        opacity:0.3;
+    }
+    50% {
+        opacity: 0.7;    
+    }
+    75% {
+        opacity:1;
+    }
+  }
 }
 
 .marker-marker-bus-from {
@@ -647,8 +727,9 @@ body,
               span {
                   font-size: px-rem(28);
               }
+            white-space:nowrap;
             margin-top: px-rem(16);
-            width: px-rem(295);
+            width: px-rem(300);
             color: #ccc;
             text-overflow: -o-ellipsis-lastline;
             overflow: hidden;
@@ -770,9 +851,10 @@ body,
               color: #cccccc;
               margin-top: px-rem(16);
               position: absolute;
-              bottom: px-rem(8);
-              left:px-rem(65);
+              top: px-rem(198);
+              left:px-rem(5);
               z-index: 999;
+              width:px-rem(380);
             }
             .taji{
               width:px-rem(184);

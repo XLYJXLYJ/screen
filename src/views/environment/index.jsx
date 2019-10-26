@@ -953,7 +953,7 @@ class App extends Component {
       this.map = new AMap.Map("mapcontainer", {
         resizeEnable: true, // 是否监控地图容器尺寸变化，默认值为false
         zooms: [3, 18],
-        zoom: 14,
+        zoom: 18,
         animateEnable: true,
         jogEnable: true,
         mapStyle: "amap://styles/e82b537e91ee2e22c215325293b01d70" //设置地图的显示样式
@@ -1135,7 +1135,8 @@ class App extends Component {
       }
 
       this.state.equipmentList.map((item, index) => {
-        let canvasCircle = `<div class="select-pulse"></div>`
+        let canvasCircle = `<div class="select-pulse"></div>
+        <div class="select-pulse1"></div>`
           let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
           let pageX = 0.05, pageY = 0.05
           let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
@@ -1143,7 +1144,7 @@ class App extends Component {
             new AMap.Marker({
             content: canvasCircle,
             position: new AMap.LngLat(item.longitude, item.latitude),
-            offset: new AMap.Pixel(-27, -19),
+            offset: new AMap.Pixel(-32, -28),
             size: new AMap.Size(50, 60),
             zIndex: 99 - index,
             })
@@ -1172,7 +1173,7 @@ class App extends Component {
       if(this.state.actionEquipmentListIndex>3){
         let arr = Object.keys(this.refs)
         if(arr.length!=0){
-          this.refs.content.style.top = -7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
+          this.refs.content.style.top = -8.6 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
         }else{
           console.log(this.refs)
         }
@@ -1278,7 +1279,7 @@ class App extends Component {
             new AMap.Marker({
               content: canvasC,
               position: new AMap.LngLat(item.longitude, item.latitude),
-              offset: new AMap.Pixel(-24, -32),
+              offset: new AMap.Pixel(-30, -40),
               size: new AMap.Size(50, 60),
               zIndex: 999,
             })
@@ -1603,72 +1604,72 @@ class App extends Component {
       .then(re => {
         let res = re.data
         if (res.status == 200) {
-          // let data = res.response
-          let data =  {
-            mapList: [{longitude: "114.03322516505993", latitude: "22.567655873539117"},
-            {longitude: "114.05741734885589", latitude: "22.570405120994014"},
-            {longitude: "114.05873565456415", latitude: "22.563237148348076"},
-            {longitude: "114.078177646276", latitude: "22.527747225143692"},
-            {longitude: "114.07508774154371", latitude: "22.525589270430714"},
-            {longitude: "114.07957105383541", latitude: "22.51918457950339"},
-            {longitude: "114.05102564488274", latitude: "22.513942918144956"},
-            {longitude: "114.02808873488428", latitude: "22.54069176808944"}],
-            deviceList: [{
-              deviceName: "1 号塔机监测系统",
-              longitude: "114.0399936290864",
-              latitude: "22.547919658186872",
-              status: Math.ceil(Math.random()*2),
-              orderProductList: 2137,
-              alarmTimes: 2197,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:30-Math.ceil(Math.random()*30),
-              height:Math.ceil(Math.random()*30),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
-            }, 
-            {
-              deviceName: "2 号塔机监测系统",
-              longitude: "114.0440153808594",
-              latitude: "22.56797929382324",
-              status: Math.ceil(Math.random()*2),
-              orderProductList: 2197,
-              alarmTimes: 502,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:30-Math.ceil(Math.random()*30),
-              height:Math.ceil(Math.random()*30),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
-            }, 
-            {
-              deviceName: "3 号塔机监测系统",
-              longitude: "114.05853808556",
-              latitude: "22.54797929382318",
-              status: Math.ceil(Math.random()*2),
-              orderProductList: 197,
-              alarmTimes: 623,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:30-Math.ceil(Math.random()*30),
-              height:Math.ceil(Math.random()*30),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            },
-            {
-              deviceName: "4 号塔机监测系统",
-              longitude: "114.06453808556",
-              latitude: "22.56997929382318",
-              status: Math.ceil(Math.random()*2),
-              orderProductList: 297,
-              alarmTimes: 623,
-              rotary: Math.ceil(Math.random()*360),
-              amplitude:30-Math.ceil(Math.random()*30),
-              height:Math.ceil(Math.random()*30),
-              heavy:Math.ceil(Math.random()*100),
-              img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-              deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            },
+          let data = res.response
+          // let data =  {
+          //   mapList: [{longitude: "114.03322516505993", latitude: "22.567655873539117"},
+          //   {longitude: "114.05741734885589", latitude: "22.570405120994014"},
+          //   {longitude: "114.05873565456415", latitude: "22.563237148348076"},
+          //   {longitude: "114.078177646276", latitude: "22.527747225143692"},
+          //   {longitude: "114.07508774154371", latitude: "22.525589270430714"},
+          //   {longitude: "114.07957105383541", latitude: "22.51918457950339"},
+          //   {longitude: "114.05102564488274", latitude: "22.513942918144956"},
+          //   {longitude: "114.02808873488428", latitude: "22.54069176808944"}],
+          //   deviceList: [{
+          //     deviceName: "1 号塔机监测系统",
+          //     longitude: "114.0399936290864",
+          //     latitude: "22.547919658186872",
+          //     status: Math.ceil(Math.random()*2),
+          //     orderProductList: 2137,
+          //     alarmTimes: 2197,
+          //     rotary: Math.ceil(Math.random()*360),
+          //     amplitude:30-Math.ceil(Math.random()*30),
+          //     height:Math.ceil(Math.random()*30),
+          //     heavy:Math.ceil(Math.random()*100),
+          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          //     deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
+          //   }, 
+          //   {
+          //     deviceName: "2 号塔机监测系统",
+          //     longitude: "114.0440153808594",
+          //     latitude: "22.56797929382324",
+          //     status: Math.ceil(Math.random()*2),
+          //     orderProductList: 2197,
+          //     alarmTimes: 502,
+          //     rotary: Math.ceil(Math.random()*360),
+          //     amplitude:30-Math.ceil(Math.random()*30),
+          //     height:Math.ceil(Math.random()*30),
+          //     heavy:Math.ceil(Math.random()*100),
+          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          //     deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
+          //   }, 
+          //   {
+          //     deviceName: "3 号塔机监测系统",
+          //     longitude: "114.05853808556",
+          //     latitude: "22.54797929382318",
+          //     status: Math.ceil(Math.random()*2),
+          //     orderProductList: 197,
+          //     alarmTimes: 623,
+          //     rotary: Math.ceil(Math.random()*360),
+          //     amplitude:30-Math.ceil(Math.random()*30),
+          //     height:Math.ceil(Math.random()*30),
+          //     heavy:Math.ceil(Math.random()*100),
+          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+          //   },
+          //   {
+          //     deviceName: "4 号塔机监测系统",
+          //     longitude: "114.06453808556",
+          //     latitude: "22.56997929382318",
+          //     status: Math.ceil(Math.random()*2),
+          //     orderProductList: 297,
+          //     alarmTimes: 623,
+          //     rotary: Math.ceil(Math.random()*360),
+          //     amplitude:30-Math.ceil(Math.random()*30),
+          //     height:Math.ceil(Math.random()*30),
+          //     heavy:Math.ceil(Math.random()*100),
+          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
+          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
+          //   },
             // {
             //   deviceName: "5 号塔机监测系统",
             //   longitude: "114.07853808556",
@@ -1697,7 +1698,7 @@ class App extends Component {
             //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
             //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
             // }
-          ]}
+          // ]}
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
             return [item.longitude, item.latitude]
@@ -1736,7 +1737,7 @@ class App extends Component {
                 }
                 if (data.mapList) {
                     !this.map && this.initEquipmentList();
-                    // this.map && this.initMap();
+                   
 
                     //初始化24小时设置告警 环形图
                     // console.log("初始化24小时设置告警 环形图", this.state.equipmentList, this.state.actionEquipmentListIndex, this.state.equipmentList[this.state.actionEquipmentListIndex].alarmTimes)
@@ -2031,16 +2032,19 @@ class App extends Component {
             </div>
 
             <div className="left-middle">
-            {this.state.endIndicators
-                ? this.state.endIndicators.map((item, index) => {
-                  return (
-                    item.indicatorName == '防撞' ? 
-                      (item.indicatorValue == '已启用' ? 
-                      (<div key={index}><img src={require("../../assets/images/yes.png")} alt=""/><span>防撞已启用</span></div>) 
-                      : (<div key={index}><img src={require("../../assets/images/no.png")} alt=""/><span>防撞未启用</span></div>))
+            {this.state.startIndicators
+                ?
+               
+                  this.state.startIndicators[8].status == 1 
+                  ? 
+
+                  (<div><img src={require("../../assets/images/yes.png")} alt=""/><span>防撞已启用</span></div>)  
+                      
+                  : this.state.startIndicators[8].status == 0 
+                    ?(<div><img src={require("../../assets/images/no.png")} alt=""/><span>防撞未启用</span></div>)
                     :''
-                  )
-                }):(<div><img src={require("../../assets/images/no.png")} alt=""/><span>防撞未启用</span></div>)
+             
+                :''
               }
             </div>
 
