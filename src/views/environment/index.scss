@@ -83,13 +83,16 @@ body,
   }
 }
 
+// #squre-contain-1{
+//   position:absolute;
+//   transform:rotate(90deg);
+// }
 #squre-contain{
   width: px-rem(480); 
   height: px-rem(480); 
   border-radius:  px-rem(240);
   transition: all 3s;
   transform:rotate(0deg);
-  position: relative;
   position:absolute;    
   -webkit-animation-name: fadeInOut;
   -webkit-animation-timing-function: ease-in-out;
@@ -101,6 +104,7 @@ body,
   animation-iteration-count: 1;
   animation-duration: 3s;
   animation-direction: alternate;
+  margin: 0 auto;
   @keyframes fadeInOut {
     0% {
       opacity:0;
@@ -979,7 +983,7 @@ body,
       .warn-24th-numtitle {
         font-size: px-rem(40);
         position: relative;
-        top: px-rem(-28);
+        top: px-rem(28);
         color: #ccc;
       }
 
@@ -987,7 +991,7 @@ body,
         color: #fff;
         font-size: px-rem(100);
         position: relative;
-        top: px-rem(-58);
+        top: px-rem(43);
         .warn-24th-li {
           // margin-bottom: px-rem(-15);
           .warn-num {

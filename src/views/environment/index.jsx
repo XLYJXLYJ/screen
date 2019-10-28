@@ -91,7 +91,8 @@ class MarqueeWrap extends Component {
                 style={this.props.styleCss}
                 className="marquee-wrap-marquee"
                 behavior=""
-                scrolldelay="10"
+                truespeed = "true"
+                scrolldelay="400"
                 direction={this.props.marqueeDirection}
                 scrollamount={this.props.scrollamount}
             >
@@ -246,7 +247,8 @@ class App extends Component {
       mapPolygonPath: [],
       //指标数据
       indicators: "",
-      startIndicators: "", //开始指标数据
+      startIndicators: "", // 开始指标数据
+      startIndicators_90:"", // 解决旋转问题
       endIndicators: "",
       //设备列表
       equipmentList: [],
@@ -953,7 +955,7 @@ class App extends Component {
       this.map = new AMap.Map("mapcontainer", {
         resizeEnable: true, // 是否监控地图容器尺寸变化，默认值为false
         zooms: [3, 18],
-        zoom: 18,
+        zoom: 1,
         animateEnable: true,
         jogEnable: true,
         mapStyle: "amap://styles/e82b537e91ee2e22c215325293b01d70" //设置地图的显示样式
@@ -1078,7 +1080,7 @@ class App extends Component {
             context.closePath();
             //小球
             context.beginPath();
-            context.arc(10+item.amplitude*2.9, 0.5, 2, 0, 360, false);
+            context.arc(12+item.amplitude*1.5, 0.5, 2, 0, 360, false);
             context.fillStyle = "rgb(252,184,19)";
             context.fill();
             context.stroke();
@@ -1102,11 +1104,12 @@ class App extends Component {
               position: new AMap.LngLat(item.longitude, item.latitude),
               offset: new AMap.Pixel(-19, -27),
               size: new AMap.Size(50, 59),
-              zIndex: 999,
+              zIndex: -999,
             })
           )
         }
     })
+    
     this.map.add(this.markerList)
   }
 
@@ -1259,7 +1262,7 @@ class App extends Component {
             new AMap.Marker({
               content: content,
               position: new AMap.LngLat(item.longitude, item.latitude),
-              offset: new AMap.Pixel(-23, 40),
+              offset: new AMap.Pixel(-43, 40),
               size: new AMap.Size(40, 50),
               zIndex: -100,
             })
@@ -1308,6 +1311,7 @@ class App extends Component {
       bounds: this.map.getBounds(),
       url: mapbg,
       zIndex: 2,
+      zoom: 18,
       zooms: [3, 18] // 设置可见级别，[最小级别，最大级别]
     })
     this.map.add(imageLayer)
@@ -1515,6 +1519,7 @@ class App extends Component {
         setTimeout(() => {
           this.setState({
             startIndicators: this.state.indicators.newInd,
+            startIndicators_90:parseInt(this.state.indicators.newInd[4].indicatorValue) + 90,
             endIndicators: this.state.indicators.oldInd
           })
         }, (1000 * time) / 2)
@@ -1772,7 +1777,8 @@ class App extends Component {
             this.setState({
               indicators: data,
               startIndicators: data.newInd ? data.newInd : backData.oldInd,
-              // this.state.startIndicators
+              startIndicators_90: parseInt(data.newInd[4]) + 90 ?parseInt(data.newInd[4].indicatorValue) + 90 : parseInt(backData.oldInd[4].indicatorValue) + 90,
+              // this.state.startIndicators.indicatorValue
               //   ? this.state.endIndicators
               //   : backData.newInd.map(e => {
               //     e.indicatorValue = '-'
@@ -2143,20 +2149,20 @@ class App extends Component {
                         <li className='content' key={index}>
                           {
                             item.height>23 ? (
-                              <div className='number' style={{top:+item.height-4,left:-item.amplitude+34}}>
+                              <div className='number' style={{top:+item.height-4,left:(-item.amplitude+36)*0.8}}>
                                 <span>{item.heavy}t</span><br/>
                                 <span>{item.height}m</span><br/>
                               </div>
                             ) : (
-                              <div className='number' style={{top:+item.height+10,left:-item.amplitude+34}}>
+                              <div className='number' style={{top:+item.height+10,left:(-item.amplitude+36)*0.8}}>
                                 <span>{item.heavy}t</span><br/>
                                 <span>{item.height}m</span><br/>
                               </div>
                             )
                           }
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                          <img className='line'  style={{height:+item.height+4,left:-item.amplitude+56}} src={require("../../assets/images/line.png")} alt=""/>
-                          <img className='thing' style={{top:+item.height+10,left:-item.amplitude+54}} src={require("../../assets/images/thing.png")} alt=""/>
+                          <img className='line'  style={{height:parseInt(+item.height)*0.8+3,left:parseInt(parseInt(-item.amplitude+106)*0.7)-9}} src={require("../../assets/images/line.png")} alt=""/>
+                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9,left:parseInt(parseInt(-item.amplitude+104)*0.7)-9}} src={require("../../assets/images/thing.png")} alt=""/>
                           <div id="breathe-line-gif" style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <p>{item.deviceName}</p>
@@ -2174,14 +2180,16 @@ class App extends Component {
 
             {this.state.endIndicators
                 ? (
-                  <div ref='square' id='squre-contain' style={{transform:`rotate(${this.state.startIndicators[4].indicatorValue}deg)`}}>
-                    <div id="square">
+       
+                    <div ref='square' id='squre-contain' style={{transform:`rotate(${this.state.startIndicators_90}deg)`}}>
+                      <div id="square">
+                      </div>
+                      <div id='square-taji-contain'>
+                        <img id='square-taji' src={require("../../assets/images/bi.png")} alt=""/>
+                        <div id="circle" style={{top:`${this.state.startIndicators[2].indicatorValue * 0.25}px` }}></div>
+                      </div>
                     </div>
-                    <div id='square-taji-contain'>
-                      <img id='square-taji' src={require("../../assets/images/bi.png")} alt=""/>
-                      <div id="circle" style={{left:this.state.startIndicators[2].indicatorValue}}></div>
-                    </div>
-                  </div>
+          
                 ):                
                 <div ref='square' id='squre-contain'>
                   <div id="square">
@@ -2248,8 +2256,7 @@ class App extends Component {
                 ? this.state.warnStatistic.indicatorWarnList.map(
                   (item, index) => {
                     return (
-                      item.indicatorName !== '幅度'?
-                      (<div className="warn-24th-li" key={index}>
+                      <div className="warn-24th-li" key={index}>
                         <div className="warn-num">
                           <span className="warn-name">
                             {item.indicatorName}
@@ -2268,7 +2275,7 @@ class App extends Component {
                             />
                           }
                         </div>
-                      </div>):''
+                      </div>
                     )
                   }
                 )
