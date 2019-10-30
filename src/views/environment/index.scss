@@ -201,8 +201,8 @@ body,
 /* 未选中产生动画（向外扩散变大）的圆圈  */
 .pulse {
   position: absolute;
-  width: px-rem(400); 
-  height: px-rem(400); 
+  width: px-rem(390); 
+  height: px-rem(390); 
   left: px-rem(-170); 
   top: px-rem(-170); 
   -webkit-border-radius: px-rem(200); 
@@ -356,8 +356,8 @@ body,
 }
 .select-pulse1 {
   position: absolute;
-  width: px-rem(520); 
-  height: px-rem(520); 
+  width: px-rem(526); 
+  height: px-rem(526); 
   left: px-rem(-15); 
   top: px-rem(-65); 
   -webkit-border-radius: px-rem(260); 
@@ -393,7 +393,7 @@ body,
 
 .marker-marker-bus-from {
   position: relative;
-  z-index: -100;
+  z-index: -999;
   top:px-rem(-40);
 
   .marker-target {
@@ -404,7 +404,7 @@ body,
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
-    z-index: -100
+    z-index: -999;
   }
 
   .marker-marker-name {
@@ -828,6 +828,7 @@ body,
             transition: all 1.5s;
             top:px-rem(14);
             z-index: 999;
+            white-space: nowrap;
             .number{
               position: absolute;
               background: #FCB813;
@@ -972,8 +973,12 @@ body,
         font-size: px-rem(100);
         font-weight: bold;
         height: px-rem(400);
+        // padding-top: px-rem(0);
+        z-index: 999;
+        position: relative;
+        // top: px-rem(80);
         // font-family: AvenirNext;
-
+        
         #proportion-24th {
           height: 100%;
           // font-family: AvenirNext;
@@ -983,7 +988,7 @@ body,
       .warn-24th-numtitle {
         font-size: px-rem(40);
         position: relative;
-        top: px-rem(28);
+        top: px-rem(29);
         color: #ccc;
       }
 

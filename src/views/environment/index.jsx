@@ -214,26 +214,13 @@ class App extends Component {
     this.columnarAmplitude = null //PMTSP 7天柱状图对象
     this.proportion24th = null //24小时报警次数饼图对象
 
-    this.figureOfBreadChart = null // 图饼图对象-成员数量
-
     this.markerList = [] // 地图标准列表
     this.removeMarkerList = [] // 需要移除的地图列表
     this.markerListCircle = [] // 地图光圈
     this.removeMarkerListCircle = [] // 移除选中地图光圈
     this.markerListText = '' // 地图文字列表
-    this.changeCircle = '' // 清楚变大圆的定时器
-    this.aMapPolygon = null // 地图矩形对象
-    this.aMapPolygonBottom = null
-    this.brokenLineLableIndex = [] // 标注的索引
-    this.oldMapPolygonPath = "" // 上一次黄色区域经纬度
-    this.bannerTime = null // banner轮播
-    this.equipmentListTime01 = [] // 发光设备定时器
-    this.equipmentListTime02 = [] // 转动设备定时器
-    this.oldIndicators1 = '' // 旧值
-    this.startIndicators1 = '' // 新值
-    this.ulTop = ''
+
     this.state = {
-      equipmentListAnimation: true, // 设备动画
       projectName: "", // 项目名称
       logo: "", // logo图片
       // projectNameStatus: true, // 项目名称样式
@@ -721,10 +708,10 @@ class App extends Component {
 
     this.proportion24th.render()
 
-    let OFFSET = 20 //控制第一次折线长度
-    let APPEND_OFFSET = 95 //控制第二次折线的长度  越小越长
-    let LINEHEIGHT = 0
-    let yellowAngle = .5 //黄色环第一次折线角度
+    let OFFSET = 10 //控制第一次折线长度
+    let APPEND_OFFSET = 92 //控制第二次折线的长度  越小越长
+    let LINEHEIGHT = 8
+    let yellowAngle = .2 //黄色环第一次折线角度
     let coord = this.proportion24th.get("coord") // 获取坐标系对象
     let center = coord.center // 极坐标圆心坐标
     let r = coord.radius // 极坐标半径
@@ -764,12 +751,12 @@ class App extends Component {
           _router: routerPoint,
           _data: data[i],
           x: routerPoint.x,
-          y: routerPoint.y,
+          y: routerPoint.y-2,
           r: r + OFFSET,
           fill
         }
         // 判断文本的方向
-        label._side = "left"
+        label._side = "right"
         halves[0].push(label)
       } // end of for
 
@@ -954,8 +941,9 @@ class App extends Component {
 
       this.map = new AMap.Map("mapcontainer", {
         resizeEnable: true, // 是否监控地图容器尺寸变化，默认值为false
-        zooms: [3, 18],
-        zoom: 1,
+        expandZoomRange:true,
+        zoom:20,
+        zooms:[3,20],
         animateEnable: true,
         jogEnable: true,
         mapStyle: "amap://styles/e82b537e91ee2e22c215325293b01d70" //设置地图的显示样式
@@ -1040,7 +1028,6 @@ class App extends Component {
     this.map.remove(this.markerList)
     this.removeMarkerList = []
     this.markerList = []
-    this.equipmentListTime01 = []
 
     if(this.markerList.length !== 0){
       // this.state.equipmentList.forEach((item, index) => {
@@ -1104,7 +1091,7 @@ class App extends Component {
               position: new AMap.LngLat(item.longitude, item.latitude),
               offset: new AMap.Pixel(-19, -27),
               size: new AMap.Size(50, 59),
-              zIndex: -999,
+              zIndex: 99 - index,
             })
           )
         }
@@ -1149,7 +1136,7 @@ class App extends Component {
             position: new AMap.LngLat(item.longitude, item.latitude),
             offset: new AMap.Pixel(-32, -28),
             size: new AMap.Size(50, 60),
-            zIndex: 99 - index,
+            zIndex: 999 - index,
             })
           )
 
@@ -1176,7 +1163,7 @@ class App extends Component {
       if(this.state.actionEquipmentListIndex>3){
         let arr = Object.keys(this.refs)
         if(arr.length!=0){
-          this.refs.content.style.top = -8.6 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
+          this.refs.content.style.top = -8.7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
         }else{
           console.log(this.refs)
         }
@@ -1208,7 +1195,6 @@ class App extends Component {
       }
 
       this.markerListCircle = []
-      this.equipmentListTime01 = []
       this.state.equipmentList.forEach((item, index) => {
           //光圈开始
           let canvasC = `<div class="pulse"></div>`
@@ -1218,7 +1204,7 @@ class App extends Component {
               position: new AMap.LngLat(item.longitude, item.latitude),
               offset: new AMap.Pixel(22, 14),
               size: new AMap.Size(50, 60),
-              zIndex: 99 - index,
+              zIndex: 0 - index,
             })
           )
       })
@@ -1264,7 +1250,7 @@ class App extends Component {
               position: new AMap.LngLat(item.longitude, item.latitude),
               offset: new AMap.Pixel(-43, 40),
               size: new AMap.Size(40, 50),
-              zIndex: -100,
+              zIndex: 99 - index,
             })
           )
         })
@@ -1284,7 +1270,7 @@ class App extends Component {
               position: new AMap.LngLat(item.longitude, item.latitude),
               offset: new AMap.Pixel(-30, -40),
               size: new AMap.Size(50, 60),
-              zIndex: 999,
+              zIndex: 999 - index,
             })
           )
         }
@@ -1294,7 +1280,7 @@ class App extends Component {
 
   //画定位2d图形
   map2D() {
-    new AMap.Polygon({
+    let polygon = new AMap.Polygon({
       fillOpacity: 0,
       strokeWeight: 0,
       path: Object.assign([], this.state.mapPolygonPath),
@@ -1302,6 +1288,8 @@ class App extends Component {
       fillColor: 'rgba(252, 184, 19,0)',
       map: this.map
     })
+    console.log(polygon)
+    // this.map.add(polygon)
     this.map.setFitView()
   }
   // 画方格
@@ -1311,8 +1299,9 @@ class App extends Component {
       bounds: this.map.getBounds(),
       url: mapbg,
       zIndex: 2,
-      zoom: 18,
-      zooms: [3, 18] // 设置可见级别，[最小级别，最大级别]
+      expandZoomRange:true,
+      zoom:20,
+      zooms:[3,20],
     })
     this.map.add(imageLayer)
   }
@@ -1345,7 +1334,9 @@ class App extends Component {
       let canvas2 = document.createElement("canvas")
       //   第一层
       let customLayer = new AMap.CustomLayer(canvas, {
-        zooms: [3, 18],
+        expandZoomRange:true,
+        zoom:20,
+        zooms:[3,20],
         alwaysRender: true, //缩放过程中是否重绘，复杂绘制建议设为false
         zIndex: 0
       })
@@ -1413,7 +1404,9 @@ class App extends Component {
       }
       //   第二层 - 下方阴影
       let customLayer2 = new AMap.CustomLayer(canvas2, {
-        zooms: [3, 18],
+        expandZoomRange:true,
+        zoom:20,
+        zooms:[3,20],
         alwaysRender: true, //缩放过程中是否重绘，复杂绘制建议设为false
         zIndex: 0
       })
@@ -1473,10 +1466,6 @@ class App extends Component {
         equipmentList: []
       })
       window.clearInterval(this.equipmentListTime)
-
-      for(let i=0;i<this.equipmentListTime01.length;i++){
-        window.clearInterval(this.equipmentListTime01[i])
-      }
 
       this.equipmentListTime = null
       this.map && this.initMap()
@@ -1777,7 +1766,7 @@ class App extends Component {
             this.setState({
               indicators: data,
               startIndicators: data.newInd ? data.newInd : backData.oldInd,
-              startIndicators_90: parseInt(data.newInd[4]) + 90 ?parseInt(data.newInd[4].indicatorValue) + 90 : parseInt(backData.oldInd[4].indicatorValue) + 90,
+              startIndicators_90: data.newInd ?parseInt(data.newInd[4].indicatorValue) + 90 : parseInt(backData.oldInd[4].indicatorValue) + 90,
               // this.state.startIndicators.indicatorValue
               //   ? this.state.endIndicators
               //   : backData.newInd.map(e => {
@@ -1786,9 +1775,10 @@ class App extends Component {
               //   }),
               endIndicators: data.oldInd ? data.oldInd : backData.newInd
             },()=>{
+              console.log('')
               // console.log(this.state.indicators,this.state.startIndicators, this.state.endIndicators)
               // this.selMapMarker()
-            })
+            });
         }
       }).catch(error => {
         if (this.state.footerInfoStatus !== 'noNetwork') {
@@ -2135,6 +2125,31 @@ class App extends Component {
           </div>
           <div className="app-content-center">
             {/* 地图 start */}
+
+            <div>
+                {this.state.endIndicators
+                    ? (
+                        <div ref='square' id='squre-contain' style={{transform:`rotate(${this.state.startIndicators_90}deg)`}}>
+                          <div id="square">
+                          </div>
+                          <div id='square-taji-contain'>
+                            <img id='square-taji' src={require("../../assets/images/bi.png")} alt=""/>
+                            <div id="circle" style={{top:`${this.state.startIndicators[2].indicatorValue * 0.25}px` }}></div>
+                          </div>
+                        </div>
+                    ):                
+                    <div ref='square' id='squre-contain'>
+                      <div id="square">
+                      </div>
+                      <div id='square-taji-contain'>
+                        <img id='square-taji' src={require("../../assets/images/bi.png")} alt=""/>
+                        <div id="circle"></div>
+                      </div>
+                    </div>
+                  }
+              </div>
+
+
             <div className="content-right-map">
               <div id="mapcontainer">
               </div>
@@ -2147,22 +2162,23 @@ class App extends Component {
                     (item,index)=>{
                       return(
                         <li className='content' key={index}>
-                          {
+                            {
+                            item.heavy == null ? '' :
                             item.height>23 ? (
-                              <div className='number' style={{top:+item.height-4,left:(-item.amplitude+36)*0.8}}>
-                                <span>{item.heavy}t</span><br/>
-                                <span>{item.height}m</span><br/>
+                              <div className='number' style={{top:+item.height-4,left:(-item.amplitude+56)*0.8}}>
+                                <span>{parseInt(item.heavy)}t</span><br/>
+                                <span>{parseInt(item.height)}m</span><br/>
                               </div>
                             ) : (
-                              <div className='number' style={{top:+item.height+10,left:(-item.amplitude+36)*0.8}}>
-                                <span>{item.heavy}t</span><br/>
-                                <span>{item.height}m</span><br/>
+                              <div className='number' style={{top:+item.height+10,left:(-item.amplitude+56)*0.8}}>
+                                <span>{parseInt(item.heavy)}t</span><br/>
+                                <span>{parseInt(item.height)}m</span><br/>
                               </div>
                             )
                           }
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
                           <img className='line'  style={{height:parseInt(+item.height)*0.8+3,left:parseInt(parseInt(-item.amplitude+106)*0.7)-9}} src={require("../../assets/images/line.png")} alt=""/>
-                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9,left:parseInt(parseInt(-item.amplitude+104)*0.7)-9}} src={require("../../assets/images/thing.png")} alt=""/>
+                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9,left:parseInt(parseInt(-item.amplitude+100)*0.7)-7}} src={require("../../assets/images/thing.png")} alt=""/>
                           <div id="breathe-line-gif" style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <p>{item.deviceName}</p>
@@ -2176,31 +2192,6 @@ class App extends Component {
             </div>
             </div>
             {/* 地图 end */}
-            <div>
-
-            {this.state.endIndicators
-                ? (
-       
-                    <div ref='square' id='squre-contain' style={{transform:`rotate(${this.state.startIndicators_90}deg)`}}>
-                      <div id="square">
-                      </div>
-                      <div id='square-taji-contain'>
-                        <img id='square-taji' src={require("../../assets/images/bi.png")} alt=""/>
-                        <div id="circle" style={{top:`${this.state.startIndicators[2].indicatorValue * 0.25}px` }}></div>
-                      </div>
-                    </div>
-          
-                ):                
-                <div ref='square' id='squre-contain'>
-                  <div id="square">
-                  </div>
-                  <div id='square-taji-contain'>
-                    <img id='square-taji' src={require("../../assets/images/bi.png")} alt=""/>
-                    <div id="circle"></div>
-                  </div>
-                </div>
-              }
-              </div>
           </div>
           <div className="app-content-right">
             <div className="warn-info-title">报警信息统计</div>
