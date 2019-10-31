@@ -775,7 +775,8 @@ body,
         height: 100%;
         border-radius: px-rem(16);
         overflow: hidden;
-
+        position: relative;
+        top: px-rem(-150);
         .brokenlin-container-num {
           background-color: yellow;
           color: #000;

@@ -596,19 +596,36 @@ class App extends Component {
   //初始化24th 设备告警次数
   initProportion24th() {
     this.proportion24th && this.proportion24th.destroy()
+
+    
     let _r = 255
     let _lineR = 255
     function pxRem(num) {
       return num / 38.4 + "rem"
     }
-    let startAngle = -Math.PI / 2 - Math.PI
-    let height = this.proportionDom.current.offsetHeight
+    let startAngle = -Math.PI/2 - Math.PI //开始角度
 
+    let height = this.proportionDom.current.offsetHeight+20
     let indexVal = this.state.equipmentList[this.state.actionEquipmentListIndex].orderProductList //选中值
     let total = Object.assign([], this.state.equipmentList).reduce((a, b) => {
       return a + b.alarmTimes
     }, 0)
-    let equipmentList = JSON.parse(JSON.stringify(this.state.equipmentList))
+
+    let copyData = JSON.parse(JSON.stringify(this.state.equipmentList))
+    console.log(copyData);
+    let equipmentList = [];
+    copyData.map(item =>{
+      if(item.alarmTimes==0 || item.bindStatus==4){ //报警次数为0 或 未绑定
+        return false
+      }else{
+        equipmentList.push(item);
+      }
+    })
+
+    if(equipmentList.length<=0){
+      return;
+    }
+
     //所有设置报警次数都是等于0  :平分甜甜圈🍩
     let isAllZeo = equipmentList.every(e => e.alarmTimes == 0)
     isAllZeo && equipmentList.forEach(e => e.alarmTimes = 10)
@@ -616,6 +633,7 @@ class App extends Component {
     if (this.state.actionEquipmentListIndex != 0) {
       equipmentList.splice(0, 0, equipmentList.splice(this.state.actionEquipmentListIndex, 1)[0]) //选中设备放到数组第一位
     }
+
     let ds = new DataSet()
     let dv = ds.createView().source(equipmentList)
     dv.transform({
@@ -655,7 +673,11 @@ class App extends Component {
           return "rgba(0,0,0,0)"
         } else {
           let rgb = `rgb(${_r}, ${_r}, ${_r})`
-          _r = _r - 50
+          if(_r>50){
+            _r = _r - 50
+          }else{
+            _r = 250
+          }
           return rgb
         }
       })
@@ -671,7 +693,7 @@ class App extends Component {
               fill: "#000",
               textBaseline: 'middle',
               textAlign: 'center',
-              fontSize: 8
+              fontSize: 10
             }
           }
           : null
@@ -708,10 +730,10 @@ class App extends Component {
 
     this.proportion24th.render()
 
-    let OFFSET = 10 //控制第一次折线长度
-    let APPEND_OFFSET = 92 //控制第二次折线的长度  越小越长
-    let LINEHEIGHT = 8
-    let yellowAngle = .2 //黄色环第一次折线角度
+    let OFFSET = 20 //控制第一次折线长度
+    let APPEND_OFFSET = 95 //控制第二次折线的长度  越小越长
+    let LINEHEIGHT = 12 //行高 - 让数据平均分布
+    let yellowAngle = 0.3 //黄色环第一次折线角度
     let coord = this.proportion24th.get("coord") // 获取坐标系对象
     let center = coord.center // 极坐标圆心坐标
     let r = coord.radius // 极坐标半径
@@ -730,11 +752,11 @@ class App extends Component {
       let fill = "#fcb813"
       for (let i = 0; i < data.length; i++) {
         let isYellow = data[i].orderProductList == indexVal //黄色部分
-        OFFSET = isYellow ? 20 : 10 //控制第一次折线长度
+        OFFSET = isYellow ? OFFSET : 10 //控制第一次折线长度
         let percent = data[i].percent
         let targetAngle = angle + Math.PI * 2 * percent
         let middleAngle =
-          angle + (isYellow ? 0 : (targetAngle - angle) / 1.5)
+          angle + (isYellow ? 0 : (targetAngle - angle) / 3) //调节高度间隔
         angle = targetAngle
         let edgePoint = getEndPoint(center, middleAngle, r + (isYellow ? 5 : 0))//折线离环的距离
         let routerPoint = getEndPoint(center, middleAngle - (isYellow ? yellowAngle : 0), r + OFFSET)
@@ -751,12 +773,12 @@ class App extends Component {
           _router: routerPoint,
           _data: data[i],
           x: routerPoint.x,
-          y: routerPoint.y-2,
+          y: routerPoint.y,
           r: r + OFFSET,
           fill
         }
         // 判断文本的方向
-        label._side = "right"
+        label._side = "left"
         halves[0].push(label)
       } // end of for
 
@@ -1202,7 +1224,7 @@ class App extends Component {
             new AMap.Marker({
               content: canvasC,
               position: new AMap.LngLat(item.longitude, item.latitude),
-              offset: new AMap.Pixel(22, 14),
+              offset: new AMap.Pixel(24, 14),
               size: new AMap.Size(50, 60),
               zIndex: 0 - index,
             })
@@ -1248,7 +1270,7 @@ class App extends Component {
             new AMap.Marker({
               content: content,
               position: new AMap.LngLat(item.longitude, item.latitude),
-              offset: new AMap.Pixel(-43, 40),
+              offset: new AMap.Pixel(-42, 40),
               size: new AMap.Size(40, 50),
               zIndex: 99 - index,
             })
@@ -2165,20 +2187,20 @@ class App extends Component {
                             {
                             item.heavy == null ? '' :
                             item.height>23 ? (
-                              <div className='number' style={{top:+item.height-4,left:(-item.amplitude+56)*0.8}}>
+                              <div className='number' style={{top:(+item.height-4)*0.8>32?32:(+item.height-4)*0.8,left:(-item.amplitude+56)*0.8}}>
                                 <span>{parseInt(item.heavy)}t</span><br/>
                                 <span>{parseInt(item.height)}m</span><br/>
                               </div>
                             ) : (
-                              <div className='number' style={{top:+item.height+10,left:(-item.amplitude+56)*0.8}}>
+                              <div className='number' style={{top:(+item.height+10)*0.8>32?32:(+item.height+10)*0.8,left:(-item.amplitude+56)*0.8}}>
                                 <span>{parseInt(item.heavy)}t</span><br/>
                                 <span>{parseInt(item.height)}m</span><br/>
                               </div>
                             )
                           }
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                          <img className='line'  style={{height:parseInt(+item.height)*0.8+3,left:parseInt(parseInt(-item.amplitude+106)*0.7)-9}} src={require("../../assets/images/line.png")} alt=""/>
-                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9,left:parseInt(parseInt(-item.amplitude+100)*0.7)-7}} src={require("../../assets/images/thing.png")} alt=""/>
+                          <img className='line'  style={{height:parseInt(+item.height)*0.8+3>40?40:parseInt(+item.height)*0.8+3,left:parseInt(parseInt(-item.amplitude+106)*0.7)-9}} src={require("../../assets/images/line.png")} alt=""/>
+                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9>46?46:parseInt(+item.height)*0.8+9,left:parseInt(parseInt(-item.amplitude+100)*0.7)-7}} src={require("../../assets/images/thing.png")} alt=""/>
                           <div id="breathe-line-gif" style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <p>{item.deviceName}</p>
