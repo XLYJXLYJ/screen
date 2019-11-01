@@ -133,15 +133,15 @@ body,
       border-radius: px-rem(4); 
     }
     #circle{
-      width: px-rem(16);  
-      height: px-rem(16);  
+      width: px-rem(15);  
+      height: px-rem(15);  
       background: rgb(252,184,19); 
       border-radius: px-rem(20); 
       transition: all 3s;
       transform:rotate(0deg);
       position: relative;
-      left:px-rem(224);
-      top:px-rem(122);
+      left:px-rem(225);
+      top:px-rem(102);
     }
   }
 
@@ -821,7 +821,7 @@ body,
 
         .app-content-bottom-content-1{
           position: relative;
-          transition: all 1.5s;
+          transition: all 4s;
           .content{
             height: px-rem(254);
             width: px-rem(400);
@@ -831,7 +831,7 @@ body,
             float:left;
             margin-right: px-rem(40);
             margin-bottom: px-rem(80);
-            transition: all 1.5s;
+            transition: all 4s;
             top:px-rem(14);
             z-index: 999;
             white-space: nowrap;
@@ -848,7 +848,7 @@ body,
               padding-right: px-rem(7);
               font-family: AvenirNext;
               text-align: left;
-              transition: all 1.5s;
+              transition: all 4s;
               span{
                 // font-family: AvenirNextCondensed-Bold;
                 color: #222233;
@@ -881,7 +881,7 @@ body,
               left:px-rem(76);
               top: px-rem(44);
               right: px-rem(76);
-              transition: all 1.5s;
+              transition: all 4s;
             }
             .breathe-line {
               position:relative;
@@ -922,7 +922,7 @@ body,
               left:px-rem(8);
               top: px-rem(178);
               right: px-rem(76);
-              transition: all 1.5s;
+              transition: all 4s;
             }
           }
         }
@@ -1038,7 +1038,8 @@ body,
               height: px-rem(12);
               border-radius: px-rem(6);
               background-color: #fcb813;
-              transition: all 0.6s;
+              // transition: all 0.6s;
+              transition: all 3s linear;
 
               &::after {
                 content: "";

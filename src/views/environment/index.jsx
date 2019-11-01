@@ -237,8 +237,9 @@ class App extends Component {
       //指标数据
       indicators: "",
       startIndicators: "", // 开始指标数据
-      endIndicators_90:"", // 解决旋转问题
+      startIndicators_90:"", // 解决旋转问题
       endIndicators: "",
+      endIndicators_null:'',
       //设备列表
       equipmentList: [],
       // 选中当前设备
@@ -1056,18 +1057,148 @@ class App extends Component {
 
   // 画没有选中的塔机臂
   resetMapMarker() {
-    this.map.remove(this.markerList)
-    this.removeMarkerList = []
-    this.markerList = []
+    // this.map.remove(this.markerList)
+    // this.removeMarkerList = []
+    // this.markerList = []
 
     if(this.markerList.length !== 0){
-      // this.state.equipmentList.forEach((item, index) => {
-      //   console.log('jinlailalalalal')
-      // })
-      return;
+      this.map.remove(this.removeMarkerList)
+      this.removeMarkerList = [];
+      this.removeMarkerList = copyArr(this.markerList)
+      function copyArr(arr) {
+          let res = []
+          for (let i = 0; i < arr.length; i++) {
+            res.push(arr[i])
+          }
+          return res
+      }
+      this.markerList.forEach((e, i) => {
+        if(this.state.actionEquipmentListIndex == i){
+          this.removeMarkerList.splice(i,1)
+          this.markerList.splice(i,1)
+        }
+      })
+      this.map.add(this.removeMarkerList)
+      
+      
+      // return null
     }
+
     this.state.equipmentList.forEach((item, index) => {
-        if(index !== this.state.actionEquipmentListIndex){
+      if(this.removeMarkerList.length == 0){
+          let canvasC = document.createElement('canvas')
+          let size = this.map.getSize() //resize
+          let width = size.width
+          let height = size.height
+          canvasC.style.width = width + "px"
+          canvasC.style.height = height + "px"
+          canvasC.width = width*devicePixelRatio
+          canvasC.height = height*devicePixelRatio
+          let context = canvasC.getContext('2d')
+          context.fillStyle = 'rgba(252, 184, 19,1)'
+          context.strokeStyle = 'rgba(252, 184, 19,1)'
+      
+          let radius = 0
+
+          let draw = () => {
+            context.clearRect(0, 0, canvasC.width, canvasC.height)
+            context.lineWidth = 1;
+            //边框颜色
+            context.beginPath();
+            context.strokeStyle="rgb(252,184,19)";
+            context.translate(100, 95);
+            context.rotate((item.rotary - 180) * Math.PI / 180);
+            this.fillRoundRectLong(context, -5,-25, 125,10, 2, 'rgba(252,184,19,0.8)');
+            context.closePath();
+            //方块的颜色
+            context.beginPath();
+            // context.fillStyle = "rgb(252,184,19)";
+            this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
+            context.closePath();
+            //小球
+            context.beginPath();
+            context.arc(12+item.amplitude*1.5, 0.5, 2, 0, 360, false);
+            context.fillStyle = "rgb(252,184,19)";
+            context.fill();
+            context.stroke();
+            context.closePath();
+            // AMap.Util.requestAnimFrame(draw)
+            context.restore();
+          }
+          draw()
+          this.markerList.push(
+            new AMap.Marker({
+              content: canvasC,
+              position: new AMap.LngLat(item.longitude, item.latitude),
+              offset: new AMap.Pixel(-19, -27),
+              size: new AMap.Size(50, 59),
+              zIndex: 99 - index,
+            })
+          )
+      }else{
+        if(index == this.state.actionEquipmentListIndex){
+          let canvasC = document.createElement('canvas')
+          let size = this.map.getSize() //resize
+          let width = size.width
+          let height = size.height
+          canvasC.style.width = width + "px"
+          canvasC.style.height = height + "px"
+          canvasC.width = width*devicePixelRatio
+          canvasC.height = height*devicePixelRatio
+          let context = canvasC.getContext('2d')
+          context.fillStyle = 'rgba(252, 184, 19,1)'
+          context.strokeStyle = 'rgba(252, 184, 19,1)'
+      
+          let radius = 0
+
+          let draw = () => {
+            context.clearRect(0, 0, canvasC.width, canvasC.height)
+            context.lineWidth = 1;
+            //边框颜色
+            context.beginPath();
+            context.strokeStyle="rgb(252,184,19)";
+            context.translate(100, 95);
+            context.rotate((item.rotary - 180) * Math.PI / 180);
+            this.fillRoundRectLong(context, -5,-25, 125,10, 2, 'rgba(252,184,19,0.8)');
+            context.closePath();
+            //方块的颜色
+            context.beginPath();
+            // context.fillStyle = "rgb(252,184,19)";
+            this.fillRoundRect(context, -15, -15, 30, 30, 2, 'rgba(252,184,19)');
+            context.closePath();
+            //小球
+            context.beginPath();
+            context.arc(12+item.amplitude*1.5, 0.5, 2, 0, 360, false);
+            context.fillStyle = "rgb(252,184,19)";
+            context.fill();
+            context.stroke();
+            context.closePath();
+            // AMap.Util.requestAnimFrame(draw)
+            context.restore();
+          }
+          draw()
+
+          this.markerList.splice(this.state.actionEquipmentListIndex,0,
+            new AMap.Marker({
+              content: canvasC,
+              position: new AMap.LngLat(item.longitude, item.latitude),
+              offset: new AMap.Pixel(-19, -27),
+              size: new AMap.Size(50, 59),
+              zIndex: 99 - index,
+            })
+          )
+        }
+      }
+
+    })
+
+    console.log(this.removeMarkerList)
+    console.log(this.markerList)
+
+    if(this.removeMarkerList.length == 0){
+      this.removeMarkerList = []
+      this.state.equipmentList.forEach((item, index) => {
+        if(index !== 0){
           let canvasC = document.createElement('canvas')
           let size = this.map.getSize() //resize
           let width = size.width
@@ -1107,16 +1238,8 @@ class App extends Component {
             context.restore();
           }
           draw()
-          // this.markerList.push(
-          //   new AMap.Marker({
-          //     content: canvasC,
-          //     position: new AMap.LngLat(item.longitude, item.latitude),
-          //     offset: new AMap.Pixel(-15, -17),
-          //     size: new AMap.Size(50, 59),
-          //     zIndex: 999,
-          //   })
-          // )
-          this.markerList.push(
+
+          this.removeMarkerList.push(
             new AMap.Marker({
               content: canvasC,
               position: new AMap.LngLat(item.longitude, item.latitude),
@@ -1127,8 +1250,10 @@ class App extends Component {
           )
         }
     })
-    
-    this.map.add(this.markerList)
+      
+      this.map.add(this.removeMarkerList)
+    }
+
   }
 
     //地图标注选中圆圈效果
@@ -1194,7 +1319,8 @@ class App extends Component {
       if(this.state.actionEquipmentListIndex>3){
         let arr = Object.keys(this.refs)
         if(arr.length!=0){
-          this.refs.content.style.top = -8.7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
+          let height = -8.7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
+          this.refs.content.style.top = height
         }else{
           console.log(this.refs)
         }
@@ -1691,14 +1817,15 @@ class App extends Component {
             this.setState({
               indicators: data,
               startIndicators: data.newInd ? data.newInd : backData.oldInd,
-              endIndicators_90: data.oldInd ?parseInt(data.oldInd[4].indicatorValue) + 90 : parseInt(backData.newInd[4].indicatorValue) + 90,
+              startIndicators_90: data.newInd ?parseInt(data.newInd[4].indicatorValue) + 90 : parseInt(backData.oldInd[4].indicatorValue) + 90,
               // this.state.startIndicators.indicatorValue
               //   ? this.state.endIndicators
               //   : backData.newInd.map(e => {
               //     e.indicatorValue = '-'
               //     return e
               //   }),
-              endIndicators: data.oldInd ? data.oldInd : backData.newInd
+              endIndicators: data.oldInd ? data.oldInd : backData.newInd,
+              endIndicators_null: data.oldInd
             },()=>{
               console.log(this.state.endIndicators)
               // if(this.state.endIndicators[2].indicatorValue == '-'){
@@ -1894,8 +2021,8 @@ class App extends Component {
               )}
 
             <div className="left-supervise-value">
-              {this.state.endIndicators
-                ? this.state.endIndicators.map((item, index) => {
+              {this.state.startIndicators
+                ? this.state.startIndicators.map((item, index) => {
                   return (
                     item.indicatorName !== "防撞" ? (
                       <div 
@@ -1924,7 +2051,7 @@ class App extends Component {
                               <span>
                                 <CountUp
                                   start={
-                                    this.state.startIndicators[index]
+                                    this.state.endIndicators[index]
                                       .indicatorValue
                                   }
                                   end={item.indicatorValue}
@@ -2057,12 +2184,13 @@ class App extends Component {
             <div>
                 {this.state.endIndicators || this.state.startIndicators
                     ? (
-                        <div ref='square' id='squre-contain' style={{transform:`rotate(${this.state.endIndicators_90}deg)`}}>
+                        <div ref='square' id='squre-contain' style={{transform:`rotate(${this.state.startIndicators_90}deg)`}}>
                           <div id="square" style={{opacity:(this.state.showTaji ==0)?'0':'1'}}>
                           </div>
                           <div id='square-taji-contain' style={{opacity:(this.state.showTaji ==0)?'0':'1'}}>
                             <img id='square-taji' src={require("../../assets/images/bi.png")} alt=""/>
-                            <div id="circle" style={{top:`${this.state.endIndicators?this.state.endIndicators[2].indicatorValue * 0.25 : 0}px` }}></div>
+         
+                            <div id="circle" style={{top:`${this.state.endIndicators_null != null?this.state.startIndicators[2].indicatorValue * 0.5 : -20}px` }}></div>
                           </div>
                         </div>
                     ):(
