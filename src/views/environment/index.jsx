@@ -221,6 +221,8 @@ class App extends Component {
     this.markerListText = '' // 地图文字列表
 
     this.state = {
+      showTaji: 0, //初始化是否显示塔机
+
       projectName: "", // 项目名称
       logo: "", // logo图片
       // projectNameStatus: true, // 项目名称样式
@@ -235,7 +237,7 @@ class App extends Component {
       //指标数据
       indicators: "",
       startIndicators: "", // 开始指标数据
-      startIndicators_90:"", // 解决旋转问题
+      endIndicators_90:"", // 解决旋转问题
       endIndicators: "",
       //设备列表
       equipmentList: [],
@@ -488,11 +490,11 @@ class App extends Component {
       theme: "themeOne"
     })
     this.columnarTorque.source(this.state.sevenDays.torque.dayValue, {
-      value: {
-        type: "linear",
-        values: ["min"],
-        tickInterval: this.state.sevenDays.torque.maxValue //设置最大高度
-      },
+      // value: {
+      //   type: "linear",
+      //   // values: ["min"],
+      //   tickInterval: this.state.sevenDays.torque.maxValue //设置最大高度
+      // },
     })
 
     this.columnarTorque
@@ -503,7 +505,7 @@ class App extends Component {
       .color("#fcb813")
     this.columnarTorque.render()
   }
-  //初始化7天 PM10 柱状图
+  //初始化7天 载重 柱状图
   initColumnarAmplitude() {
     if (this.columnarHeavy) {
       this.columnarHeavy.changeData(this.state.sevenDays.heavy.dayValue)
@@ -525,6 +527,7 @@ class App extends Component {
       }
     })
     let height = this.columnarHeavyDom.current.offsetHeight
+
     this.columnarHeavy = new G2.Chart({
       container: "columnar-heavy",
       pixelRatio: devicePixelRatio,
@@ -548,7 +551,7 @@ class App extends Component {
       .color("#fcb813")
     this.columnarHeavy.render()
   }
-  //初始化7天 TSP 柱状图
+  //初始化7天 幅度 柱状图
   initColumnarHeavy() {
     if (this.columnarAmplitude) {
       this.columnarAmplitude.changeData(this.state.sevenDays.amplitude.dayValue)
@@ -612,7 +615,6 @@ class App extends Component {
     }, 0)
 
     let copyData = JSON.parse(JSON.stringify(this.state.equipmentList))
-    console.log(copyData);
     let equipmentList = [];
     copyData.map(item =>{
       if(item.alarmTimes==0 || item.bindStatus==4){ //报警次数为0 或 未绑定
@@ -693,7 +695,7 @@ class App extends Component {
               fill: "#000",
               textBaseline: 'middle',
               textAlign: 'center',
-              fontSize: 10
+              fontSize: 8
             }
           }
           : null
@@ -730,10 +732,10 @@ class App extends Component {
 
     this.proportion24th.render()
 
-    let OFFSET = 20 //控制第一次折线长度
+    let OFFSET = 0 //控制第一次折线长度
     let APPEND_OFFSET = 95 //控制第二次折线的长度  越小越长
-    let LINEHEIGHT = 12 //行高 - 让数据平均分布
-    let yellowAngle = 0.3 //黄色环第一次折线角度
+    let LINEHEIGHT = 20 //行高 - 让数据平均分布
+    let yellowAngle = .6 //黄色环第一次折线角度
     let coord = this.proportion24th.get("coord") // 获取坐标系对象
     let center = coord.center // 极坐标圆心坐标
     let r = coord.radius // 极坐标半径
@@ -752,7 +754,7 @@ class App extends Component {
       let fill = "#fcb813"
       for (let i = 0; i < data.length; i++) {
         let isYellow = data[i].orderProductList == indexVal //黄色部分
-        OFFSET = isYellow ? OFFSET : 10 //控制第一次折线长度
+        OFFSET = isYellow ? OFFSET : 5 //控制第一次折线长度
         let percent = data[i].percent
         let targetAngle = angle + Math.PI * 2 * percent
         let middleAngle =
@@ -959,6 +961,8 @@ class App extends Component {
       this.selMapMarkerCircle()
       
       this.selMapText()
+
+ 
     } else {
 
       this.map = new AMap.Map("mapcontainer", {
@@ -985,6 +989,11 @@ class App extends Component {
       setTimeout(() => {
         this.mapCheck();
         this.map3D();
+
+      this.setState({
+        showTaji: 1,
+      })
+
       }, 1000)
     }
   }
@@ -1292,7 +1301,7 @@ class App extends Component {
               position: new AMap.LngLat(item.longitude, item.latitude),
               offset: new AMap.Pixel(-30, -40),
               size: new AMap.Size(50, 60),
-              zIndex: 999 - index,
+              zIndex: 9999,
             })
           )
         }
@@ -1310,7 +1319,6 @@ class App extends Component {
       fillColor: 'rgba(252, 184, 19,0)',
       map: this.map
     })
-    console.log(polygon)
     // this.map.add(polygon)
     this.map.setFitView()
   }
@@ -1473,8 +1481,8 @@ class App extends Component {
         ctx2.closePath()
         ctx2.stroke()
         ctx2.fill()
-      }
 
+      }
         customLayer.setMap(this.map)
         customLayer2.setMap(this.map)
     })
@@ -1530,7 +1538,7 @@ class App extends Component {
         setTimeout(() => {
           this.setState({
             startIndicators: this.state.indicators.newInd,
-            startIndicators_90:parseInt(this.state.indicators.newInd[4].indicatorValue) + 90,
+            // endIndicators_90:parseInt(this.state.indicators.oldInd[4].indicatorValue) + 90,
             endIndicators: this.state.indicators.oldInd
           })
         }, (1000 * time) / 2)
@@ -1563,15 +1571,6 @@ class App extends Component {
         let res = re.data
         if (res.status == 200) {
           let data = res.response
-          // let data = {
-          //   yunPingStatus: 1,
-          //   projectName: "深圳市龙华新区龙华二小改建工程",
-          //   slogan: null,
-          //   sloganStyle: null,
-          //   yunPingName: "1号智能云屏系统",
-          //   yunPingCode: "huanjingjiance",
-          //   logo: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/logo2.png"
-          // }
           let footerInfoStatus = ''
           // 设备已解绑状态
 
@@ -1621,100 +1620,6 @@ class App extends Component {
         let res = re.data
         if (res.status == 200) {
           let data = res.response
-          // let data =  {
-          //   mapList: [{longitude: "114.03322516505993", latitude: "22.567655873539117"},
-          //   {longitude: "114.05741734885589", latitude: "22.570405120994014"},
-          //   {longitude: "114.05873565456415", latitude: "22.563237148348076"},
-          //   {longitude: "114.078177646276", latitude: "22.527747225143692"},
-          //   {longitude: "114.07508774154371", latitude: "22.525589270430714"},
-          //   {longitude: "114.07957105383541", latitude: "22.51918457950339"},
-          //   {longitude: "114.05102564488274", latitude: "22.513942918144956"},
-          //   {longitude: "114.02808873488428", latitude: "22.54069176808944"}],
-          //   deviceList: [{
-          //     deviceName: "1 号塔机监测系统",
-          //     longitude: "114.0399936290864",
-          //     latitude: "22.547919658186872",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 2137,
-          //     alarmTimes: 2197,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAxMDMwMDEwMDAwOA=="
-          //   }, 
-          //   {
-          //     deviceName: "2 号塔机监测系统",
-          //     longitude: "114.0440153808594",
-          //     latitude: "22.56797929382324",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 2197,
-          //     alarmTimes: 502,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjcwMTEwMDAwNg=="
-          //   }, 
-          //   {
-          //     deviceName: "3 号塔机监测系统",
-          //     longitude: "114.05853808556",
-          //     latitude: "22.54797929382318",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 197,
-          //     alarmTimes: 623,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          //   },
-          //   {
-          //     deviceName: "4 号塔机监测系统",
-          //     longitude: "114.06453808556",
-          //     latitude: "22.56997929382318",
-          //     status: Math.ceil(Math.random()*2),
-          //     orderProductList: 297,
-          //     alarmTimes: 623,
-          //     rotary: Math.ceil(Math.random()*360),
-          //     amplitude:30-Math.ceil(Math.random()*30),
-          //     height:Math.ceil(Math.random()*30),
-          //     heavy:Math.ceil(Math.random()*100),
-          //     img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-          //     deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-          //   },
-            // {
-            //   deviceName: "5 号塔机监测系统",
-            //   longitude: "114.07853808556",
-            //   latitude: "22.57797929382318",
-            //   status: 1,
-            //   orderProductList: 12,
-            //   alarmTimes: 623,
-            //   rotary: Math.ceil(Math.random()*360),
-            //   amplitude:30-Math.ceil(Math.random()*30),
-            //   height:Math.ceil(Math.random()*30),
-            //   heavy:Math.ceil(Math.random()*100),
-            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            // },
-            // {
-            //   deviceName: "6 号塔机监测系统",
-            //   longitude: "114.08853808556",
-            //   latitude: "22.58797929382318",
-            //   status: 1,
-            //   orderProductList: 12,
-            //   alarmTimes: 623,
-            //   rotary: Math.ceil(Math.random()*360),
-            //   amplitude:30-Math.ceil(Math.random()*30),
-            //   height:Math.ceil(Math.random()*30),
-            //   heavy:Math.ceil(Math.random()*100),
-            //   img: "https://photo.test.jianzaogong.com/ws/photo?path=/yunping/hj_big2.png",
-            //   deviceCode: "MjAxOTAzMjgwMTEwMDAwMw=="
-            // }
-          // ]}
           //格式化地图范围坐标
           let mapPolygonPath = data.mapList ? data.mapList.map(item => {
             return [item.longitude, item.latitude]
@@ -1753,8 +1658,6 @@ class App extends Component {
                 }
                 if (data.mapList) {
                     !this.map && this.initEquipmentList();
-                   
-
                     //初始化24小时设置告警 环形图
                     // console.log("初始化24小时设置告警 环形图", this.state.equipmentList, this.state.actionEquipmentListIndex, this.state.equipmentList[this.state.actionEquipmentListIndex].alarmTimes)
                     this.state.equipmentList.length > 0 && this.state.equipmentList[this.state.actionEquipmentListIndex].alarmTimes > 0 &&
@@ -1788,7 +1691,7 @@ class App extends Component {
             this.setState({
               indicators: data,
               startIndicators: data.newInd ? data.newInd : backData.oldInd,
-              startIndicators_90: data.newInd ?parseInt(data.newInd[4].indicatorValue) + 90 : parseInt(backData.oldInd[4].indicatorValue) + 90,
+              endIndicators_90: data.oldInd ?parseInt(data.oldInd[4].indicatorValue) + 90 : parseInt(backData.newInd[4].indicatorValue) + 90,
               // this.state.startIndicators.indicatorValue
               //   ? this.state.endIndicators
               //   : backData.newInd.map(e => {
@@ -1797,8 +1700,10 @@ class App extends Component {
               //   }),
               endIndicators: data.oldInd ? data.oldInd : backData.newInd
             },()=>{
-              console.log('')
-              // console.log(this.state.indicators,this.state.startIndicators, this.state.endIndicators)
+              console.log(this.state.endIndicators)
+              // if(this.state.endIndicators[2].indicatorValue == '-'){
+              //   this.state.endIndicators[2].indicatorValue = 0
+              // }
               // this.selMapMarker()
             });
         }
@@ -1858,6 +1763,7 @@ class App extends Component {
         let res = re.data
         if (res.status == 200) {
           let data = res.response
+
           this.setState(
             {
               sevenDays: data
@@ -1988,8 +1894,8 @@ class App extends Component {
               )}
 
             <div className="left-supervise-value">
-              {this.state.startIndicators
-                ? this.state.startIndicators.map((item, index) => {
+              {this.state.endIndicators
+                ? this.state.endIndicators.map((item, index) => {
                   return (
                     item.indicatorName !== "防撞" ? (
                       <div 
@@ -2149,18 +2055,18 @@ class App extends Component {
             {/* 地图 start */}
 
             <div>
-                {this.state.endIndicators
+                {this.state.endIndicators || this.state.startIndicators
                     ? (
-                        <div ref='square' id='squre-contain' style={{transform:`rotate(${this.state.startIndicators_90}deg)`}}>
-                          <div id="square">
+                        <div ref='square' id='squre-contain' style={{transform:`rotate(${this.state.endIndicators_90}deg)`}}>
+                          <div id="square" style={{opacity:(this.state.showTaji ==0)?'0':'1'}}>
                           </div>
-                          <div id='square-taji-contain'>
+                          <div id='square-taji-contain' style={{opacity:(this.state.showTaji ==0)?'0':'1'}}>
                             <img id='square-taji' src={require("../../assets/images/bi.png")} alt=""/>
-                            <div id="circle" style={{top:`${this.state.startIndicators[2].indicatorValue * 0.25}px` }}></div>
+                            <div id="circle" style={{top:`${this.state.endIndicators?this.state.endIndicators[2].indicatorValue * 0.25 : 0}px` }}></div>
                           </div>
                         </div>
-                    ):                
-                    <div ref='square' id='squre-contain'>
+                    ):(
+                      <div ref='square' id='squre-contain'>
                       <div id="square">
                       </div>
                       <div id='square-taji-contain'>
@@ -2168,6 +2074,7 @@ class App extends Component {
                         <div id="circle"></div>
                       </div>
                     </div>
+                    )
                   }
               </div>
 
@@ -2185,7 +2092,7 @@ class App extends Component {
                       return(
                         <li className='content' key={index}>
                             {
-                            item.heavy == null ? '' :
+                            item.heavy == null || this.state.footerInfoStatus === "serverPast" ? '' :
                             item.height>23 ? (
                               <div className='number' style={{top:(+item.height-4)*0.8>32?32:(+item.height-4)*0.8,left:(-item.amplitude+56)*0.8}}>
                                 <span>{parseInt(item.heavy)}t</span><br/>
@@ -2200,10 +2107,10 @@ class App extends Component {
                           }
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
                           <img className='line'  style={{height:parseInt(+item.height)*0.8+3>40?40:parseInt(+item.height)*0.8+3,left:parseInt(parseInt(-item.amplitude+106)*0.7)-9}} src={require("../../assets/images/line.png")} alt=""/>
-                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9>46?46:parseInt(+item.height)*0.8+9,left:parseInt(parseInt(-item.amplitude+100)*0.7)-7}} src={require("../../assets/images/thing.png")} alt=""/>
+                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9>46?46:parseInt(+item.height)*0.8+9.5,left:parseInt(parseInt(-item.amplitude+100)*0.7)-7}} src={require("../../assets/images/thing.png")} alt=""/>
                           <div id="breathe-line-gif" style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
-                          <p>{item.deviceName}</p>
+                          <p style={{color: (this.state.actionEquipmentListIndex==index) ? "white" : "#cccccc"}}>{item.deviceName}</p>
                         </li>
                       )
                     }
@@ -2275,7 +2182,15 @@ class App extends Component {
                             {item.indicatorName}
                           </span>
                           <span className="warn-total-num">
-                            {item.alarmTimes}
+                           
+                            <CountUp
+                            start={0}
+                                end={item.alarmTimes}
+                                decimals={0}
+                                duration={2.5}
+                                useEasing={true}
+                                useGrouping={true}
+                            />
                           </span>
                         </div>
                         <div className="warn-total">

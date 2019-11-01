@@ -105,6 +105,7 @@ body,
   animation-duration: 3s;
   animation-direction: alternate;
   margin: 0 auto;
+  z-index: 999;
   @keyframes fadeInOut {
     0% {
       opacity:0;
@@ -119,27 +120,31 @@ body,
         opacity:1;
     }
   }
-  #square-taji{
-    height:px-rem(316); 
-    width: px-rem(20); 
-    transition: all 3s;
-    transform:rotate(0deg);
-    position: relative;
-    left:px-rem(224);
-    top:px-rem(192);
-    border-radius: px-rem(4); 
+  #square-taji-contain{
+    opacity: 0;
+    #square-taji{
+      height:px-rem(316); 
+      width: px-rem(20); 
+      transition: all 3s;
+      transform:rotate(0deg);
+      position: relative;
+      left:px-rem(224);
+      top:px-rem(192);
+      border-radius: px-rem(4); 
+    }
+    #circle{
+      width: px-rem(16);  
+      height: px-rem(16);  
+      background: rgb(252,184,19); 
+      border-radius: px-rem(20); 
+      transition: all 3s;
+      transform:rotate(0deg);
+      position: relative;
+      left:px-rem(224);
+      top:px-rem(122);
+    }
   }
-  #circle{
-    width: px-rem(16);  
-    height: px-rem(16);  
-    background: rgb(252,184,19); 
-    border-radius: px-rem(20); 
-    transition: all 3s;
-    transform:rotate(0deg);
-    position: relative;
-    left:px-rem(224);
-    top:px-rem(122);
-  }
+
   #square {
     width: px-rem(60); 
     height: px-rem(60);
@@ -152,6 +157,7 @@ body,
     top:px-rem(226);
     border-radius: px-rem(4);
     box-shadow:0 px-rem(-10) px-rem(20) rgba(0,0,0,0.4);
+    opacity: 0;
   }
 }
 
@@ -761,7 +767,6 @@ body,
     .app-content-center {
       flex: 1 1 auto;
       display: flex;
-
       .content-right-map {
         flex: 1;
         border-radius: px-rem(16);
