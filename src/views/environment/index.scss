@@ -724,7 +724,7 @@ body,
           .columnarAmplitude {
             height: px-rem(160);
             flex: 1;
-            margin-right: px-rem(92);
+            margin-right: px-rem(72);
           }
 
           .columnarAmplitude {
@@ -818,6 +818,8 @@ body,
         position: absolute;
         bottom: 0px;
         overflow: hidden;
+        background: #222326;
+        // box-shadow:0 px-rem(-50) px-rem(50) red;
 
         .app-content-bottom-content-1{
           position: relative;
@@ -1039,7 +1041,7 @@ body,
               border-radius: px-rem(6);
               background-color: #fcb813;
               // transition: all 0.6s;
-              transition: all 3s linear;
+              transition: all 6s linear;
 
               &::after {
                 content: "";

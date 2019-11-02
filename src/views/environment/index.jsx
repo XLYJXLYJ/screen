@@ -491,11 +491,11 @@ class App extends Component {
       theme: "themeOne"
     })
     this.columnarTorque.source(this.state.sevenDays.torque.dayValue, {
-      // value: {
-      //   type: "linear",
-      //   // values: ["min"],
-      //   tickInterval: this.state.sevenDays.torque.maxValue //设置最大高度
-      // },
+      value: {
+        type: "linear",
+        values: ["min"],
+        tickInterval: this.state.sevenDays.torque.maxValue //设置最大高度
+      },
     })
 
     this.columnarTorque
@@ -1534,7 +1534,7 @@ class App extends Component {
 
         //画外阴影
         // ctx.lineJoin = "round" //设置线段的连接方式
-        ctx.shadowBlur = 160
+        ctx.shadowBlur = 70
         ctx.shadowColor = 'rgba(252, 184, 19,.2)'
         ctx.shadowOffsetX = 0
         ctx.shadowOffsetY = 40
@@ -1630,7 +1630,7 @@ class App extends Component {
     if (this.equipmentListTime) {
       return null
     }
-    let updateTime = this.state.equipmentList.length == 1 ? 60 : 10
+    let updateTime = this.state.equipmentList.length == 1 ? 60 : 30
     //切换时间
     // let updateTime = 200
     this.updateDate('init')
@@ -2014,6 +2014,13 @@ class App extends Component {
                             : "-"}
                     </div>
                 }
+                {
+                    this.state.footerInfoStatus == 'notBind' && 
+                    <div className="left-setup-code" >
+                        设备码  <span style={{color: `#fff`,fontSize: `px-rem(100)`,fontWeight: `bold`}}>-</span> 
+                    </div>
+                }
+
                 
               </div>
             ) : (
@@ -2322,7 +2329,7 @@ class App extends Component {
                           </span>
                         </div>
                         <div className="warn-total">
-                          {item.alarmTimes != 0 &&
+                          {
                             <div
                               className="warn-proportion"
                               style={{
