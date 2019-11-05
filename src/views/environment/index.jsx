@@ -260,6 +260,9 @@ class App extends Component {
   }
   //组件将要渲染
   componentWillMount() {
+    this.map = null
+    console.log(222)
+    console.log(this.map)
     this.getBaseInfo()
     this.getDevice()
     this.updateLocalTime()
@@ -273,7 +276,7 @@ class App extends Component {
     gaodeMapsDom.src = `https://webapi.amap.com/maps?v=1.4.15&key=34dda2918eee145d1520d8a7c59c3408&plugin=AMap.Geocoder,AMap.Object3DLayer,AMap.Scale&callback=init`
 
     window.init = () => {
-      this.initMap()
+      // this.initMap()
     }
     headerDom.appendChild(gaodeMapsDom)
   }
@@ -608,7 +611,6 @@ class App extends Component {
       return num / 38.4 + "rem"
     }
     let startAngle = -Math.PI/2 - Math.PI //开始角度
-
     let height = this.proportionDom.current.offsetHeight+20
     let indexVal = this.state.equipmentList[this.state.actionEquipmentListIndex].orderProductList //选中值
     let total = Object.assign([], this.state.equipmentList).reduce((a, b) => {
@@ -965,7 +967,7 @@ class App extends Component {
 
  
     } else {
-
+      console.log(333)
       this.map = new AMap.Map("mapcontainer", {
         resizeEnable: true, // 是否监控地图容器尺寸变化，默认值为false
         expandZoomRange:true,
@@ -1192,9 +1194,6 @@ class App extends Component {
 
     })
 
-    console.log(this.removeMarkerList)
-    console.log(this.markerList)
-
     if(this.removeMarkerList.length == 0){
       this.removeMarkerList = []
       this.state.equipmentList.forEach((item, index) => {
@@ -1229,6 +1228,9 @@ class App extends Component {
             context.closePath();
             //小球
             context.beginPath();
+            if(item.amplitude > 52){
+              item.amplitude = 52
+            }
             context.arc(12+item.amplitude*1.5, 0.5, 2, 0, 360, false);
             context.fillStyle = "rgb(252,184,19)";
             context.fill();
@@ -1256,12 +1258,46 @@ class App extends Component {
 
   }
 
-    //地图标注选中圆圈效果
-    selMapMarkerCircle() {
-      let that = this
-      if(this.mapMarkerDrawCircle.length !== 0){
-        this.map.remove(this.removeMapMarkerDrawCircle)
-        this.removeMapMarkerDrawCircle = [];
+  //地图标注选中圆圈效果
+  selMapMarkerCircle() {
+    let that = this
+    if(this.mapMarkerDrawCircle.length !== 0){
+      this.map.remove(this.removeMapMarkerDrawCircle)
+      this.removeMapMarkerDrawCircle = [];
+      this.removeMapMarkerDrawCircle = copyArr(this.mapMarkerDrawCircle)
+      function copyArr(arr) {
+          let res = []
+          for (let i = 0; i < arr.length; i++) {
+            res.push(arr[i])
+          }
+          return res
+      }
+      this.mapMarkerDrawCircle.forEach((e, i) => {
+        if(this.state.actionEquipmentListIndex == i){
+          this.removeMapMarkerDrawCircle = this.removeMapMarkerDrawCircle.slice(i,i+1)
+        }
+      })
+      this.map.add(this.removeMapMarkerDrawCircle)
+      
+      return null
+    }
+
+    this.state.equipmentList.map((item, index) => {
+      let canvasCircle = `<div class="select-pulse"></div>
+      <div class="select-pulse1"></div>`
+        let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
+        let pageX = 0.05, pageY = 0.05
+        let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
+        this.mapMarkerDrawCircle.push(
+          new AMap.Marker({
+          content: canvasCircle,
+          position: new AMap.LngLat(item.longitude, item.latitude),
+          offset: new AMap.Pixel(-32, -28),
+          size: new AMap.Size(50, 60),
+          zIndex: 999 - index,
+          })
+        )
+
         this.removeMapMarkerDrawCircle = copyArr(this.mapMarkerDrawCircle)
         function copyArr(arr) {
             let res = []
@@ -1276,96 +1312,29 @@ class App extends Component {
           }
         })
         this.map.add(this.removeMapMarkerDrawCircle)
-        
-        return null
-      }
-
-      this.state.equipmentList.map((item, index) => {
-        let canvasCircle = `<div class="select-pulse"></div>
-        <div class="select-pulse1"></div>`
-          let item1 = this.state.equipmentList[this.state.actionEquipmentListIndex]
-          let pageX = 0.05, pageY = 0.05
-          let bounds = new AMap.Bounds([+item1.longitude - 0.06, +item1.latitude - pageY], [+item1.longitude + pageX, +item1.latitude + pageY])
-          this.mapMarkerDrawCircle.push(
-            new AMap.Marker({
-            content: canvasCircle,
-            position: new AMap.LngLat(item.longitude, item.latitude),
-            offset: new AMap.Pixel(-32, -28),
-            size: new AMap.Size(50, 60),
-            zIndex: 999 - index,
-            })
-          )
-
-          this.removeMapMarkerDrawCircle = copyArr(this.mapMarkerDrawCircle)
-          function copyArr(arr) {
-              let res = []
-              for (let i = 0; i < arr.length; i++) {
-                res.push(arr[i])
-              }
-              return res
-          }
-          this.mapMarkerDrawCircle.forEach((e, i) => {
-            if(this.state.actionEquipmentListIndex == i){
-              this.removeMapMarkerDrawCircle = this.removeMapMarkerDrawCircle.slice(i,i+1)
-            }
-          })
-          this.map.add(this.removeMapMarkerDrawCircle)
-      })
-    }
+    })
+  }
     
-    // 画没有选中塔机的发光光圈
-    resetMapMarkerIris() {
-      // 没有数据情况下
-      if(this.state.actionEquipmentListIndex>3){
-        let arr = Object.keys(this.refs)
-        if(arr.length!=0){
-          let height = -8.7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
-          this.refs.content.style.top = height
-        }else{
-          console.log(this.refs)
-        }
+  // 画没有选中塔机的发光光圈
+  resetMapMarkerIris() {
+    // 没有数据情况下
+    if(this.state.actionEquipmentListIndex>3){
+      let arr = Object.keys(this.refs)
+      if(arr.length!=0){
+        let height = -8.7 * parseInt(this.state.actionEquipmentListIndex/4) + 'rem'
+        this.refs.content.style.top = height
       }else{
-        this.refs.content.style.top = 0
+        // console.log(this.refs)
       }
-      if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
-        return null
-      }
-      if(this.markerListCircle.length !== 0){
-        this.map.remove(this.removeMarkerListCircle)
-        this.removeMarkerListCircle = [];
-        this.removeMarkerListCircle = copyArr(this.markerListCircle)
-        function copyArr(arr) {
-            let res = []
-            for (let i = 0; i < arr.length; i++) {
-              res.push(arr[i])
-            }
-            return res
-        }
-        this.markerListCircle.forEach((e, i) => {
-          if(this.state.actionEquipmentListIndex == i){
-            this.removeMarkerListCircle.splice(i,1)
-          }
-        })
-        this.map.add(this.removeMarkerListCircle)
-        
-        return null
-      }
-
-      this.markerListCircle = []
-      this.state.equipmentList.forEach((item, index) => {
-          //光圈开始
-          let canvasC = `<div class="pulse"></div>`
-          this.markerListCircle.push(
-            new AMap.Marker({
-              content: canvasC,
-              position: new AMap.LngLat(item.longitude, item.latitude),
-              offset: new AMap.Pixel(24, 14),
-              size: new AMap.Size(50, 60),
-              zIndex: 0 - index,
-            })
-          )
-      })
-
+    }else{
+      this.refs.content.style.top = 0
+    }
+    if (!this.state.equipmentList || this.state.equipmentList.length == 0) {
+      return null
+    }
+    if(this.markerListCircle.length !== 0){
+      this.map.remove(this.removeMarkerListCircle)
+      this.removeMarkerListCircle = [];
       this.removeMarkerListCircle = copyArr(this.markerListCircle)
       function copyArr(arr) {
           let res = []
@@ -1380,7 +1349,40 @@ class App extends Component {
         }
       })
       this.map.add(this.removeMarkerListCircle)
+      
+      return null
     }
+
+    this.markerListCircle = []
+    this.state.equipmentList.forEach((item, index) => {
+        //光圈开始
+        let canvasC = `<div class="pulse"></div>`
+        this.markerListCircle.push(
+          new AMap.Marker({
+            content: canvasC,
+            position: new AMap.LngLat(item.longitude, item.latitude),
+            offset: new AMap.Pixel(24, 14),
+            size: new AMap.Size(50, 60),
+            zIndex: 0 - index,
+          })
+        )
+    })
+
+    this.removeMarkerListCircle = copyArr(this.markerListCircle)
+    function copyArr(arr) {
+        let res = []
+        for (let i = 0; i < arr.length; i++) {
+          res.push(arr[i])
+        }
+        return res
+    }
+    this.markerListCircle.forEach((e, i) => {
+      if(this.state.actionEquipmentListIndex == i){
+        this.removeMarkerListCircle.splice(i,1)
+      }
+    })
+    this.map.add(this.removeMarkerListCircle)
+  }
   //地图文字
   selMapText(){
         // 没有数据情况下
@@ -1427,7 +1429,7 @@ class App extends Component {
               position: new AMap.LngLat(item.longitude, item.latitude),
               offset: new AMap.Pixel(-30, -40),
               size: new AMap.Size(50, 60),
-              zIndex: 9999,
+              zIndex: 999,
             })
           )
         }
@@ -1616,7 +1618,9 @@ class App extends Component {
   // 初始化设备列表
   initEquipmentList() {
     // 没有数据情况下
+    console.log(789)
     if (!this.state.equipmentList.length) {
+      console.log(456)
       this.setState({
         actionEquipmentListIndex: 0,
         equipmentList: []
@@ -1628,6 +1632,7 @@ class App extends Component {
       return null
     }
     if (this.equipmentListTime) {
+      console.log(123)
       return null
     }
     let updateTime = this.state.equipmentList.length == 1 ? 60 : 30
@@ -1672,6 +1677,7 @@ class App extends Component {
   }
   //更新接口数据
   updateDate(type) {
+    console.log('00000')
     !type && this.getBaseInfo()
     !type && this.getDevice()
     this.map && this.initMap()
@@ -1783,7 +1789,10 @@ class App extends Component {
                     }
                 }
                 if (data.mapList) {
+                    console.log(1111)
+                    console.log(this.map)
                     !this.map && this.initEquipmentList();
+                    this.initMap()
                     //初始化24小时设置告警 环形图
                     // console.log("初始化24小时设置告警 环形图", this.state.equipmentList, this.state.actionEquipmentListIndex, this.state.equipmentList[this.state.actionEquipmentListIndex].alarmTimes)
                     this.state.equipmentList.length > 0 && this.state.equipmentList[this.state.actionEquipmentListIndex].alarmTimes > 0 &&
@@ -1827,7 +1836,6 @@ class App extends Component {
               endIndicators: data.oldInd ? data.oldInd : backData.newInd,
               endIndicators_null: data.oldInd
             },()=>{
-              console.log(this.state.endIndicators)
               // if(this.state.endIndicators[2].indicatorValue == '-'){
               //   this.state.endIndicators[2].indicatorValue = 0
               // }
@@ -2241,8 +2249,8 @@ class App extends Component {
                             )
                           }
                           <img className='taji' src={require("../../assets/images/taji.png")} alt=""/>
-                          <img className='line'  style={{height:parseInt(+item.height)*0.8+3>40?40:parseInt(+item.height)*0.8+3,left:parseInt(parseInt(-item.amplitude+106)*0.7)-9}} src={require("../../assets/images/line.png")} alt=""/>
-                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9>46?46:parseInt(+item.height)*0.8+9.5,left:parseInt(parseInt(-item.amplitude+100)*0.7)-7}} src={require("../../assets/images/thing.png")} alt=""/>
+                          <img className='line'  style={{height:parseInt(+item.height)*0.8+3>40?40:parseInt(+item.height)*0.8+3,left:parseInt(parseInt(-item.amplitude+106)*0.7)-9 >100?100:parseInt(parseInt(-item.amplitude+106)*0.7)-9}} src={require("../../assets/images/line.png")} alt=""/>
+                          <img className='thing' style={{top:parseInt(+item.height)*0.8+9>46?46:parseInt(+item.height)*0.8+9.5,left:parseInt(parseInt(-item.amplitude+100)*0.7)-7>98?98:parseInt(parseInt(-item.amplitude+100)*0.7)-7}} src={require("../../assets/images/thing.png")} alt=""/>
                           <div id="breathe-line-gif" style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <div className='breathe-line' style={{display: (this.state.actionEquipmentListIndex==index) ? "block" : "none"}}></div>
                           <p style={{color: (this.state.actionEquipmentListIndex==index) ? "white" : "#cccccc"}}>{item.deviceName}</p>
@@ -2301,6 +2309,7 @@ class App extends Component {
             </div>
             <div className="warn-24th-title">24 小时报警次数占比图</div>
             <div className="warn-24th-chart">
+              
               {this.state.equipmentList && this.state.equipmentList.length > 0 && this.state.equipmentList[this.state.actionEquipmentListIndex].alarmTimes > 0 ?
                 <div ref={this.proportionDom} id="proportion-24th" /> : "-"
               }

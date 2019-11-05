@@ -10,7 +10,7 @@ const instance = axios.create({
     "Content-Type": "application/x-www-form-urlencoded"
   },
   responseType: "json",
-  withCredentials: true,
+  // withCredentials: true,
   secure: true,
   transformRequest: [
     function(data) {
